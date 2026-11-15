@@ -141,7 +141,7 @@ def update_rollups(state: dict) -> None:
             leaf["status"] == "completed" for leaf in relevant
         ) else "active" if any(leaf["status"] in ("running", "completed") for leaf in relevant)
           else "pending")
-    state["root"]["status"] = ("completed" if all(
+    state["root"]["status"] = ("awaiting_final_verification" if all(
         x["status"] == "completed" for x in state["milestones"]
     ) else "active")
 
