@@ -1,0 +1,419 @@
+# SPDX-License-Identifier: Apache-2.0
+"""Real Hermes hierarchical planner -> executor -> verifier -> replanner.
+
+Only the explicit CLI command triggers paid OpenAI calls. Neither dry-run
+nor the offline integration tests use any API key.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import shutil
+import signal
+import subprocess
+import sys
+import time
+import uuid
+from datetime import datetime, timezone
+from pathlib import Path
+
+from hiergoal.core import (
+    GATES, GATE_DESCRIPTIONS, ROOT_GOAL, PlanError,
+    next_leaf, parse_object, replace_failed_leaf, update_rollups, validate_plan,
+)
+from scripts.stream_report import parse_events
+
+ROOT = Path(__file__).resolve().parents[1]
+FIXTURE = ROOT / "fixtures" / "ledger_release"
+EVALUATION = ROOT / "evaluation"
+STANDARD_INPUT_USD_MTOK = 0.10
+STANDARD_OUTPUT_USD_MTOK = 0.50
+
+
+class ExperimentStopped(RuntimeError):
+    """A bounded run stopped before a verified completion."""
+    def __init__(self, reason: str, uncertain: bool = True):
+        super().__init__(reason)
+        self.uncertain = uncertain
+
+
+def save_json(path: Path, value: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp = path.with_suffix(".tmp")
+    temp.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    temp.replace(path)
+
+
+def grade(workspace: Path, checks: list[str], seconds: int = 30) -> dict:
+    """Run owner-controlled acceptance methods from outside the agent workspace."""
+    if not checks or any(c not in GATES for c in checks):
+        raise ValueError("Unknown or empty deterministic gate")
+    names = ["test_release.IndependentAcceptance." + GATES[c] for c in checks]
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.pathsep.join([str(EVALUATION), str(workspace)])
+    args = [sys.executable, "-m", "unittest", "-v", *names]
+    try:
+        result = subprocess.run(
+            args, cwd=EVALUATION, env=env, timeout=seconds,
+            capture_output=True, text=True
+        )
+        output = result.stdout + "\n" + result.stderr
+        match = re.search(r"\bRan\s+(\d+)\s+tests?\s+in\b", output)
+        count = int(match.group(1)) if match else None
+        return {
+            "passed": result.returncode == 0 and count == len(checks),
+            "tests_run": count, "expected_tests": len(checks),
+            "exit_code": result.returncode, "output": output[-12000:],
+        }
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return {"passed": False, "tests_run": None, "expected_tests": len(checks),
+                "exit_code": None, "output": str(exc)}
+
+
+def visible_grade(workspace: Path) -> dict:
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.pathsep.join([str(workspace), env.get("PYTHONPATH", "")])
+    try:
+        proc = subprocess.run([sys.executable, "-m", "unittest", "discover",
+                               "-s", str(FIXTURE / "tests"), "-v"],
+                              cwd=EVALUATION, env=env, capture_output=True, text=True,
+                              timeout=30)
+        result = proc.stdout + "\n" + proc.stderr
+        match = re.search(r"\bRan\s+(\d+)\s+tests?\s+in\b", result)
+        count = int(match.group(1)) if match else None
+        return {"passed": proc.returncode == 0 and count == 3,
+                "tests_run": count, "exit_code": proc.returncode, "output": result[-12000:]}
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return {"passed": False, "tests_run": None, "exit_code": None, "output": str(exc)}
+
+
+def original_visible_tests_unchanged(workspace: Path) -> bool:
+    candidate = workspace / "tests" / "test_visible.py"
+    source = FIXTURE / "tests" / "test_visible.py"
+    return candidate.is_file() and candidate.read_bytes() == source.read_bytes()
+
+
+def build_plan_prompt() -> str:
+    gate_text = json.dumps(GATE_DESCRIPTIONS, indent=2, ensure_ascii=False)
+    return (
+        "ROLE=PLANNER\nYou are creating an executable goal hierarchy for Hermes Agent.\n"
+        "Do not use tools, edit files, or execute commands. Return a standalone JSON object only.\n"
+        "The user's long-term goal is IMMUTABLE:\n" + ROOT_GOAL + "\n\n"
+        "The owner supplies all independently verifiable acceptance gates below. "
+        "Do not invent checks or omit any. Assign EACH gate to exactly ONE short-term leaf.\n"
+        + gate_text + "\n"
+        "JSON schema: {\"milestones\":[{\"id\":\"M1\",\"title\":\"...\","
+        "\"subgoals\":[{\"id\":\"S1\",\"instruction\":\"...\","
+        "\"checks\":[\"invalid_rows\"],\"depends_on\":[]}]}]}\n"
+        "Create 2 to 4 mid-term milestones with unique M1..M4 IDs, and 3 to 8 "
+        "short-term executable leaves with unique S1..S8 IDs. Each leaf must have "
+        "a specific, self-contained coding instruction and dependency IDs. "
+        "A dependency must refer to another leaf; dependencies must be acyclic. "
+        "Do not include the root goal as an editable field. Return JSON, no markdown."
+    )
+
+
+def build_execute_prompt(state: dict, leaf: dict) -> str:
+    milestone = next(m["title"] for m in state["milestones"] if m["id"] == leaf["parent"])
+    checks = {c: GATE_DESCRIPTIONS[c] for c in leaf["checks"]}
+    return (
+        "ROLE=EXECUTE\nYou are the actual Hermes coding agent. Operate ONLY in "
+        "the current workspace. An independent Python controller executes this "
+        "leaf of an approved 3-level goal tree and will verify the result.\n"
+        "IMMUTABLE LONG-TERM GOAL:\n" + state["root"]["goal"] + "\n"
+        "MID-TERM MILESTONE: " + leaf["parent"] + " " + milestone + "\n"
+        "CURRENT SHORT-TERM GOAL: " + leaf["id"] + " " + leaf["instruction"] + "\n"
+        "DETERMINISTIC ACCEPTANCE CONTRACT: "
+        + json.dumps(checks, ensure_ascii=False) + "\n"
+        "DEPENDENCIES ALREADY COMPLETED: " + ", ".join(leaf["depends_on"]) + "\n"
+        "Read README.md and relevant code; make the smallest correct code change. "
+        "Do not modify or delete any tests, use the network, install packages, "
+        "read secrets, touch Git remotes or edit outside this working directory. "
+        "You can call terminal and file tools and run visible tests. "
+        "If visible tests fail due to OTHER pending goals, report that rather than "
+        "altering the immutable objective. Use native todo_list to record the "
+        "current leaf, with its mid-term milestone parent, and mark work complete "
+        "only after evidence. The controller, not your own assertion, decides "
+        "whether this leaf passes. Give a concise factual completion summary."
+    )
+
+
+def build_replan_prompt(state: dict, leaf: dict, grade_result: dict) -> str:
+    return (
+        "ROLE=REPLAN\nNo tools or code edits. A deterministic evaluator rejected "
+        "a short-term task. Revise ONLY that short-term instruction, without changing "
+        "the user-owned long-term objective, its parent, dependencies, or acceptance gates.\n"
+        "ROOT: " + state["root"]["goal"] + "\n"
+        "FAILED LEAF: " + json.dumps(
+            {k: leaf[k] for k in ("id", "parent", "instruction", "checks", "depends_on")},
+            ensure_ascii=False
+        ) + "\nEVALUATOR OUTPUT:\n" + grade_result["output"][-3500:] + "\n"
+        "Return a standalone JSON object with exactly these two nonempty strings: "
+        "{\"diagnosis\":\"specific failure cause\",\"revised_instruction\":\"specific "
+        "alternative implementation strategy\"}. Do not return code fences."
+    )
+
+
+class Controller:
+    def __init__(self, args: argparse.Namespace):
+        self.args = args
+        if args.resume:
+            self.directory = args.resume.resolve()
+            self.workspace = self.directory / "workspace"
+            if not self.workspace.is_dir() or not (self.directory / "state.json").is_file():
+                raise ExperimentStopped("Resume directory has no valid state", uncertain=False)
+            self.state = json.loads((self.directory / "state.json").read_text(encoding="utf-8"))
+            if self.state["root"]["goal"] != ROOT_GOAL:
+                raise ExperimentStopped("Immutable goal does not match current protocol", uncertain=False)
+            # A previous CLI may still be alive; the operator must verify it is stopped.
+            for leaf in self.state["leaves"].values():
+                if leaf["status"] == "running":
+                    leaf["status"] = "pending"
+            self.records = json.loads((self.directory / "records.json").read_text(encoding="utf-8"))
+        else:
+            run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6]
+            self.directory = (args.output / ("hiergoal-" + run_id)).resolve()
+            self.directory.mkdir(parents=True, exist_ok=False)
+            self.workspace = self.directory / "workspace"
+            shutil.copytree(FIXTURE, self.workspace)
+            self.state = None
+            self.records = {"experiment": "hermes-hiergoal-v1", "model": "gpt-6-luna",
+                            "mode": "controlled-hierarchical-single-case", "calls": [],
+                            "estimated_visible_usd": 0.0, "timed_out": False,
+                            "outcome": "NOT_RUN", "halt_reason": None}
+            pre = grade(self.workspace, list(GATES))
+            save_json(self.directory / "initial_grading.json", pre)
+            if pre["passed"] or pre["tests_run"] != len(GATES):
+                raise ExperimentStopped("Initial fixture not reliably broken or grader failed", uncertain=False)
+        self._save()
+
+    def _save(self) -> None:
+        if self.state is not None:
+            save_json(self.directory / "state.json", self.state)
+        save_json(self.directory / "records.json", self.records)
+
+    def _record_gate(self, name: str, checks: list[str]) -> dict:
+        outcome = grade(self.workspace, checks)
+        save_json(self.directory / ("gate-" + name + ".json"), outcome)
+        return outcome
+
+    def _call_hermes(self, role: str, prompt: str, toolsets: str) -> dict:
+        if len(self.records["calls"]) >= self.args.max_calls:
+            raise ExperimentStopped("max-calls guard reached; no further requests")
+        if self.records["estimated_visible_usd"] >= self.args.pilot_budget_usd:
+            raise ExperimentStopped("estimated pilot budget reached; no further requests")
+        index = len(self.records["calls"]) + 1
+        tag = "%02d-%s" % (index, role)
+        prompt_path = self.directory / (tag + ".prompt.txt")
+        stdout_path = self.directory / (tag + ".stream.jsonl")
+        stderr_path = self.directory / (tag + ".stderr.txt")
+        prompt_path.write_text(prompt, encoding="utf-8")
+        command = [
+            self.args.hermes, "chat", "--provider", "openai-api",
+            "--model", "gpt-6-luna", "--reasoning", self.args.reasoning,
+            "--toolsets", toolsets, "--ignore-user-config", "--ignore-rules",
+            "--in", str(self.workspace), "--format", "stream-json",
+            "--max-turns", str(self.args.max_turns), "--source", "hiergoal-lab",
+            "--query-file", str(prompt_path), "--oneshot"
+        ]
+        save_json(self.directory / (tag + ".invocation.json"), {"argv": command})
+        elapsed = time.monotonic()
+        timed_out = False
+        with stdout_path.open("w", encoding="utf-8") as out, stderr_path.open("w", encoding="utf-8") as err:
+            proc = subprocess.Popen(command, cwd=self.workspace, stdout=out, stderr=err)
+            try:
+                proc.wait(timeout=self.args.timeout_seconds)
+            except subprocess.TimeoutExpired:
+                timed_out = True
+                try:
+                    proc.send_signal(signal.SIGTERM)
+                    proc.wait(timeout=8)
+                except (subprocess.TimeoutExpired, OSError):
+                    proc.kill()
+                    proc.wait()
+        duration = time.monotonic() - elapsed
+        trace = parse_events(stdout_path)
+        result_text = None
+        for line in stdout_path.read_text(encoding="utf-8").splitlines():
+            try:
+                message = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(message, dict) and message.get("type") == "result":
+                result_text = message.get("text")
+        inbound = trace["tokens_input"]
+        outbound = trace["tokens_output"]
+        usage_complete = (isinstance(inbound, int) and isinstance(outbound, int)
+                          and inbound >= 0 and outbound >= 0)
+        charge = round((inbound * STANDARD_INPUT_USD_MTOK +
+                        outbound * STANDARD_OUTPUT_USD_MTOK) / 1000000, 8) if usage_complete else None
+        entry = {"index": index, "role": role, "exit_code": proc.returncode,
+                 "hermes_exit_code": trace["hermes_exit_code"],
+                 "terminal_result_seen": trace["terminal_result_seen"],
+                 "elapsed_seconds": round(duration, 3), "timed_out": timed_out,
+                 "tokens_input": inbound, "tokens_output": outbound,
+                 "estimated_visible_usd": charge, "tool_calls": trace["tool_calls"],
+                 "nested_todo_observed": trace["verified_nested_todo_result_observed"],
+                 "session_id": trace["session_id"], "invalid_json_lines": trace["invalid_json_lines"]}
+        self.records["calls"].append(entry)
+        if charge is not None:
+            self.records["estimated_visible_usd"] = round(
+                self.records["estimated_visible_usd"] + charge, 8)
+        if timed_out:
+            self.records["timed_out"] = True
+        self._save()
+        if timed_out or not trace["terminal_result_seen"] or trace["invalid_json_lines"]:
+            raise ExperimentStopped("Hermes timed out or returned an incomplete stream: " + tag)
+        if proc.returncode != 0 or trace["hermes_exit_code"] != 0:
+            raise ExperimentStopped("Hermes failed at " + tag + "; inspect stderr/stream", uncertain=False)
+        if not usage_complete:
+            raise ExperimentStopped("Token usage missing; stop for budget safety")
+        if not isinstance(result_text, str) or not result_text.strip():
+            raise ExperimentStopped("Hermes provided no final response: " + tag)
+        return {"text": result_text, "call": entry}
+
+    def plan(self) -> None:
+        payload = self._call_hermes("plan", build_plan_prompt(), "todo")
+        try:
+            self.state = validate_plan(parse_object(payload["text"]))
+        except PlanError as exc:
+            raise ExperimentStopped("Invalid model plan: " + str(exc), uncertain=False) from exc
+        self.state["root"]["status"] = "active"
+        self._save()
+
+    def execute(self) -> None:
+        if self.state is None:
+            self.plan()
+        while True:
+            leaf = next_leaf(self.state)
+            if leaf is None:
+                if all(x["status"] == "completed" for x in self.state["leaves"].values()
+                       if x["status"] != "superseded"):
+                    break
+                raise ExperimentStopped("No executable leaf: goal tree is blocked", uncertain=False)
+            before = self._record_gate(leaf["id"] + "-before", leaf["checks"])
+            if before["passed"]:
+                leaf["status"] = "completed"
+                leaf["history"].append({"action": "preverified", "gate_pass": True})
+                update_rollups(self.state)
+                self._save()
+                continue
+            leaf["attempts"] += 1
+            leaf["status"] = "running"
+            self._save()
+            self._call_hermes("execute-" + leaf["id"],
+                              build_execute_prompt(self.state, leaf), "file,terminal,todo")
+            after = self._record_gate(leaf["id"] + "-after", leaf["checks"])
+            leaf["history"].append({"action": "executed", "gate_pass": after["passed"],
+                                    "attempt": leaf["attempts"]})
+            if after["passed"]:
+                leaf["status"] = "completed"
+                update_rollups(self.state)
+                self._save()
+                continue
+            leaf["status"] = "failed"
+            self._save()
+            if leaf["revision"] >= 1 or self.state["replans"] >= self.args.max_replans:
+                raise ExperimentStopped("Gate failed after bounded replanning: " + leaf["id"],
+                                        uncertain=False)
+            message = self._call_hermes("replan-" + leaf["id"],
+                                        build_replan_prompt(self.state, leaf, after), "todo")
+            try:
+                revised = parse_object(message["text"])
+                diagnosis = revised["diagnosis"]
+                instruction = revised["revised_instruction"]
+                if instruction.strip() == leaf["instruction"].strip():
+                    raise PlanError("Replanning instruction is unchanged")
+                replace_failed_leaf(self.state, leaf["id"], instruction, diagnosis)
+            except (KeyError, AttributeError, PlanError) as exc:
+                raise ExperimentStopped("Invalid replan: " + str(exc), uncertain=False) from exc
+            self._save()
+
+    def finish(self) -> dict:
+        full = self._record_gate("final-independent", list(GATES))
+        visible = visible_grade(self.workspace)
+        save_json(self.directory / "final-visible.json", visible)
+        unchanged = original_visible_tests_unchanged(self.workspace)
+        self.records["final_independent"] = {"passed": full["passed"], "tests_run": full["tests_run"]}
+        self.records["final_visible"] = {"passed": visible["passed"], "tests_run": visible["tests_run"]}
+        self.records["original_visible_tests_unchanged"] = unchanged
+        accepted = full["passed"] and visible["passed"] and unchanged
+        self.records["outcome"] = "PASS" if accepted else "FAIL"
+        self.state["root"]["status"] = "completed" if accepted else "blocked"
+        self._save()
+        return self.records
+
+    def abort(self, error: ExperimentStopped) -> None:
+        self.records["outcome"] = "UNCERTAIN" if error.uncertain else "FAIL"
+        self.records["halt_reason"] = str(error)
+        if self.state:
+            self.state["root"]["status"] = "blocked"
+        self._save()
+
+
+def run(args: argparse.Namespace) -> int:
+    if args.dry_run:
+        initial = grade(FIXTURE, list(GATES))
+        if initial["passed"] or initial["tests_run"] != len(GATES):
+            print("ERROR: source fixture is not a valid failing test case", file=sys.stderr)
+            return 2
+        print("DRY RUN PASS: source fixture fails the independent tests.")
+        print("Configured Hermes command: hermes chat --provider openai-api "
+              "--model gpt-6-luna --format stream-json --query-file PATH --oneshot")
+        print("No Hermes / OpenAI calls made.")
+        return 0
+    if not args.ack_unsandboxed:
+        print("Refusing real run without --ack-unsandboxed. Hermes terminal tools "
+              "can access local files outside workspace; use a disposable OS environment.",
+              file=sys.stderr)
+        return 2
+    if not shutil.which(args.hermes):
+        print("Hermes CLI not found; install and configure it before the real run.",
+              file=sys.stderr)
+        return 2
+    controller = None
+    try:
+        controller = Controller(args)
+        controller.execute()
+        result = controller.finish()
+    except ExperimentStopped as exc:
+        if controller is not None:
+            controller.abort(exc)
+            result = controller.records
+        else:
+            print("Setup failed:", exc, file=sys.stderr)
+            return 2
+    print(json.dumps({"directory": str(controller.directory),
+                      "outcome": result["outcome"],
+                      "calls": len(result["calls"]),
+                      "replans": controller.state["replans"] if controller.state else None,
+                      "estimated_visible_usd": result["estimated_visible_usd"],
+                      "halt_reason": result["halt_reason"]}, ensure_ascii=False, indent=2))
+    return 0 if result["outcome"] == "PASS" else 1
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Hierarchical real Hermes experiment")
+    parser.add_argument("--hermes", default="hermes", help="Hermes binary path")
+    parser.add_argument("--reasoning", default="low", choices=["none", "low", "medium", "high"])
+    parser.add_argument("--max-calls", type=int, default=12)
+    parser.add_argument("--max-turns", type=int, default=18)
+    parser.add_argument("--max-replans", type=int, default=2)
+    parser.add_argument("--pilot-budget-usd", type=float, default=3.0)
+    parser.add_argument("--timeout-seconds", type=int, default=600)
+    parser.add_argument("--output", type=Path, default=ROOT / "runs")
+    parser.add_argument("--resume", type=Path)
+    parser.add_argument("--ack-unsandboxed", action="store_true",
+                        help="Acknowledge terminal/file tools are not OS-sandboxed")
+    parser.add_argument("--dry-run", action="store_true")
+    args = parser.parse_args()
+    if (args.max_calls < 1 or args.max_turns < 1 or args.max_replans < 0
+            or args.pilot_budget_usd <= 0 or args.timeout_seconds < 15):
+        parser.error("Invalid bounds")
+    sys.exit(run(args))
+
+
+if __name__ == "__main__":
+    main()
