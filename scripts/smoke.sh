@@ -5,11 +5,11 @@ cd "$(dirname "$0")/.."
 PY=python3
 command -v "$PY" >/dev/null || PY=python
 "$PY" -m unittest discover -s tests -v
-"$PY" scripts/run_hermes.py --dry-run
+"$PY" -m hiergoal.controller --dry-run
 echo
 if command -v hermes >/dev/null; then
-  echo "Hermes CLI found. Run 'hermes doctor' to check your local installation."
+  echo "Hermes CLI found. Check: hermes doctor"
 else
-  echo "Hermes not yet installed. See the official installation guide in README.md."
+  echo "Hermes CLI not installed. Follow official Hermes installation guide."
 fi
-echo "Offline smoke checks complete. No model API call made."
+echo "Offline smoke checks complete. No model API calls."
