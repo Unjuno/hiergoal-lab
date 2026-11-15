@@ -10,6 +10,7 @@ import difflib
 import json
 import os
 import platform
+import re
 import shutil
 import signal
 import subprocess
@@ -44,17 +45,21 @@ A separate independent evaluator exists, but you cannot claim to pass it.
 """
 
 
-def check_tests(workspace: Path, directory: Path, seconds: int = 30) -> dict:
+def check_tests(workspace: Path, directory: Path, seconds: int = 30, minimum_tests: int = 1) -> dict:
     env = os.environ.copy()
     env["PYTHONPATH"] = str(workspace) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
     command = [sys.executable, "-m", "unittest", "discover", "-s", str(directory), "-p", "test*.py", "-v"]
     try:
         result = subprocess.run(command, cwd=workspace, env=env,
                                 text=True, capture_output=True, timeout=seconds)
-        return {"ok": result.returncode == 0, "returncode": result.returncode,
-                "log": (result.stdout + "\n" + result.stderr)[-20000:]}
+        log = result.stdout + "\n" + result.stderr
+        match = re.search(r"\bRan\s+(\d+)\s+tests?\s+in\b", log)
+        tests_run = int(match.group(1)) if match else None
+        return {"ok": result.returncode == 0 and tests_run is not None and tests_run >= minimum_tests,
+                "returncode": result.returncode, "tests_run": tests_run,
+                "minimum_tests": minimum_tests, "log": log[-20000:]}
     except (subprocess.TimeoutExpired, OSError) as error:
-        return {"ok": False, "returncode": None, "log": str(error)}
+        return {"ok": False, "returncode": None, "tests_run": None, "minimum_tests": minimum_tests, "log": str(error)}
 
 
 def diff_workspace(before: Path, after: Path) -> str:
@@ -83,8 +88,10 @@ def run(args: argparse.Namespace) -> Path:
     shutil.copytree(FIXTURE, workspace)
     prompt_file = directory / "query.txt"
     prompt_file.write_text(PROMPT, encoding="utf-8")
-    pre = check_tests(workspace, workspace / "tests")
+    pre = check_tests(workspace, FIXTURE / "tests", minimum_tests=3)
     (directory / "pretest.log").write_text(pre["log"], encoding="utf-8")
+    if pre["tests_run"] is None or pre["tests_run"] < 3:
+        raise RuntimeError("Pretest discovery failed: the immutable visible tests were not executed.")
     if pre["ok"]:
         raise RuntimeError("Fixture already passes visible tests: no repair task to benchmark.")
 
@@ -123,8 +130,14 @@ def run(args: argparse.Namespace) -> Path:
                 proc.wait()
     seconds = round(time.monotonic() - start, 3)
 
-    visible = check_tests(workspace, workspace / "tests")
-    independent = check_tests(workspace, EVALUATOR)
+    # Grade against original tests outside the editable workspace, not agent-edited copies.
+    visible = check_tests(workspace, FIXTURE / "tests", minimum_tests=3)
+    independent = check_tests(workspace, EVALUATOR, minimum_tests=6)
+    original_tests_unchanged = (
+        (workspace / "tests" / "test_visible.py").is_file()
+        and (workspace / "tests" / "test_visible.py").read_bytes()
+        == (FIXTURE / "tests" / "test_visible.py").read_bytes()
+    )
     (directory / "visible_tests.log").write_text(visible["log"], encoding="utf-8")
     (directory / "independent_tests.log").write_text(independent["log"], encoding="utf-8")
     (directory / "changes.diff").write_text(diff_workspace(FIXTURE, workspace), encoding="utf-8")
@@ -139,7 +152,7 @@ def run(args: argparse.Namespace) -> Path:
     if timed_out or not trace["terminal_result_seen"] or trace["invalid_json_lines"]:
         verdict = "UNCERTAIN"
     elif (proc.returncode == 0 and trace["hermes_exit_code"] == 0
-          and visible["ok"] and independent["ok"]):
+          and visible["ok"] and independent["ok"] and original_tests_unchanged):
         verdict = "PASS"
     else:
         verdict = "FAIL"
@@ -150,6 +163,8 @@ def run(args: argparse.Namespace) -> Path:
         "reasoning": args.reasoning, "task": "ledger-release",
         "verdict": verdict, "pretest_pass": pre["ok"],
         "visible_tests_pass": visible["ok"], "independent_tests_pass": independent["ok"],
+        "visible_tests_run": visible["tests_run"], "independent_tests_run": independent["tests_run"],
+        "original_visible_tests_unchanged": original_tests_unchanged,
         "plan_file_present": plan.exists(), "three_horizons_detected": has_horizons,
         "process_exit_code": proc.returncode, "timed_out": timed_out,
         "elapsed_seconds": seconds, "host_os": platform.platform(),
