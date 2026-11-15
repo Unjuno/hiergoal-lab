@@ -33,6 +33,13 @@ Create RESEARCH_PLAN.md BEFORE changing code. It must show three linked horizons
 LONG-TERM goal, MID-TERM milestones, SHORT-TERM executable subgoals. Each short-term
 goal needs a checkable acceptance criterion and parent milestone.
 
+Use Hermes' built-in todo_list tool to register an actual nested task tree,
+not just prose: one LONG-TERM parent item, MID-TERM children, and SHORT-TERM
+grandchildren with stable id/parent references. Set statuses honestly. After
+each tested step, update todo_list (prefer merge=True). If a leaf fails,
+mark it cancelled and register a revised leaf with the same parent. Keep only
+one item in_progress. RESEARCH_PLAN.md is the durable human-readable record.
+
 Execute the planned steps with the tools available to you, recording actual
 command/test evidence in RESEARCH_PLAN.md. When an attempt fails or new evidence
 invalidates a plan, revise the smallest affected subgoal and record the reason.
