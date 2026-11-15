@@ -1,95 +1,108 @@
-# HierGoal Lab — Real Hermes Agent Research
+# HierGoal Lab — Hermes Agent Hierarchical Goal Experiment
 
-An Apache-2.0 research harness for observing a **real Hermes Agent** repairing a Python package while explicitly planning long-, mid-, and short-term subgoals.
+[![Offline CI](https://github.com/Unjuno/hiergoal-lab/actions/workflows/offline.yml/badge.svg)](https://github.com/Unjuno/hiergoal-lab/actions/workflows/offline.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-**Status: offline harness and CI tested; actual local Hermes/OpenAI integration has NOT been tested and no paid benchmark has been run.**
+A self-contained experimental controller that runs a **real Hermes Agent** through a three-level goal hierarchy: user-owned long-term goal → model-proposed mid-term milestones → model-proposed short-term executable tasks.
 
-**Important limitation:** This repository does **not** implement a new hierarchical goal controller or automatic replanning algorithm. It instructs the *existing* Hermes Agent to create a three-horizon plan, register native nested `todo_list` items (with parent IDs), execute a real coding task, and revise the plan when necessary. The harness observes these actions and independently tests the final code. Observed nested todo tool results demonstrate goal-tree creation, **not** that the hierarchy causally controlled subsequent actions.
+The controller (Python standard library only) validates the plan, schedules leaves by dependency, invokes Hermes for each leaf, uses an **independent deterministic evaluator** for acceptance, and requests **bounded local replanning** when a leaf fails. This is an actual external execution controller, not just a prompt asking the agent to plan.
 
-**Scope:** one observational case study; **no baseline/comparison condition**, no performance improvement claim, and no reproduction of H-JEPA's neural architecture.
+**State:** offline tests and fake-Hermes end-to-end integration pass in GitHub Actions. Real Hermes + an OpenAI API key are required for a paid experiment on your machine; **no real paid experiment has been executed here**.
 
-## Quick start (macOS / Linux / WSL2)
+**Study type:** one observational case; no comparison group, no statistical performance claim, and no direct implementation of H-JEPA.
 
-Requires Git, Python 3.11+ for the harness, and Hermes Agent installed separately.
+## First experiment: local execution
+
+Requirements: macOS/Linux/WSL2, Git, Python 3.11+, a separately installed Hermes Agent CLI, and OpenAI API credentials supported by Hermes.
+
+1. Clone and run the **zero-cost checks**:
 
 ~~~bash
 git clone https://github.com/Unjuno/hiergoal-lab.git
 cd hiergoal-lab
-
-# First verify code without spending any API credit
 python3 -m unittest discover -s tests -v
-python3 scripts/run_hermes.py --dry-run
+python3 -m hiergoal.controller --dry-run
+~~~
 
-# After installing/configuring Hermes and the OpenAI API key:
+2. Install Hermes if needed, following the [official installation guide](https://hermes-agent.nousresearch.com/docs/getting-started/installation). If installed, configure the direct **OpenAI API** provider and your existing key:
+
+~~~bash
 hermes doctor
-python3 scripts/run_hermes.py --model gpt-6-luna --reasoning low --max-turns 20
-~~~
-
-If Hermes is not installed, follow the [official installation instructions](https://hermes-agent.nousresearch.com/docs/getting-started/installation). On macOS / Linux / WSL2 the official CLI installer command is:
-
-~~~bash
-curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
-~~~
-
-Examine third-party install scripts before executing them; do not run the installer as root unnecessarily. Once installed, use the **interactive** command below to configure the direct OpenAI API provider and existing API key:
-
-~~~bash
 hermes model
 ~~~
 
-Select **OpenAI API (direct)**, not ChatGPT subscription/Codex OAuth or OpenRouter. The experiment explicitly passes the provider "openai-api" and model "gpt-6-luna"; if your account cannot access that model, the run should fail and its diagnostics will be recorded. The official [OpenAI model catalog](https://developers.openai.com/api/docs/models/gpt-6-luna) lists the model.
+Select OpenAI API (direct), not ChatGPT subscription / Codex OAuth / OpenRouter. The controller pins provider = openai-api, model = gpt-6-luna, reasoning = low by default, and uses the officially documented one-shot structured CLI protocol. Hermes reads credentials using its normal local credential configuration. Do not put the key in this repository or a GitHub issue.
 
-**Never paste your key into a GitHub file, issue, run log, or chat.** If already configured under Hermes, you do not need to configure it again. The runner uses the normal Hermes credential resolution.
+3. **Run in a disposable VM/container or a low-privilege local account.** Hermes terminal/file tools have host-level capabilities; a copied workspace is NOT an OS security sandbox. Inspect the prompt/CLI before using real credentials. When ready, explicitly acknowledge the limitation:
 
-## Experiment
-
-One test fixture is copied to a fresh directory. Hermes must create a three-horizon RESEARCH_PLAN.md, edit real Python files, run visible tests, and revise affected subgoals when needed. A separate deterministic grader is executed after Hermes returns.
-
-The harness invokes Hermes with:
-
-- provider: openai-api
-- model: gpt-6-luna (override possible)
-- reasoning: low (override possible)
-- toolsets: file,terminal,todo only
-- ignore-user-config and ignore-rules to reduce unrelated interference
-- query-file and stream-json for an auditable invocation
-- max-turns: 20, timeout: 900 seconds
-
-These settings do **not** guarantee cost or host-security isolation. The agent is given local shell/file tools. Run in a disposable VM/container or low-privilege account with no sensitive files, repositories, production credentials, or writable important mounts. A copied working directory is not a security sandbox. Killing the CLI may not stop an already-running gateway turn; check the Hermes session afterward.
-
-**Outputs are kept locally and gitignored**:
-
-~~~text
-runs/ledger-release-<UTC>-<id>/
-  workspace/               actual changed project + RESEARCH_PLAN.md
-  query.txt                exact submitted prompt
-  invocation.json          exact CLI arguments (no API key)
-  hermes.stream.jsonl      raw stream events
-  hermes.stderr.log        diagnostics
-  pretest.log              verification that fixture was initially broken
-  visible_tests.log        final public tests
-  independent_tests.log    final outside-workspace grader
-  changes.diff             source code diff
-  summary.json             completion verdict + measured counts
+~~~bash
+python3 -m hiergoal.controller \
+  --ack-unsandboxed \
+  --reasoning low \
+  --max-calls 12 \
+  --max-replans 2 \
+  --pilot-budget-usd 3
 ~~~
 
-The result has a **PASS / FAIL / UNCERTAIN** status for **task completion**. Successful CLI exit alone does not count as software-task completion. Grading runs **immutable visible tests and separate independent tests**, checks the number of tests executed, and refuses a PASS if the agent changed the visible test file.
+This is the first **paid** Hermes/Luna experiment. Start with one run and review outputs before increasing scope. The $3 pilot guard is based on recorded visible tokens and nominal price; **it is not a hard billing cap**. It cannot prevent one request from exceeding the amount or fully account for auxiliary model calls. Monitor actual API project spending in the [OpenAI Platform](https://platform.openai.com/usage).
 
-The stream report also records `native_todo_list_calls` and `verified_nested_todo_result_observed`: the latter is set only when a readable, non-error Hermes todo tool result contains a valid parent-child link. This does **not** establish that hierarchical planning caused the task's success or that a replanning event occurred. The human-readable plan is a secondary artifact; inspect the event trace and actual tool calls manually before publishing a claim.
+On success the controller exits 0. Other outcomes exit nonzero and are reported as FAIL or UNCERTAIN. No fabricated benchmark results are included.
 
-### API expenses
+## What it actually controls
 
-The OpenAI catalog currently lists standard short-context GPT-6 Luna at **$0.10 per million input tokens**, **$0.50 per million output tokens**. Costs depend on caching, context length, service tier, auxiliary calls and other usage. The summary's USD estimate uses only the visible Hermes result token counts; it is **not** a billing receipt or a hard budget cap. Manage project spend in the OpenAI Platform console. Do a single task first; do not run batches automatically.
+- **Root / long term:** exact fixed owner objective, not writable by model-generated plan.
+- **Mid term:** 2–4 model-generated milestones.
+- **Short term:** 3–8 model-generated coding leaves with owner-defined acceptance gates, explicit parent IDs and dependency IDs.
+- **Plan validation:** exhaustive gate coverage, unique IDs, nonempty instructions, no missing dependencies/cycles.
+- **Execution:** only dependency-ready leaves run; already-passing gates may be marked preverified without another model call.
+- **Verification:** independently maintained Python unit tests, executed from outside the writable workspace. Agent claims cannot determine success; final integration and visible tests run separately.
+- **Adaptive replanning:** when a leaf fails verification, call Hermes for a diagnosis and an alternative leaf instruction, supersede the failed leaf, rewire dependents, and retry. Root goal and gate IDs are unchanged. Replan attempts and API calls are bounded.
+- **Traceability:** saved plan, per-call prompt and argv, raw stream-json/stderr, independent gate outputs, task statuses, token-count-based expense estimates.
 
-Official pricing: https://developers.openai.com/api/docs/models/gpt-6-luna
+This does NOT rewrite Hermes internals or replace its native /goal subsystem. It is an **external, task-specific orchestrator** exercising a real Hermes instance. One trace does not prove hierarchical planning improves success rates, nor that an internal Hermes todo tree was causally responsible.
 
-## Reproducibility and citations
+## Outputs and reproducibility
 
-- Detailed protocol (Japanese): [docs/protocol_ja.md](docs/protocol_ja.md)
-- Original Hermes feature proposal: https://github.com/NousResearch/hermes-agent/issues/156054
-- Research motivation: Zhang et al., H-JEPA: End-to-End Learning of Hierarchical World Models for Visual Planning, https://arxiv.org/abs/2610.06805
-- Hermes CLI stream-json reference: https://hermes-agent.nousresearch.com/docs/reference/cli-commands
+All local output is excluded from Git by .gitignore. Each run creates a distinct folder:
 
-This repository is independently authored and licensed Apache-2.0; Hermes Agent is a separately licensed upstream dependency, and neither Nous Research nor OpenAI endorses these results. No claimed causal improvement is warranted by one observed run.
+~~~text
+runs/hiergoal-<UTC>-<id>/
+  workspace/                 copy of the coding task after agent edits
+  state.json                 actual goal hierarchy, status, supersessions
+  records.json               per-call usage, estimate and overall verdict
+  initial_grading.json       fixed starting state
+  01-plan.prompt.txt         exact planner instruction
+  01-plan.stream.jsonl       actual Hermes output and tool events
+  01-plan.stderr.txt         diagnostics
+  ...-execute-S*.stream.jsonl / ...-replan-S*.stream.jsonl
+  gate-*.json                immutable gate results
+  final-visible.json         external visible-test check
+~~~
 
-**Do not publish raw traces without inspecting/redacting them**: tool output can contain data from your local system. After the first real experiment, review summary.json and changes.diff, then publish sanitized results and link them to the upstream Issue.
+The evaluator in evaluation/test_release.py is **not copied into the task workspace**, although it is part of this public repository. The harness is not a malicious-agent security boundary: never execute it against sensitive host data.
+
+To resume an interrupted run, first confirm no earlier Hermes gateway task is still working and then run:
+
+~~~bash
+python3 -m hiergoal.controller --resume runs/hiergoal-<id> --ack-unsandboxed
+~~~
+
+Running the same experiment on different Hermes versions or workstations can change results; record the Hermes version, Python version, OS, model route, reasoning level, and time when publishing.
+
+## Safety and pricing
+
+- The only approved model route for this controller is gpt-6-luna via the direct OpenAI API.
+- Default maximum: 12 Hermes invocations, 18 tool iterations per invocation, 2 replans, 600 seconds per invocation. These are bounded local execution controls, not guaranteed API billing limits or a secure container.
+- USD estimates use the standard short-context Luna rates of $0.10 input and $0.50 output per 1M tokens and may differ from actual billing due to caching, context-length tiers, service tiers and additional API calls.
+- The controller stops additional invocations if estimated visible spend exceeds its local pilot guard or token telemetry is absent. API metering can still lag behind real billing.
+- Inspect and redact traces before publishing. Raw logs may include local system information.
+
+## References
+
+- [Research protocol in Japanese](docs/protocol_ja.md)
+- [Original Hermes feature proposal #156054](https://github.com/NousResearch/hermes-agent/issues/156054)
+- [H-JEPA: End-to-End Learning of Hierarchical World Models for Visual Planning (2026)](https://arxiv.org/abs/2610.06805) — architectural research motivation, not direct evidence about LLM agents
+- [Hermes Agent official CLI reference](https://hermes-agent.nousresearch.com/docs/reference/cli-commands)
+- [GPT-6 Luna model specification and pricing](https://developers.openai.com/api/docs/models/gpt-6-luna)
+
+Independent research project licensed under Apache-2.0. Hermes Agent remains an upstream dependency with its own license. Neither Nous Research nor OpenAI endorses the experiment.
