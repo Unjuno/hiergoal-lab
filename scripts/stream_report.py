@@ -10,6 +10,10 @@ def parse_events(path: Path) -> dict:
     init = final = None
     calls = []
     failures = 0
+    todo_calls = 0
+    nested_todo_writes_requested = 0
+    nested_todo_result_observed = False
+    todo_results_readable = 0
     for line in path.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
@@ -28,8 +32,35 @@ def parse_events(path: Path) -> dict:
         elif kind == "tool_use":
             calls.append({"name": event.get("name", "unknown"),
                           "timestamp": event.get("timestamp")})
+            if event.get("name") == "todo_list":
+                todo_calls += 1
+                payload = event.get("input")
+                if isinstance(payload, str):
+                    try:
+                        payload = json.loads(payload)
+                    except json.JSONDecodeError:
+                        payload = None
+                if isinstance(payload, dict) and isinstance(payload.get("todos"), list):
+                    if any(isinstance(t, dict) and bool(t.get("parent"))
+                           for t in payload["todos"]):
+                        nested_todo_writes_requested += 1
         elif kind == "tool_result":
             failures += bool(event.get("is_error", False))
+            if event.get("name") == "todo_list" and not event.get("is_error", False):
+                payload = event.get("output")
+                if isinstance(payload, str):
+                    try:
+                        payload = json.loads(payload)
+                    except json.JSONDecodeError:
+                        payload = None
+                if isinstance(payload, dict) and isinstance(payload.get("todos"), list):
+                    todo_results_readable += 1
+                    items = [x for x in payload["todos"] if isinstance(x, dict)]
+                    ids = {str(x.get("id")) for x in items}
+                    nested_todo_result_observed |= any(
+                        bool(x.get("parent")) and str(x["parent"]) in ids
+                        for x in items
+                    )
         elif kind == "result":
             final = event
     tokens = (final or {}).get("tokens") or {}
@@ -44,6 +75,10 @@ def parse_events(path: Path) -> dict:
         "tool_calls": len(calls),
         "tool_timeline": calls,
         "tool_failures": failures,
+        "native_todo_list_calls": todo_calls,
+        "nested_todo_writes_requested": nested_todo_writes_requested,
+        "readable_todo_tool_results": todo_results_readable,
+        "verified_nested_todo_result_observed": nested_todo_result_observed,
         "tokens_input": tokens.get("input"),
         "tokens_output": tokens.get("output"),
         "tokens_total": tokens.get("total"),
