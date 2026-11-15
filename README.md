@@ -2,7 +2,9 @@
 
 An Apache-2.0 research harness for observing a **real Hermes Agent** repairing a Python package while explicitly planning long-, mid-, and short-term subgoals.
 
-**Status: scaffold ready for local execution; no paid model benchmark has been run or published.**
+**Status: offline harness and CI tested; actual local Hermes/OpenAI integration has NOT been tested and no paid benchmark has been run.**
+
+**Important limitation:** This repository does **not** implement a new hierarchical goal controller or automatic replanning algorithm. It instructs the *existing* Hermes Agent to create a three-horizon plan, register native nested `todo_list` items (with parent IDs), execute a real coding task, and revise the plan when necessary. The harness observes these actions and independently tests the final code. Observed nested todo tool results demonstrate goal-tree creation, **not** that the hierarchy causally controlled subsequent actions.
 
 **Scope:** one observational case study; **no baseline/comparison condition**, no performance improvement claim, and no reproduction of H-JEPA's neural architecture.
 
@@ -71,7 +73,9 @@ runs/ledger-release-<UTC>-<id>/
   summary.json             completion verdict + measured counts
 ~~~
 
-The result has a **PASS / FAIL / UNCERTAIN** status. Successful CLI exit alone does not count as software-task completion. Planning is scored separately: existence of three labels in a file is **not** evidence that Hermes actually obeyed the plan. Inspect the trace and the artifact manually.
+The result has a **PASS / FAIL / UNCERTAIN** status for **task completion**. Successful CLI exit alone does not count as software-task completion. Grading runs **immutable visible tests and separate independent tests**, checks the number of tests executed, and refuses a PASS if the agent changed the visible test file.
+
+The stream report also records `native_todo_list_calls` and `verified_nested_todo_result_observed`: the latter is set only when a readable, non-error Hermes todo tool result contains a valid parent-child link. This does **not** establish that hierarchical planning caused the task's success or that a replanning event occurred. The human-readable plan is a secondary artifact; inspect the event trace and actual tool calls manually before publishing a claim.
 
 ### API expenses
 
