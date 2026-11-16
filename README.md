@@ -139,3 +139,13 @@ python3 -m hiergoal.controller --resume runs/hiergoal-<your-run-id> \
 ## 8. Experiment provenance
 
 Each new run records an immutable `protocol_id` computed from SHA-256 digests of the controller, planner validator, logging parser, acceptance tests, task fixture and free-model setup script, plus the local Git commit, Python version, OS and architecture. Resumption refuses a changed protocol to prevent results from mixing different evaluator/code revisions; create a new run after updating the repository. The public report includes a limited provenance subset and does not publish local paths or raw environment variables.
+
+## 9. Read-only local preflight (no inference)
+
+After setting up the `hiergoal-free` profile, check the local Hermes and OpenCode CLI binaries and config before running the task:
+
+~~~bash
+python3 -m hiergoal.preflight --check-catalog --output runs/preflight.json
+~~~
+
+This checks the installed CLI versions and the selected model's current OpenCode catalog listing. `--check-catalog` may access the Internet for catalog metadata but never submits a model prompt. A reported `READY_FOR_MANUAL_LIVE_TEST` is **not proof of login, successful Hermes tool execution, or free billing**; it only verifies the static prerequisites. The first live run remains a manual operator action.
