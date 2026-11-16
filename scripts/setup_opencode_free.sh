@@ -8,6 +8,8 @@ cd "$(dirname "$0")/.."
 PROFILE=hiergoal-free
 MODEL=opencode/glm-5.3-flash-free
 PLUGIN=cryptobredda/hermes-opencode-free-acp
+# Reviewed source revision: v0.4.0 (reproducible, no moving default branch).
+PLUGIN_REF=0ef669a84c024661c03d34768c118275e93aa713
 
 if [[ -n "$(printenv HERMES_HOME 2>/dev/null || true)" ]]; then
   echo "HERMES_HOME is overridden; unset it for the dedicated named-profile setup." >&2
@@ -55,7 +57,7 @@ YAML
 fi
 
 echo "Installing the public ACP model-provider plugin into $PROFILE..."
-hermes -p "$PROFILE" plugins install "$PLUGIN" --enable
+hermes -p "$PROFILE" plugins install "$PLUGIN" --ref "$PLUGIN_REF" --enable
 echo "Verifying installed provider..."
 hermes -p "$PROFILE" plugins list
 echo
