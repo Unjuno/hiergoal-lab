@@ -94,6 +94,18 @@ import json, sys
 from pathlib import Path
 C = CONFIG_MARKER
 argv = sys.argv[1:]
+if argv[:3] != ["-p", "hiergoal-free", "chat"]:
+    sys.stderr.write("Wrong isolated Hermes profile")
+    raise SystemExit(2)
+if argv[argv.index("--provider")+1] != "opencode-free-acp":
+    sys.stderr.write("Wrong inference provider")
+    raise SystemExit(2)
+if argv[argv.index("--model")+1] != "opencode/glm-5.3-flash-free":
+    sys.stderr.write("Wrong or paid model")
+    raise SystemExit(2)
+if "--ignore-user-config" in argv or "--safe-mode" in argv:
+    sys.stderr.write("Plugin would be disabled")
+    raise SystemExit(2)
 prompt = Path(argv[argv.index("--query-file")+1]).read_text(encoding="utf-8")
 work = Path(argv[argv.index("--in")+1])
 status_file = work / ".fake_count"
@@ -112,12 +124,12 @@ elif prompt.startswith("ROLE=EXECUTE"):
     response = "Executed repair steps in task workspace."
 else:
     response = "UNKNOWN ROLE"
-print(json.dumps({"type":"system","subtype":"init","model":"gpt-6-luna",
+print(json.dumps({"type":"system","subtype":"init","model":"opencode/glm-5.3-flash-free",
                   "session_id":"fake-session", "timestamp":1}))
 print(json.dumps({"type":"tool_use","name":"terminal","timestamp":2}))
 print(json.dumps({"type":"tool_result","name":"terminal","is_error":False, "timestamp":3}))
 print(json.dumps({"type":"result","session_id":"fake-session","exit_code":0,
-                  "text":response,"tokens":{"input":300,"output":100,"total":400},
+                  "text":response,"tokens":{"input":0,"output":0,"total":0},
                   "duration_ms":30,"timestamp":4}))
 '''
     path.write_text(program.replace("CONFIG_MARKER", payload), encoding="utf-8")
@@ -194,6 +206,10 @@ class ControllerOfflineIntegration(unittest.TestCase):
         self.assertEqual(records["final_independent"]["tests_run"], 6)
         self.assertTrue(records["original_visible_tests_unchanged"])
         self.assertGreaterEqual(len(records["calls"]), 4)
+        self.assertEqual(records["provider"], "opencode-free-acp")
+        self.assertEqual(records["model"], "opencode/glm-5.3-flash-free")
+        self.assertIsNone(records["estimated_visible_usd"])
+        self.assertFalse(records["calls"][0]["token_usage_measured"])
 
     def test_model_plan_missing_gates_is_rejected(self):
         run, records, state = self.invoke(invalid_plan=True)
@@ -212,7 +228,15 @@ class ControllerOfflineIntegration(unittest.TestCase):
             [sys.executable, "-m", "hiergoal.controller", "--dry-run"],
             cwd=ROOT, text=True, capture_output=True, timeout=30)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
-        self.assertIn("No Hermes / OpenAI calls made", run.stdout)
+        self.assertIn("No Hermes / OpenCode model calls made", run.stdout)
+
+    def test_paid_model_is_rejected_by_argparse(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "hiergoal.controller", "--model", "gpt-6-luna",
+             "--ack-unsandboxed"],
+            cwd=ROOT, text=True, capture_output=True, timeout=30)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("invalid choice", result.stderr)
 
 
 if __name__ == "__main__":
