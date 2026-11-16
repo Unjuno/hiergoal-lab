@@ -49,7 +49,8 @@ class RunnerIntegration(unittest.TestCase):
                                                f"if {str(tamper)}:"), encoding="utf-8")
             fake.chmod(0o755)
             result = subprocess.run([
-                sys.executable, str(RUNNER), "--hermes", str(fake),
+                sys.executable, str(RUNNER), "--allow-paid-openai",
+                "--hermes", str(fake),
                 "--output", str(base / "runs"), "--timeout-seconds", "30",
                 "--max-turns", "5",
             ], capture_output=True, text=True, timeout=55)
