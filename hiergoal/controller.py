@@ -44,6 +44,27 @@ FREE_MODELS = (
 )
 
 
+def verify_free_profile() -> Path:
+    """Fail closed unless the isolated Hermes profile has no paid fallback chain."""
+    if os.environ.get("HERMES_HOME"):
+        raise ExperimentStopped("Unset HERMES_HOME: the free-only profile is under ~/.hermes/profiles", uncertain=False)
+    config = Path.home() / ".hermes" / "profiles" / PROFILE / "config.yaml"
+    if not config.is_file():
+        raise ExperimentStopped("Missing free-only profile. Run scripts/setup_opencode_free.sh", uncertain=False)
+    source = config.read_text(encoding="utf-8")
+    if "# HierGoal isolated free-only configuration" not in source:
+        raise ExperimentStopped("Unrecognized profile config; refusing possible paid fallback", uncertain=False)
+    if not re.search(r"(?m)^\s*provider:\s*opencode-free-acp\s*$", source):
+        raise ExperimentStopped("Free profile provider is not opencode-free-acp", uncertain=False)
+    if not re.search(r"(?m)^fallback_providers:\s*\[\s*\]\s*$", source):
+        raise ExperimentStopped("Free profile must have fallback_providers: []", uncertain=False)
+    if re.search(r"(?m)^\s*fallback_providers:\s*(?!\[\s*\]\s*$)", source):
+        raise ExperimentStopped("Unexpected nested fallback chain", uncertain=False)
+    if re.search(r"(?m)^fallback_model\s*:", source):
+        raise ExperimentStopped("Legacy paid fallback must be absent", uncertain=False)
+    return config
+
+
 class ExperimentStopped(RuntimeError):
     """A bounded run stopped before a verified completion."""
     def __init__(self, reason: str, uncertain: bool = True):
@@ -184,6 +205,10 @@ class Controller:
                 if leaf["status"] == "running":
                     leaf["status"] = "pending"
             self.records = json.loads((self.directory / "records.json").read_text(encoding="utf-8"))
+            if (self.records.get("provider"), self.records.get("model"), self.records.get("profile")) != (
+                PROVIDER, args.model, PROFILE
+            ):
+                raise ExperimentStopped("Cannot resume a run from another model/provider/profile", uncertain=False)
         else:
             run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6]
             self.directory = (args.output / ("hiergoal-" + run_id)).resolve()
@@ -384,7 +409,12 @@ def run(args: argparse.Namespace) -> int:
     if not shutil.which(args.hermes):
         print("Hermes CLI not found; install it before the real run.", file=sys.stderr)
         return 2
-    # The provider validates the actual OpenCode executable on startup.
+    try:
+        verify_free_profile()
+    except ExperimentStopped as exc:
+        print("Refusing to run:", exc, file=sys.stderr)
+        return 2
+    # The ACP provider validates the actual OpenCode executable and selected model.
     # Offline fake-Hermes integration exercises this path without OpenCode.
     controller = None
     try:
