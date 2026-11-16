@@ -86,6 +86,9 @@ def diff_workspace(before: Path, after: Path) -> str:
 
 
 def run(args: argparse.Namespace) -> Path:
+    if not args.dry_run and not args.allow_paid_openai:
+        raise RuntimeError("Legacy Luna runner is paid and disabled by default. "
+                           "Use python3 -m hiergoal.controller for the OpenCode free experiment.")
     if not args.dry_run and not shutil.which(args.hermes):
         raise RuntimeError("Hermes CLI is not installed or not on PATH. Run 'hermes doctor' after installing it.")
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6]
@@ -194,6 +197,8 @@ def main():
     p.add_argument("--max-turns", type=int, default=20)
     p.add_argument("--timeout-seconds", type=int, default=900)
     p.add_argument("--output", type=Path, default=ROOT / "runs")
+    p.add_argument("--allow-paid-openai", action="store_true",
+                   help="Explicitly opt in to the legacy paid OpenAI API experiment")
     p.add_argument("--dry-run", action="store_true", help="Only copy fixture and print Hermes command; no API use")
     args = p.parse_args()
     if args.max_turns < 1 or args.timeout_seconds < 15:
