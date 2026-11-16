@@ -114,3 +114,13 @@ This is **external hierarchical orchestration**, not an alteration to Hermes nat
 - [OpenCode Free ACP community source](https://github.com/cryptobredda/hermes-opencode-free-acp)
 
 Apache-2.0 independent research project. The authors of Hermes Agent, OpenCode and the ACP provider do not endorse this research. Review and redact raw tool logs before sharing.
+
+## 6. Generate a publication-ready evidence summary (no inference)
+
+After a run, create a **whitelisted report** that excludes prompts, raw tool output and stderr:
+
+~~~bash
+python3 -m hiergoal.report runs/hiergoal-<your-run-id>
+~~~
+
+The resulting `report-public.json` verifies the saved PASS claim against final test evidence and a terminal Hermes stream event, records SHA-256 fingerprints and flags missing evidence as `UNCERTAIN`. It is not a signed artifact or proof that the model was free. Inspect this summary and redact any sensitive local metadata before publishing. Do not upload the raw `runs/` directory.
