@@ -41,8 +41,8 @@ if [[ -e "$PROFILE_DIR" ]]; then
   fi
   echo "Existing HierGoal profile found; preserving its settings."
 else
-  echo "Creating an empty Hermes profile without cloning credentials or fallbacks..."
-  hermes profile create "$PROFILE" --no-skills --no-alias
+  echo "Creating a Hermes profile without copying provider keys or paid fallbacks..."
+  hermes profile create "$PROFILE" --no-skills --no-alias --no-credentials
   mkdir -p "$PROFILE_DIR"
   cat > "$CONFIG" <<'YAML'
 # HierGoal isolated free-only configuration
