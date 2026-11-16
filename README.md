@@ -124,3 +124,14 @@ python3 -m hiergoal.report runs/hiergoal-<your-run-id>
 ~~~
 
 The resulting `report-public.json` verifies the saved PASS claim against final test evidence and a terminal Hermes stream event, records SHA-256 fingerprints and flags missing evidence as `UNCERTAIN`. It is not a signed artifact or proof that the model was free. Inspect this summary and redact any sensitive local metadata before publishing. Do not upload the raw `runs/` directory.
+
+## 7. Interrupted calls and safe resumption
+
+Every Hermes invocation writes a `started` record before process launch and records its status after the terminal event. The controller uses a POSIX file lock to prevent two local controllers from writing to one run. If a previous invocation was interrupted, **resumption is refused by default**. Confirm externally that the old Hermes process and gateway turn are no longer running, then use:
+
+~~~bash
+python3 -m hiergoal.controller --resume runs/hiergoal-<your-run-id> \
+  --ack-unsandboxed --confirm-stopped
+~~~
+
+`--confirm-stopped` is an explicit operator assertion, **not** an automated stop check. A detached gateway may continue even after the CLI exits. Do not use this flag until the old session is verified stopped. The interrupted call remains counted toward `--max-calls` and the recovery is recorded. These POSIX locks require macOS / Linux / WSL2 and do not protect runs shared across hosts or network filesystems.

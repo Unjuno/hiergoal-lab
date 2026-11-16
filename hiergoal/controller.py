@@ -8,6 +8,7 @@ No paid-provider fallback is configured by this project.
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
 import os
 import re
@@ -193,29 +194,67 @@ def build_replan_prompt(state: dict, leaf: dict, grade_result: dict) -> str:
 
 
 class Controller:
+    def _acquire_lock(self) -> None:
+        """Prevent two controllers from mutating one run concurrently (POSIX flock)."""
+        self._lock_handle = (self.directory / ".controller.lock").open("a+")
+        try:
+            fcntl.flock(self._lock_handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as exc:
+            self._lock_handle.close()
+            self._lock_handle = None
+            raise ExperimentStopped("Another controller currently owns this run", uncertain=True) from exc
+
+    def close(self) -> None:
+        handle = getattr(self, "_lock_handle", None)
+        if handle is not None and not handle.closed:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+            handle.close()
+        self._lock_handle = None
+
     def __init__(self, args: argparse.Namespace):
         self.args = args
+        self._lock_handle = None
         if args.resume:
             self.directory = args.resume.resolve()
             self.workspace = self.directory / "workspace"
             if not self.workspace.is_dir() or not (self.directory / "state.json").is_file():
                 raise ExperimentStopped("Resume directory has no valid state", uncertain=False)
+            self._acquire_lock()
             self.state = json.loads((self.directory / "state.json").read_text(encoding="utf-8"))
             if self.state["root"]["goal"] != ROOT_GOAL:
                 raise ExperimentStopped("Immutable goal does not match current protocol", uncertain=False)
-            # A previous CLI may still be alive; the operator must verify it is stopped.
-            for leaf in self.state["leaves"].values():
-                if leaf["status"] == "running":
-                    leaf["status"] = "pending"
             self.records = json.loads((self.directory / "records.json").read_text(encoding="utf-8"))
             if (self.records.get("provider"), self.records.get("model"), self.records.get("profile")) != (
                 PROVIDER, args.model, PROFILE
             ):
                 raise ExperimentStopped("Cannot resume a run from another model/provider/profile", uncertain=False)
+            if self.records.get("outcome") == "PASS":
+                raise ExperimentStopped("This run is already complete; do not resume it", uncertain=False)
+            potentially_active = any(
+                call.get("status") in ("started", "running", "incomplete")
+                or call.get("timed_out") is True
+                for call in self.records.get("calls", [])
+            ) or any(leaf["status"] == "running" for leaf in self.state["leaves"].values())
+            if potentially_active and not args.confirm_stopped:
+                raise ExperimentStopped(
+                    "An interrupted Hermes call may still be running. Verify it has stopped, "
+                    "then explicitly pass --confirm-stopped when resuming.", uncertain=True
+                )
+            if potentially_active:
+                for call in self.records.get("calls", []):
+                    if call.get("status") in ("started", "running", "incomplete"):
+                        call["status"] = "operator_confirmed_stopped"
+                self.records.setdefault("recovery_notes", []).append(
+                    "Operator confirmed prior invocation stopped before resumption."
+                )
+            for leaf in self.state["leaves"].values():
+                if leaf["status"] == "running":
+                    leaf["status"] = "pending"
         else:
             run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:6]
             self.directory = (args.output / ("hiergoal-" + run_id)).resolve()
             self.directory.mkdir(parents=True, exist_ok=False)
+            self._acquire_lock()
             self.workspace = self.directory / "workspace"
             shutil.copytree(FIXTURE, self.workspace)
             self.state = None
@@ -260,10 +299,20 @@ class Controller:
             "--query-file", str(prompt_path), "--oneshot"
         ]
         save_json(self.directory / (tag + ".invocation.json"), {"argv": command})
+        # Write-ahead record: interrupted calls must count against max_calls
+        # and must not be silently replayed on --resume.
+        self.records["calls"].append({
+            "index": index, "role": role, "status": "started",
+            "tool_calls": None, "terminal_result_seen": False
+        })
+        self._save()
         elapsed = time.monotonic()
         timed_out = False
         with stdout_path.open("w", encoding="utf-8") as out, stderr_path.open("w", encoding="utf-8") as err:
             proc = subprocess.Popen(command, cwd=self.workspace, stdout=out, stderr=err)
+            self.records["calls"][-1]["status"] = "running"
+            self.records["calls"][-1]["pid"] = proc.pid
+            self._save()
             try:
                 proc.wait(timeout=self.args.timeout_seconds)
             except subprocess.TimeoutExpired:
@@ -301,7 +350,10 @@ class Controller:
                  "estimated_visible_usd": None, "tool_calls": trace["tool_calls"],
                  "nested_todo_observed": trace["verified_nested_todo_result_observed"],
                  "session_id": trace["session_id"], "invalid_json_lines": trace["invalid_json_lines"]}
-        self.records["calls"].append(entry)
+        entry["status"] = ("finished" if trace["terminal_result_seen"]
+                           and not timed_out and not trace["invalid_json_lines"]
+                           else "incomplete")
+        self.records["calls"][-1] = entry
         if timed_out:
             self.records["timed_out"] = True
         self._save()
@@ -431,6 +483,9 @@ def run(args: argparse.Namespace) -> int:
         else:
             print("Setup failed:", exc, file=sys.stderr)
             return 2
+    finally:
+        if controller is not None:
+            controller.close()
     print(json.dumps({"directory": str(controller.directory),
                       "outcome": result["outcome"],
                       "calls": len(result["calls"]),
@@ -452,6 +507,8 @@ def main() -> None:
     parser.add_argument("--timeout-seconds", type=int, default=600)
     parser.add_argument("--output", type=Path, default=ROOT / "runs")
     parser.add_argument("--resume", type=Path)
+    parser.add_argument("--confirm-stopped", action="store_true",
+                        help="After verifying an interrupted Hermes invocation is stopped, allow resume")
     parser.add_argument("--ack-unsandboxed", action="store_true",
                         help="Acknowledge terminal/file tools are not OS-sandboxed")
     parser.add_argument("--dry-run", action="store_true")
