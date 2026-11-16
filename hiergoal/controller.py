@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Real Hermes hierarchical planner -> executor -> verifier -> replanner.
+"""Real Hermes hierarchy controller using a restricted OpenCode ACP free-model provider.
 
-Only the explicit CLI command triggers paid OpenAI calls. Neither dry-run
-nor the offline integration tests use any API key.
+Dry-run / offline integration tests do not invoke network inference. Real runs
+require the community opencode-free-acp provider and an isolated Hermes profile.
+No paid-provider fallback is configured by this project.
 """
 from __future__ import annotations
 
@@ -28,8 +29,19 @@ from scripts.stream_report import parse_events
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "fixtures" / "ledger_release"
 EVALUATION = ROOT / "evaluation"
-STANDARD_INPUT_USD_MTOK = 0.10
-STANDARD_OUTPUT_USD_MTOK = 0.50
+PROVIDER = "opencode-free-acp"
+PROFILE = "hiergoal-free"
+DEFAULT_MODEL = "opencode/glm-5.3-flash-free"
+# Exact allowlist from community opencode-free-acp v0.4.0; never infer free from a suffix.
+FREE_MODELS = (
+    DEFAULT_MODEL,
+    "opencode/deepseek-v4.1-flash-free",
+    "opencode/mimo-v2.6-flash-free",
+    "opencode/nemotron-3.5-super-vl-free",
+    "opencode/nemotron-3.5-lightning-free",
+    "opencode/beam-free",
+    "opencode/big-pickle",
+)
 
 
 class ExperimentStopped(RuntimeError):
@@ -179,10 +191,12 @@ class Controller:
             self.workspace = self.directory / "workspace"
             shutil.copytree(FIXTURE, self.workspace)
             self.state = None
-            self.records = {"experiment": "hermes-hiergoal-v1", "model": "gpt-6-luna",
+            self.records = {"experiment": "hermes-hiergoal-free-v1",
+                            "provider": PROVIDER, "model": args.model, "profile": PROFILE,
                             "mode": "controlled-hierarchical-single-case", "calls": [],
-                            "estimated_visible_usd": 0.0, "timed_out": False,
-                            "outcome": "NOT_RUN", "halt_reason": None}
+                            "estimated_visible_usd": None, "token_usage_available": False,
+                            "pricing": "OpenCode catalog lists this model as free; live billing not observed",
+                            "timed_out": False, "outcome": "NOT_RUN", "halt_reason": None}
             pre = grade(self.workspace, list(GATES))
             save_json(self.directory / "initial_grading.json", pre)
             if pre["passed"] or pre["tests_run"] != len(GATES):
@@ -202,18 +216,17 @@ class Controller:
     def _call_hermes(self, role: str, prompt: str, toolsets: str) -> dict:
         if len(self.records["calls"]) >= self.args.max_calls:
             raise ExperimentStopped("max-calls guard reached; no further requests")
-        if self.records["estimated_visible_usd"] >= self.args.pilot_budget_usd:
-            raise ExperimentStopped("estimated pilot budget reached; no further requests")
         index = len(self.records["calls"]) + 1
         tag = "%02d-%s" % (index, role)
         prompt_path = self.directory / (tag + ".prompt.txt")
         stdout_path = self.directory / (tag + ".stream.jsonl")
         stderr_path = self.directory / (tag + ".stderr.txt")
         prompt_path.write_text(prompt, encoding="utf-8")
+        # --ignore-user-config or --safe-mode would disable the ACP plugin.
+        # Run only in the separately created, non-cloned Hermes profile.
         command = [
-            self.args.hermes, "chat", "--provider", "openai-api",
-            "--model", "gpt-6-luna", "--reasoning", self.args.reasoning,
-            "--toolsets", toolsets, "--ignore-user-config", "--ignore-rules",
+            self.args.hermes, "-p", PROFILE, "chat", "--provider", PROVIDER,
+            "--model", self.args.model, "--toolsets", toolsets, "--ignore-rules",
             "--in", str(self.workspace), "--format", "stream-json",
             "--max-turns", str(self.args.max_turns), "--source", "hiergoal-lab",
             "--query-file", str(prompt_path), "--oneshot"
@@ -245,22 +258,22 @@ class Controller:
                 result_text = message.get("text")
         inbound = trace["tokens_input"]
         outbound = trace["tokens_output"]
-        usage_complete = (isinstance(inbound, int) and isinstance(outbound, int)
-                          and inbound >= 0 and outbound >= 0)
-        charge = round((inbound * STANDARD_INPUT_USD_MTOK +
-                        outbound * STANDARD_OUTPUT_USD_MTOK) / 1000000, 8) if usage_complete else None
+        # The ACP plugin reports usage=None; zero counts are not measured zero.
+        # Billing is not inferred from missing or zero token counters.
+        measured_tokens = (isinstance(inbound, int) and isinstance(outbound, int)
+                           and inbound > 0 and outbound > 0)
+        charge = None
         entry = {"index": index, "role": role, "exit_code": proc.returncode,
                  "hermes_exit_code": trace["hermes_exit_code"],
                  "terminal_result_seen": trace["terminal_result_seen"],
                  "elapsed_seconds": round(duration, 3), "timed_out": timed_out,
-                 "tokens_input": inbound, "tokens_output": outbound,
-                 "estimated_visible_usd": charge, "tool_calls": trace["tool_calls"],
+                 "tokens_input": inbound if measured_tokens else None,
+                 "tokens_output": outbound if measured_tokens else None,
+                 "token_usage_measured": measured_tokens,
+                 "estimated_visible_usd": None, "tool_calls": trace["tool_calls"],
                  "nested_todo_observed": trace["verified_nested_todo_result_observed"],
                  "session_id": trace["session_id"], "invalid_json_lines": trace["invalid_json_lines"]}
         self.records["calls"].append(entry)
-        if charge is not None:
-            self.records["estimated_visible_usd"] = round(
-                self.records["estimated_visible_usd"] + charge, 8)
         if timed_out:
             self.records["timed_out"] = True
         self._save()
@@ -268,8 +281,6 @@ class Controller:
             raise ExperimentStopped("Hermes timed out or returned an incomplete stream: " + tag)
         if proc.returncode != 0 or trace["hermes_exit_code"] != 0:
             raise ExperimentStopped("Hermes failed at " + tag + "; inspect stderr/stream", uncertain=False)
-        if not usage_complete:
-            raise ExperimentStopped("Token usage missing; stop for budget safety")
         if not isinstance(result_text, str) or not result_text.strip():
             raise ExperimentStopped("Hermes provided no final response: " + tag)
         return {"text": result_text, "call": entry}
@@ -360,9 +371,10 @@ def run(args: argparse.Namespace) -> int:
             print("ERROR: source fixture is not a valid failing test case", file=sys.stderr)
             return 2
         print("DRY RUN PASS: source fixture fails the independent tests.")
-        print("Configured Hermes command: hermes chat --provider openai-api "
-              "--model gpt-6-luna --format stream-json --query-file PATH --oneshot")
-        print("No Hermes / OpenAI calls made.")
+        print("Configured Hermes command: hermes -p hiergoal-free chat "
+              "--provider opencode-free-acp --model " + args.model +
+              " --format stream-json --query-file PATH --oneshot")
+        print("No Hermes / OpenCode model calls made.")
         return 0
     if not args.ack_unsandboxed:
         print("Refusing real run without --ack-unsandboxed. Hermes terminal tools "
@@ -370,8 +382,10 @@ def run(args: argparse.Namespace) -> int:
               file=sys.stderr)
         return 2
     if not shutil.which(args.hermes):
-        print("Hermes CLI not found; install and configure it before the real run.",
-              file=sys.stderr)
+        print("Hermes CLI not found; install it before the real run.", file=sys.stderr)
+        return 2
+    if not shutil.which("opencode"):
+        print("OpenCode CLI not found; install it before the real run.", file=sys.stderr)
         return 2
     controller = None
     try:
@@ -389,7 +403,8 @@ def run(args: argparse.Namespace) -> int:
                       "outcome": result["outcome"],
                       "calls": len(result["calls"]),
                       "replans": controller.state["replans"] if controller.state else None,
-                      "estimated_visible_usd": result["estimated_visible_usd"],
+                      "model": result["model"], "provider": result["provider"],
+                      "estimated_visible_usd": None,
                       "halt_reason": result["halt_reason"]}, ensure_ascii=False, indent=2))
     return 0 if result["outcome"] == "PASS" else 1
 
@@ -397,11 +412,11 @@ def run(args: argparse.Namespace) -> int:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Hierarchical real Hermes experiment")
     parser.add_argument("--hermes", default="hermes", help="Hermes binary path")
-    parser.add_argument("--reasoning", default="low", choices=["none", "low", "medium", "high"])
+    parser.add_argument("--model", default=DEFAULT_MODEL, choices=FREE_MODELS,
+                        help="Allowlisted free OpenCode ACP model ID")
     parser.add_argument("--max-calls", type=int, default=12)
     parser.add_argument("--max-turns", type=int, default=18)
     parser.add_argument("--max-replans", type=int, default=2)
-    parser.add_argument("--pilot-budget-usd", type=float, default=3.0)
     parser.add_argument("--timeout-seconds", type=int, default=600)
     parser.add_argument("--output", type=Path, default=ROOT / "runs")
     parser.add_argument("--resume", type=Path)
@@ -410,7 +425,7 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     if (args.max_calls < 1 or args.max_turns < 1 or args.max_replans < 0
-            or args.pilot_budget_usd <= 0 or args.timeout_seconds < 15):
+            or args.timeout_seconds < 15):
         parser.error("Invalid bounds")
     sys.exit(run(args))
 
