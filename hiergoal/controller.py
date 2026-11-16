@@ -384,9 +384,8 @@ def run(args: argparse.Namespace) -> int:
     if not shutil.which(args.hermes):
         print("Hermes CLI not found; install it before the real run.", file=sys.stderr)
         return 2
-    if not shutil.which("opencode"):
-        print("OpenCode CLI not found; install it before the real run.", file=sys.stderr)
-        return 2
+    # The provider validates the actual OpenCode executable on startup.
+    # Offline fake-Hermes integration exercises this path without OpenCode.
     controller = None
     try:
         controller = Controller(args)
