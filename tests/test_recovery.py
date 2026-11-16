@@ -7,6 +7,7 @@ from argparse import Namespace
 from pathlib import Path
 
 from hiergoal.controller import Controller, ExperimentStopped, DEFAULT_MODEL, PROVIDER, PROFILE, save_json
+from hiergoal.provenance import capture_provenance
 from hiergoal.core import ROOT_GOAL, validate_plan
 from tests.test_hiergoal_controller import PLAN
 
@@ -28,7 +29,7 @@ def seed_run(path: Path):
     save_json(run / "state.json", state)
     records = {
         "provider": PROVIDER, "profile": PROFILE, "model": DEFAULT_MODEL,
-        "outcome": "UNCERTAIN", "calls": [
+        "outcome": "UNCERTAIN", "provenance": capture_provenance(Path(__file__).resolve().parents[1]), "calls": [
             {"index": 1, "role": "execute-S1", "status": "started"}
         ],
     }

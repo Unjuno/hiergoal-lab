@@ -135,3 +135,7 @@ python3 -m hiergoal.controller --resume runs/hiergoal-<your-run-id> \
 ~~~
 
 `--confirm-stopped` is an explicit operator assertion, **not** an automated stop check. A detached gateway may continue even after the CLI exits. Do not use this flag until the old session is verified stopped. The interrupted call remains counted toward `--max-calls` and the recovery is recorded. These POSIX locks require macOS / Linux / WSL2 and do not protect runs shared across hosts or network filesystems.
+
+## 8. Experiment provenance
+
+Each new run records an immutable `protocol_id` computed from SHA-256 digests of the controller, planner validator, logging parser, acceptance tests, task fixture and free-model setup script, plus the local Git commit, Python version, OS and architecture. Resumption refuses a changed protocol to prevent results from mixing different evaluator/code revisions; create a new run after updating the repository. The public report includes a limited provenance subset and does not publish local paths or raw environment variables.

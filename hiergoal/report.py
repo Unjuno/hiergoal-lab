@@ -129,6 +129,11 @@ def compile_report(run_directory: Path) -> dict:
         "provider": str(records.get("provider", "unknown")),
         "model": str(records.get("model", "unknown")),
         "profile": str(records.get("profile", "unknown")),
+        "provenance": {
+            key: records.get("provenance", {}).get(key)
+            for key in ("protocol_id", "git_commit", "timestamp_utc",
+                        "host_os", "host_architecture", "python_version")
+        },
         "declared_outcome": declared,
         "verified_report_outcome": result,
         "evidence_issues": sorted(set(issues)),

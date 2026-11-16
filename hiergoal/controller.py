@@ -26,6 +26,7 @@ from hiergoal.core import (
     next_leaf, parse_object, replace_failed_leaf, update_rollups, validate_plan,
 )
 from scripts.stream_report import parse_events
+from hiergoal.provenance import capture_provenance, protocol_manifest
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "fixtures" / "ledger_release"
@@ -230,6 +231,12 @@ class Controller:
                 raise ExperimentStopped("Cannot resume a run from another model/provider/profile", uncertain=False)
             if self.records.get("outcome") == "PASS":
                 raise ExperimentStopped("This run is already complete; do not resume it", uncertain=False)
+            prior_protocol = self.records.get("provenance", {}).get("protocol_id")
+            if not prior_protocol or prior_protocol != protocol_manifest(ROOT)["protocol_id"]:
+                raise ExperimentStopped(
+                    "Experiment source or evaluator changed since this run began; "
+                    "start a fresh run instead of mixing protocol versions.", uncertain=False
+                )
             potentially_active = any(
                 call.get("status") in ("started", "running", "incomplete")
                 or call.get("timed_out") is True
@@ -261,6 +268,7 @@ class Controller:
             self.records = {"experiment": "hermes-hiergoal-free-v1",
                             "provider": PROVIDER, "model": args.model, "profile": PROFILE,
                             "mode": "controlled-hierarchical-single-case", "calls": [],
+                            "provenance": capture_provenance(ROOT),
                             "estimated_visible_usd": None, "token_usage_available": False,
                             "pricing": "OpenCode catalog lists this model as free; live billing not observed",
                             "timed_out": False, "outcome": "NOT_RUN", "halt_reason": None}
