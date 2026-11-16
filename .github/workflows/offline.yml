@@ -16,4 +16,4 @@ jobs:
       - name: Run offline unit tests
         run: python -m unittest discover -s tests -v
       - name: No-key dry run
-        run: python scripts/run_hermes.py --dry-run
+        run: python -m hiergoal.controller --dry-run
