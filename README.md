@@ -48,7 +48,7 @@ Read the setup script before running it. Then:
 bash scripts/setup_opencode_free.sh
 ~~~
 
-The setup creates a **non-cloned dedicated Hermes profile** named hiergoal-free. It does not copy your usual credentials, skills, paid fallback chain or auxiliary model settings. It configures opencode-free-acp with an empty fallback list and installs the separately reviewed community provider from https://github.com/cryptobredda/hermes-opencode-free-acp pinned to immutable commit:
+The setup creates a **dedicated Hermes profile** named hiergoal-free with the --no-credentials and --no-skills flags, avoiding the default copying of API keys, model and skills. It writes an explicit free-only provider with an empty paid fallback chain. **Caveat:** Hermes may still read the root auth store through its fallback behavior; this profile is not an OS-level security or complete credential-isolation boundary. Use a separate OS account or container with a clean HOME for stronger isolation. It configures opencode-free-acp with an empty fallback list and installs the separately reviewed community provider from https://github.com/cryptobredda/hermes-opencode-free-acp pinned to immutable commit:
 
 0ef669a84c024661c03d34768c118275e93aa713 (release v0.4.0)
 
