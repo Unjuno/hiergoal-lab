@@ -56,9 +56,9 @@ def verify_free_profile() -> Path:
         raise ExperimentStopped("Unrecognized profile config; refusing possible paid fallback", uncertain=False)
     if not re.search(r"(?m)^\s*provider:\s*opencode-free-acp\s*$", source):
         raise ExperimentStopped("Free profile provider is not opencode-free-acp", uncertain=False)
-    if not re.search(r"(?m)^fallback_providers:\s*\[\s*\]\s*$", source):
+    if not re.search(r"(?m)^fallback_providers:[ \t]*\[[ \t]*\][ \t]*$", source):
         raise ExperimentStopped("Free profile must have fallback_providers: []", uncertain=False)
-    if re.search(r"(?m)^\s*fallback_providers:\s*(?!\[\s*\]\s*$)", source):
+    if re.search(r"(?m)^[ \t]*fallback_providers:[ \t]*(?!\[[ \t]*\][ \t]*$)[^\n]*$", source):
         raise ExperimentStopped("Unexpected nested fallback chain", uncertain=False)
     if re.search(r"(?m)^fallback_model\s*:", source):
         raise ExperimentStopped("Legacy paid fallback must be absent", uncertain=False)
