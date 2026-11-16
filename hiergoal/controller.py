@@ -58,8 +58,11 @@ def verify_free_profile() -> Path:
         raise ExperimentStopped("Free profile provider is not opencode-free-acp", uncertain=False)
     if not re.search(r"(?m)^fallback_providers:[ \t]*\[[ \t]*\][ \t]*$", source):
         raise ExperimentStopped("Free profile must have fallback_providers: []", uncertain=False)
-    if re.search(r"(?m)^[ \t]*fallback_providers:[ \t]*(?!\[[ \t]*\][ \t]*$)[^\n]*$", source):
-        raise ExperimentStopped("Unexpected nested fallback chain", uncertain=False)
+    for line in source.splitlines():
+        if line.strip().startswith("fallback_providers:"):
+            # String comparison avoids regex backtracking accepting an unsafe value.
+            if line.strip() != "fallback_providers: []":
+                raise ExperimentStopped("Unexpected nested fallback chain", uncertain=False)
     if re.search(r"(?m)^fallback_model\s*:", source):
         raise ExperimentStopped("Legacy paid fallback must be absent", uncertain=False)
     return config
