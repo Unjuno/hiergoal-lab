@@ -177,6 +177,15 @@ class ControllerOfflineIntegration(unittest.TestCase):
     def invoke(self, fix_on_second=True, invalid_plan=False, add_ack=True):
         with tempfile.TemporaryDirectory() as folder:
             temp = Path(folder)
+            profile = temp / ".hermes" / "profiles" / "hiergoal-free"
+            profile.mkdir(parents=True)
+            (profile / "config.yaml").write_text(
+                "# HierGoal isolated free-only configuration\n"
+                "model:\n  provider: opencode-free-acp\n"
+                "  default: opencode/glm-5.3-flash-free\n"
+                "fallback_providers: []\n"
+                "delegation:\n  fallback_providers: []\n",
+                encoding="utf-8")
             binary = temp / "fake-hermes"
             make_fake(binary, fix_on_second, invalid_plan)
             args = [sys.executable, "-m", "hiergoal.controller", "--hermes", str(binary),
@@ -184,7 +193,11 @@ class ControllerOfflineIntegration(unittest.TestCase):
                     "--max-replans", "1", "--timeout-seconds", "30"]
             if add_ack:
                 args.append("--ack-unsandboxed")
-            run = subprocess.run(args, cwd=ROOT, text=True, capture_output=True, timeout=80)
+            env = os.environ.copy()
+            env["HOME"] = str(temp)
+            env.pop("HERMES_HOME", None)
+            run = subprocess.run(args, cwd=ROOT, text=True, capture_output=True, timeout=80,
+                                 env=env)
             dirs = list((temp / "runs").glob("hiergoal-*")) if (temp / "runs").exists() else []
             records, state = None, None
             if dirs:
@@ -229,6 +242,21 @@ class ControllerOfflineIntegration(unittest.TestCase):
             cwd=ROOT, text=True, capture_output=True, timeout=30)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
         self.assertIn("No Hermes / OpenCode model calls made", run.stdout)
+
+    def test_paid_fallback_configuration_is_rejected(self):
+        from hiergoal.controller import verify_free_profile, ExperimentStopped
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder) / ".hermes" / "profiles" / "hiergoal-free"
+            root.mkdir(parents=True)
+            (root / "config.yaml").write_text(
+                "# HierGoal isolated free-only configuration\n"
+                "model:\n  provider: opencode-free-acp\n"
+                "fallback_providers:\n  - provider: openai-api\n"
+                "    model: gpt-6-luna\n")
+            with patch.dict(os.environ, {"HOME": folder}):
+                with self.assertRaises(ExperimentStopped):
+                    verify_free_profile()
 
     def test_paid_model_is_rejected_by_argparse(self):
         result = subprocess.run(
