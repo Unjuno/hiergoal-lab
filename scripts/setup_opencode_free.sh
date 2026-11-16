@@ -25,7 +25,7 @@ if ! command -v opencode >/dev/null 2>&1; then
 fi
 
 echo "Checking that the current OpenCode installation offers $MODEL..."
-if ! opencode models opencode | grep -Fxq "$MODEL"; then
+if ! opencode models opencode | grep -Fx "$MODEL" >/dev/null; then
   echo "The selected free model is unavailable in the current OpenCode catalog." >&2
   echo "Try 'opencode auth login' and 'opencode models opencode'; do not substitute a paid model." >&2
   exit 2
