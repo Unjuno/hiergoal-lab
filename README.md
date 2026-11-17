@@ -7,6 +7,20 @@ An experimental Python controller running real **Hermes Agent** instances throug
 
 **Default inference:** official OpenCode v2 CLI via ACP, using a curated free model instead of the OpenAI paid API. Hermes executes file/terminal tools; OpenCode supplies inference.
 
+## Quick start: one command to verify, one command to run
+
+After installing Hermes 0.22.2+, OpenCode v2 and creating the dedicated profile with `bash scripts/setup_opencode_free.sh`:
+
+~~~bash
+# Safe check: offline tests + catalog/CLI checks, no model prompts
+bash scripts/experiment.sh --check
+
+# Execute one real benchmark task; requires isolated environment
+bash scripts/experiment.sh --run
+~~~
+
+If the check fails, follow the setup steps below. This is an **OpenCode free-model** configuration rather than the earlier paid OpenAI Luna route. Free eligibility is not guaranteed; verify current vendor terms. **No live experiment has been conducted by the repository automation.**
+
 **Status:** offline tests and synthetic-Hermes integration pass in GitHub Actions. **No actual Hermes + OpenCode model-inference experiment has been run in this environment.** No causal performance comparison or superiority claim is made.
 
 ## Requirements
