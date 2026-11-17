@@ -23,6 +23,8 @@ If the check fails, follow the setup steps below. This is an **OpenCode free-mod
 
 **Status:** offline tests and synthetic-Hermes integration pass in GitHub Actions. **No actual Hermes + OpenCode model-inference experiment has been run in this environment.** No causal performance comparison or superiority claim is made.
 
+**Issue-specific research contract:** [Conformance to Issue #156054](docs/issue-156054-conformance.md). This prototype is not a native Hermes /goal integration. Mid-term parent acceptance now requires fresh independent evidence; child completion alone is insufficient.
+
 ## Requirements
 
 - macOS / Linux / Windows WSL2, Python 3.11+, Git
