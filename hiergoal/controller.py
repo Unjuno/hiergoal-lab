@@ -382,6 +382,64 @@ class Controller:
         self.state["root"]["status"] = "active"
         self._save()
 
+    def _replan_leaf(self, leaf: dict, grade_result: dict, *, cause: str) -> None:
+        """Replace an evidence-failed leaf; retain the parent criteria and user-owned root."""
+        leaf["status"] = "failed"
+        leaf["history"].append({"action": "verification_failed",
+                                "cause": cause, "checks": list(leaf["checks"])})
+        update_rollups(self.state)
+        self._save()
+        if leaf["revision"] >= 1 or self.state["replans"] >= self.args.max_replans:
+            raise ExperimentStopped("Gate failed after bounded replanning: " + leaf["id"],
+                                    uncertain=False)
+        message = self._call_hermes("replan-" + leaf["id"],
+                                   build_replan_prompt(self.state, leaf, grade_result), "todo")
+        try:
+            revised = parse_object(message["text"])
+            diagnosis = revised["diagnosis"]
+            instruction = revised["revised_instruction"]
+            if instruction.strip() == leaf["instruction"].strip():
+                raise PlanError("Replanning instruction is unchanged")
+            replace_failed_leaf(self.state, leaf["id"], instruction, diagnosis)
+        except (KeyError, AttributeError, PlanError) as exc:
+            raise ExperimentStopped("Invalid replan: " + str(exc), uncertain=False) from exc
+        self._save()
+
+    def _verify_parent_contracts(self) -> bool:
+        """Re-run each parent's aggregate acceptance gates, not just child status."""
+        for milestone in self.state["milestones"]:
+            children = [leaf for leaf in self.state["leaves"].values()
+                        if leaf["parent"] == milestone["id"]
+                        and leaf["status"] != "superseded"]
+            if not children or any(leaf["status"] != "completed" for leaf in children):
+                raise ExperimentStopped("Parent has unfinished children: " + milestone["id"],
+                                        uncertain=False)
+            checks = list(dict.fromkeys(c for child in children for c in child["checks"]))
+            result = self._record_gate("parent-" + milestone["id"], checks)
+            milestone["verification"] = {
+                "passed": result["passed"], "checks": checks,
+                "tests_run": result["tests_run"],
+                "evidence_file": "gate-parent-" + milestone["id"] + ".json",
+            }
+            milestone["status"] = "completed" if result["passed"] else "blocked"
+            self._save()
+            if result["passed"]:
+                continue
+            for child in children:
+                diagnosis = self._record_gate("parent-" + milestone["id"] + "-diagnose-"
+                                              + child["id"], child["checks"])
+                if not diagnosis["passed"]:
+                    self._replan_leaf(child, diagnosis,
+                                      cause="parent_verification_detected_regression")
+                    return False
+            raise ExperimentStopped(
+                "Parent gate failed though all child gates passed: " + milestone["id"],
+                uncertain=True
+            )
+        update_rollups(self.state)
+        self._save()
+        return True
+
     def execute(self) -> None:
         if self.state is None:
             self.plan()
@@ -390,12 +448,17 @@ class Controller:
             if leaf is None:
                 if all(x["status"] == "completed" for x in self.state["leaves"].values()
                        if x["status"] != "superseded"):
-                    break
+                    if self._verify_parent_contracts():
+                        break
+                    continue
                 raise ExperimentStopped("No executable leaf: goal tree is blocked", uncertain=False)
             before = self._record_gate(leaf["id"] + "-before", leaf["checks"])
             if before["passed"]:
                 leaf["status"] = "completed"
-                leaf["history"].append({"action": "preverified", "gate_pass": True})
+                leaf["history"].append({
+                    "action": "preverified", "gate_pass": True,
+                    "evidence_file": "gate-" + leaf["id"] + "-before.json",
+                })
                 update_rollups(self.state)
                 self._save()
                 continue
@@ -406,29 +469,14 @@ class Controller:
                               build_execute_prompt(self.state, leaf), "file,terminal,todo")
             after = self._record_gate(leaf["id"] + "-after", leaf["checks"])
             leaf["history"].append({"action": "executed", "gate_pass": after["passed"],
-                                    "attempt": leaf["attempts"]})
+                                    "attempt": leaf["attempts"],
+                                    "evidence_file": "gate-" + leaf["id"] + "-after.json"})
             if after["passed"]:
                 leaf["status"] = "completed"
                 update_rollups(self.state)
                 self._save()
                 continue
-            leaf["status"] = "failed"
-            self._save()
-            if leaf["revision"] >= 1 or self.state["replans"] >= self.args.max_replans:
-                raise ExperimentStopped("Gate failed after bounded replanning: " + leaf["id"],
-                                        uncertain=False)
-            message = self._call_hermes("replan-" + leaf["id"],
-                                        build_replan_prompt(self.state, leaf, after), "todo")
-            try:
-                revised = parse_object(message["text"])
-                diagnosis = revised["diagnosis"]
-                instruction = revised["revised_instruction"]
-                if instruction.strip() == leaf["instruction"].strip():
-                    raise PlanError("Replanning instruction is unchanged")
-                replace_failed_leaf(self.state, leaf["id"], instruction, diagnosis)
-            except (KeyError, AttributeError, PlanError) as exc:
-                raise ExperimentStopped("Invalid replan: " + str(exc), uncertain=False) from exc
-            self._save()
+            self._replan_leaf(leaf, after, cause="leaf_verification_failed")
 
     def finish(self) -> dict:
         full = self._record_gate("final-independent", list(GATES))
@@ -438,7 +486,16 @@ class Controller:
         self.records["final_independent"] = {"passed": full["passed"], "tests_run": full["tests_run"]}
         self.records["final_visible"] = {"passed": visible["passed"], "tests_run": visible["tests_run"]}
         self.records["original_visible_tests_unchanged"] = unchanged
-        accepted = full["passed"] and visible["passed"] and unchanged
+        parent_verified = all(
+            milestone["status"] == "completed"
+            and isinstance(milestone.get("verification"), dict)
+            and milestone["verification"].get("passed") is True
+            and milestone["verification"].get("tests_run")
+                == len(milestone["verification"].get("checks", []))
+            for milestone in self.state["milestones"]
+        )
+        accepted = full["passed"] and visible["passed"] and unchanged and parent_verified
+        self.records["parent_acceptance_verified"] = parent_verified
         self.records["outcome"] = "PASS" if accepted else "FAIL"
         self.state["root"]["status"] = "completed" if accepted else "blocked"
         self._save()

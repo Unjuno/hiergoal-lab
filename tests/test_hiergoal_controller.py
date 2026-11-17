@@ -144,6 +144,15 @@ class PlanContractTests(unittest.TestCase):
         self.assertEqual(len(state["leaves"]), 3)
         self.assertEqual(set(c for x in state["leaves"].values() for c in x["checks"]), set(GATES))
 
+    def test_child_completion_does_not_complete_parent(self):
+        from hiergoal.core import update_rollups
+        state = validate_plan(PLAN)
+        for leaf in state["leaves"].values():
+            leaf["status"] = "completed"
+        update_rollups(state)
+        self.assertTrue(all(m["status"] == "awaiting_verification" for m in state["milestones"]))
+        self.assertEqual(state["root"]["status"], "active")
+
     def test_missing_criterion_rejected(self):
         doc = json.loads(json.dumps(PLAN))
         doc["milestones"][-1]["subgoals"][0]["checks"] = ["invalid_rows"]
@@ -214,6 +223,11 @@ class ControllerOfflineIntegration(unittest.TestCase):
         self.assertEqual(records["outcome"], "PASS")
         self.assertEqual(state["root"]["status"], "completed")
         self.assertEqual(state["replans"], 1)
+        self.assertTrue(records["parent_acceptance_verified"])
+        for milestone in state["milestones"]:
+            self.assertEqual(milestone["status"], "completed")
+            self.assertTrue(milestone["verification"]["passed"])
+            self.assertTrue(milestone["verification"]["evidence_file"].startswith("gate-parent-"))
         self.assertEqual(state["leaves"]["S1"]["status"], "superseded")
         self.assertEqual(state["leaves"]["S1r1"]["status"], "completed")
         self.assertEqual(records["final_independent"]["tests_run"], 6)

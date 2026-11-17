@@ -76,7 +76,7 @@ def validate_plan(document: dict) -> dict:
         if not isinstance(members, list) or not 1 <= len(members) <= 5:
             raise PlanError("Each milestone needs 1..5 short-term subgoals")
         milestones.append({"id": mid, "title": _title(milestone.get("title"), "milestone title"),
-                           "status": "pending"})
+                           "status": "pending", "verification": None})
         for item in members:
             if not isinstance(item, dict):
                 raise PlanError("Invalid subgoal")
@@ -137,10 +137,18 @@ def update_rollups(state: dict) -> None:
     for milestone in state["milestones"]:
         relevant = [leaf for leaf in state["leaves"].values()
                     if leaf["parent"] == milestone["id"] and leaf["status"] != "superseded"]
-        milestone["status"] = ("completed" if relevant and all(
-            leaf["status"] == "completed" for leaf in relevant
-        ) else "active" if any(leaf["status"] in ("running", "completed") for leaf in relevant)
-          else "pending")
+        if relevant and all(leaf["status"] == "completed" for leaf in relevant):
+            milestone["status"] = (
+                "completed" if isinstance(milestone.get("verification"), dict)
+                and milestone["verification"].get("passed") is True
+                else "awaiting_verification"
+            )
+        elif any(leaf["status"] in ("running", "completed", "failed") for leaf in relevant):
+            milestone["status"] = "active"
+            milestone["verification"] = None
+        else:
+            milestone["status"] = "pending"
+            milestone["verification"] = None
     state["root"]["status"] = ("awaiting_final_verification" if all(
         x["status"] == "completed" for x in state["milestones"]
     ) else "active")
