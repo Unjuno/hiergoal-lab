@@ -26,7 +26,7 @@ The task itself is a Python CSV-ledger repair fixture. This is only a reproducib
 
 Offline CI tests validate the controller using **fake Hermes CLI outputs** and independent Python tests. No actual Hermes model run, tool-use capability, or provider billing claim follows from CI PASS.
 
-The repository currently uses an opt-in OpenCode Free ACP provider profile, added independently of the originally discussed Luna API plan. Model choice must not be treated as part of the Issue #156054 mechanism.
+The repository supports an explicit direct OpenAI API Luna route (`--backend luna --approve-paid-api`) and an optional OpenCode Free ACP route (`--backend free`). The model route is recorded per run; neither backend has completed a live model-inference experiment in CI. Model choice is not part of the Issue #156054 mechanism.
 
 ## Publication rule
 

@@ -1,4 +1,4 @@
-# HierGoal Lab — Hermes × OpenCode Free Research
+# HierGoal Lab — Hermes Issue #156054 Hierarchical Goal Research
 
 [![Offline CI](https://github.com/Unjuno/hiergoal-lab/actions/workflows/offline.yml/badge.svg)](https://github.com/Unjuno/hiergoal-lab/actions/workflows/offline.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
@@ -6,6 +6,10 @@
 An experimental Python controller running real **Hermes Agent** instances through a three-level goal hierarchy: fixed long-term objective → model-proposed mid-term milestones → short-term executable tasks. The controller validates plans and dependencies, invokes Hermes, independently verifies results and replans failed leaves.
 
 **Default inference:** official OpenCode v2 CLI via ACP, using a curated free model instead of the OpenAI paid API. Hermes executes file/terminal tools; OpenCode supplies inference.
+
+**Current live experiment path:** to use the user's original OpenAI API/Luna plan, explicitly select `--backend luna` in the commands below. The free OpenCode route is optional and produces a separate dataset. Neither route's live inference has been proven by offline CI.
+
+**Independent re-audit (2026-11-18):** [findings and unresolved limitations](docs/re-audit-2026-11-18.md). Completed dependencies are now invalidated on local replanning and the public report requires independent parent and leaf acceptance evidence.
 
 ## Quick start: one command to verify, one command to run
 
