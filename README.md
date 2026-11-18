@@ -25,6 +25,26 @@ If the check fails, follow the setup steps below. This is an **OpenCode free-mod
 
 **Issue-specific research contract:** [Conformance to Issue #156054](docs/issue-156054-conformance.md). This prototype is not a native Hermes /goal integration. Mid-term parent acceptance now requires fresh independent evidence; child completion alone is insufficient.
 
+## Run with the original Luna / OpenAI API plan
+
+This is an explicitly opted-in alternative to the OpenCode Free ACP backend; it needs **only Hermes and an existing OpenAI API key**, not OpenCode or a community plugin.
+
+Set `OPENAI_API_KEY` in your local environment or `~/.hermes/.env`. Never commit keys, paste them into GitHub, or send them to chat.
+
+~~~bash
+git clone https://github.com/Unjuno/hiergoal-lab.git
+cd hiergoal-lab
+
+# Zero-cost local checks (Hermes CLI, key presence, tests)
+bash scripts/experiment.sh --check --backend luna
+
+# One real hierarchical Hermes task (paid OpenAI API, explicitly authorized)
+bash scripts/experiment.sh --run --backend luna --approve-paid-api --pilot-budget-usd 3
+~~~
+
+Use a disposable VM/container or a restricted OS account: Hermes has shell and file tools. The `$3` local budget guard estimates **previously observed** standard-rate Luna usage, not an enforceable billing cap. It cannot cancel a model request after that request starts or account for all auxiliary calls. The model is pinned to `gpt-6-luna` via `openai-api`; normal `.env` credentials are used even with `--ignore-user-config`. Inspect actual charges in OpenAI Platform.
+
+One run means **one observational case**, not a comparative benchmark. Existing free-ACP mode is unchanged: `bash scripts/experiment.sh --run --backend free`. Keep traces separate by backend. Neither mode has been run with real model inference in CI.
 ## Requirements
 
 - macOS / Linux / Windows WSL2, Python 3.11+, Git
