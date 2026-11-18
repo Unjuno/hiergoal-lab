@@ -35,6 +35,10 @@ PROVIDER = "opencode-free-acp"
 PROFILE = "hiergoal-free"
 DEFAULT_MODEL = "opencode/glm-5.3-flash-free"
 # Exact allowlist from community opencode-free-acp v0.4.0; never infer free from a suffix.
+LUNA_MODEL = "gpt-6-luna"
+LUNA_INPUT_RATE_PER_MTOK = 0.10
+LUNA_OUTPUT_RATE_PER_MTOK = 0.50
+
 FREE_MODELS = (
     DEFAULT_MODEL,
     "opencode/deepseek-v4.1-flash-free",
@@ -44,6 +48,39 @@ FREE_MODELS = (
     "opencode/beam-free",
     "opencode/big-pickle",
 )
+
+def resolve_route(args: argparse.Namespace) -> tuple[str, str | None, str]:
+    """Pick an explicit, non-fallback inference route."""
+    backend = getattr(args, "backend", "free")
+    model = getattr(args, "model", None)
+    if backend == "free":
+        chosen = model or DEFAULT_MODEL
+        if chosen not in FREE_MODELS:
+            raise ValueError("Free backend requires an allowlisted free model")
+        return (PROVIDER, PROFILE, chosen)
+    if backend == "luna":
+        chosen = model or LUNA_MODEL
+        if chosen != LUNA_MODEL:
+            raise ValueError("Luna backend only permits gpt-6-luna")
+        return ("openai-api", None, chosen)
+    raise ValueError("Unsupported backend")
+
+
+def hermes_arguments(args: argparse.Namespace, workspace: Path, prompt_file: Path,
+                     toolsets: str) -> list[str]:
+    provider, profile, model = resolve_route(args)
+    command = [args.hermes]
+    if profile:
+        command += ["-p", profile]
+    command += ["chat", "--provider", provider, "--model", model]
+    if provider == "openai-api":
+        command += ["--reasoning", "low", "--ignore-user-config"]
+    command += ["--toolsets", toolsets, "--ignore-rules",
+                "--in", str(workspace), "--format", "stream-json",
+                "--max-turns", str(args.max_turns),
+                "--source", "hiergoal-lab",
+                "--query-file", str(prompt_file), "--oneshot"]
+    return command
 
 
 def verify_free_profile() -> Path:
@@ -214,6 +251,7 @@ class Controller:
 
     def __init__(self, args: argparse.Namespace):
         self.args = args
+        self.route_provider, self.route_profile, self.route_model = resolve_route(args)
         self._lock_handle = None
         if args.resume:
             self.directory = args.resume.resolve()
@@ -226,7 +264,7 @@ class Controller:
                 raise ExperimentStopped("Immutable goal does not match current protocol", uncertain=False)
             self.records = json.loads((self.directory / "records.json").read_text(encoding="utf-8"))
             if (self.records.get("provider"), self.records.get("model"), self.records.get("profile")) != (
-                PROVIDER, args.model, PROFILE
+                self.route_provider, self.route_model, self.route_profile
             ):
                 raise ExperimentStopped("Cannot resume a run from another model/provider/profile", uncertain=False)
             if self.records.get("outcome") == "PASS":
@@ -265,12 +303,17 @@ class Controller:
             self.workspace = self.directory / "workspace"
             shutil.copytree(FIXTURE, self.workspace)
             self.state = None
-            self.records = {"experiment": "hermes-hiergoal-free-v1",
-                            "provider": PROVIDER, "model": args.model, "profile": PROFILE,
+            self.records = {"experiment": "hermes-hiergoal-v1",
+                            "backend": getattr(args, "backend", "free"),
+                            "provider": self.route_provider,
+                            "model": self.route_model, "profile": self.route_profile,
                             "mode": "controlled-hierarchical-single-case", "calls": [],
                             "provenance": capture_provenance(ROOT),
-                            "estimated_visible_usd": None, "token_usage_available": False,
-                            "pricing": "OpenCode catalog lists this model as free; live billing not observed",
+                            "estimated_visible_usd": (0.0 if self.route_provider == "openai-api" else None),
+                            "token_usage_available": False,
+                            "pricing": ("Indicative Standard Luna input $0.10/output $0.50 per 1M tokens; "
+                                        "actual billing is not measured" if self.route_provider == "openai-api"
+                                        else "OpenCode catalog lists this model as free; billing not observed"),
                             "timed_out": False, "outcome": "NOT_RUN", "halt_reason": None}
             pre = grade(self.workspace, list(GATES))
             save_json(self.directory / "initial_grading.json", pre)
@@ -291,21 +334,18 @@ class Controller:
     def _call_hermes(self, role: str, prompt: str, toolsets: str) -> dict:
         if len(self.records["calls"]) >= self.args.max_calls:
             raise ExperimentStopped("max-calls guard reached; no further requests")
+        if (self.route_provider == "openai-api" and
+                self.records["estimated_visible_usd"] >= self.args.pilot_budget_usd):
+            raise ExperimentStopped("Estimated Luna budget guard reached")
         index = len(self.records["calls"]) + 1
         tag = "%02d-%s" % (index, role)
         prompt_path = self.directory / (tag + ".prompt.txt")
         stdout_path = self.directory / (tag + ".stream.jsonl")
         stderr_path = self.directory / (tag + ".stderr.txt")
         prompt_path.write_text(prompt, encoding="utf-8")
-        # --ignore-user-config or --safe-mode would disable the ACP plugin.
-        # Run only in the separately created, non-cloned Hermes profile.
-        command = [
-            self.args.hermes, "-p", PROFILE, "chat", "--provider", PROVIDER,
-            "--model", self.args.model, "--toolsets", toolsets, "--ignore-rules",
-            "--in", str(self.workspace), "--format", "stream-json",
-            "--max-turns", str(self.args.max_turns), "--source", "hiergoal-lab",
-            "--query-file", str(prompt_path), "--oneshot"
-        ]
+        # Free ACP needs its dedicated profile. Luna intentionally disables user
+        # config and uses only the direct OpenAI API provider and .env credentials.
+        command = hermes_arguments(self.args, self.workspace, prompt_path, toolsets)
         save_json(self.directory / (tag + ".invocation.json"), {"argv": command})
         # Write-ahead record: interrupted calls must count against max_calls
         # and must not be silently replayed on --resume.
@@ -348,6 +388,11 @@ class Controller:
         measured_tokens = (isinstance(inbound, int) and isinstance(outbound, int)
                            and inbound > 0 and outbound > 0)
         charge = None
+        if self.route_provider == "openai-api" and measured_tokens:
+            charge = round((
+                inbound * LUNA_INPUT_RATE_PER_MTOK
+                + outbound * LUNA_OUTPUT_RATE_PER_MTOK
+            ) / 1000000, 8)
         entry = {"index": index, "role": role, "exit_code": proc.returncode,
                  "hermes_exit_code": trace["hermes_exit_code"],
                  "terminal_result_seen": trace["terminal_result_seen"],
@@ -355,13 +400,17 @@ class Controller:
                  "tokens_input": inbound if measured_tokens else None,
                  "tokens_output": outbound if measured_tokens else None,
                  "token_usage_measured": measured_tokens,
-                 "estimated_visible_usd": None, "tool_calls": trace["tool_calls"],
+                 "estimated_visible_usd": charge, "tool_calls": trace["tool_calls"],
                  "nested_todo_observed": trace["verified_nested_todo_result_observed"],
                  "session_id": trace["session_id"], "invalid_json_lines": trace["invalid_json_lines"]}
         entry["status"] = ("finished" if trace["terminal_result_seen"]
                            and not timed_out and not trace["invalid_json_lines"]
                            else "incomplete")
         self.records["calls"][-1] = entry
+        if self.route_provider == "openai-api" and charge is not None:
+            self.records["estimated_visible_usd"] = round(
+                self.records["estimated_visible_usd"] + charge, 8)
+            self.records["token_usage_available"] = True
         if timed_out:
             self.records["timed_out"] = True
         self._save()
@@ -369,6 +418,13 @@ class Controller:
             raise ExperimentStopped("Hermes timed out or returned an incomplete stream: " + tag)
         if proc.returncode != 0 or trace["hermes_exit_code"] != 0:
             raise ExperimentStopped("Hermes failed at " + tag + "; inspect stderr/stream", uncertain=False)
+        if self.route_provider == "openai-api":
+            if not measured_tokens:
+                raise ExperimentStopped(
+                    "Luna returned unmeasured tokens; stop before next billable request")
+            if self.records["estimated_visible_usd"] >= self.args.pilot_budget_usd:
+                raise ExperimentStopped(
+                    "Estimated Luna pilot budget reached; no more requests")
         if not isinstance(result_text, str) or not result_text.strip():
             raise ExperimentStopped("Hermes provided no final response: " + tag)
         return {"text": result_text, "call": entry}
@@ -510,15 +566,20 @@ class Controller:
 
 
 def run(args: argparse.Namespace) -> int:
+    try:
+        route_provider, route_profile, route_model = resolve_route(args)
+    except ValueError as exc:
+        print("Invalid route:", exc, file=sys.stderr)
+        return 2
     if args.dry_run:
         initial = grade(FIXTURE, list(GATES))
         if initial["passed"] or initial["tests_run"] != len(GATES):
             print("ERROR: source fixture is not a valid failing test case", file=sys.stderr)
             return 2
         print("DRY RUN PASS: source fixture fails the independent tests.")
-        print("Configured Hermes command: hermes -p hiergoal-free chat "
-              "--provider opencode-free-acp --model " + args.model +
-              " --format stream-json --query-file PATH --oneshot")
+        print("Configured provider:", route_provider, "model:", route_model,
+              "profile:", route_profile or "isolated defaults")
+        print("No Hermes / OpenCode / OpenAI inference calls made.")
         print("No Hermes / OpenCode model calls made.")
         return 0
     if not args.ack_unsandboxed:
@@ -529,12 +590,17 @@ def run(args: argparse.Namespace) -> int:
     if not shutil.which(args.hermes):
         print("Hermes CLI not found; install it before the real run.", file=sys.stderr)
         return 2
-    try:
-        verify_free_profile()
-    except ExperimentStopped as exc:
-        print("Refusing to run:", exc, file=sys.stderr)
+    if route_provider == "openai-api" and not args.approve_paid_api:
+        print("Luna uses paid OpenAI API credits. Pass --approve-paid-api explicitly.",
+              file=sys.stderr)
         return 2
-    # The ACP provider validates the actual OpenCode executable and selected model.
+    if route_provider == PROVIDER:
+        try:
+            verify_free_profile()
+        except ExperimentStopped as exc:
+            print("Refusing to run:", exc, file=sys.stderr)
+            return 2
+    # The provider validates access and actual model availability at runtime.
     # Offline fake-Hermes integration exercises this path without OpenCode.
     controller = None
     try:
@@ -556,7 +622,7 @@ def run(args: argparse.Namespace) -> int:
                       "calls": len(result["calls"]),
                       "replans": controller.state["replans"] if controller.state else None,
                       "model": result["model"], "provider": result["provider"],
-                      "estimated_visible_usd": None,
+                      "estimated_visible_usd": result["estimated_visible_usd"],
                       "halt_reason": result["halt_reason"]}, ensure_ascii=False, indent=2))
     return 0 if result["outcome"] == "PASS" else 1
 
@@ -564,8 +630,14 @@ def run(args: argparse.Namespace) -> int:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Hierarchical real Hermes experiment")
     parser.add_argument("--hermes", default="hermes", help="Hermes binary path")
-    parser.add_argument("--model", default=DEFAULT_MODEL, choices=FREE_MODELS,
-                        help="Allowlisted free OpenCode ACP model ID")
+    parser.add_argument("--backend", choices=["free", "luna"], default="free",
+                        help="free=OpenCode ACP; luna=direct paid OpenAI API")
+    parser.add_argument("--model", default=None,
+                        help="Model identifier; defaults to route-specific model")
+    parser.add_argument("--approve-paid-api", action="store_true",
+                        help="Explicit consent for paid OpenAI Luna API calls")
+    parser.add_argument("--pilot-budget-usd", type=float, default=3.0,
+                        help="Soft stop on observed Luna token charges (not a billing cap)")
     parser.add_argument("--max-calls", type=int, default=12)
     parser.add_argument("--max-turns", type=int, default=18)
     parser.add_argument("--max-replans", type=int, default=2)
@@ -579,7 +651,7 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
     if (args.max_calls < 1 or args.max_turns < 1 or args.max_replans < 0
-            or args.timeout_seconds < 15):
+            or args.timeout_seconds < 15 or args.pilot_budget_usd <= 0):
         parser.error("Invalid bounds")
     sys.exit(run(args))
 
