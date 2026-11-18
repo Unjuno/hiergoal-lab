@@ -278,7 +278,7 @@ class ControllerOfflineIntegration(unittest.TestCase):
              "--ack-unsandboxed"],
             cwd=ROOT, text=True, capture_output=True, timeout=30)
         self.assertEqual(result.returncode, 2)
-        self.assertIn("invalid choice", result.stderr)
+        self.assertIn("allowlisted free model", result.stderr)
 
 
 if __name__ == "__main__":
