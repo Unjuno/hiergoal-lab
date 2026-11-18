@@ -13,13 +13,25 @@ def save(path, value):
 
 
 def good_case(directory):
+    first = ["invalid_rows", "blank_rows", "decimal_exactness"]
+    second = ["half_even", "refund_sort", "cli"]
     state = {
         "root": {"id": "G0", "status": "completed"},
-        "milestones": [{"id": "M1", "status": "completed"},
-                       {"id": "M2", "status": "completed"}],
+        "milestones": [
+            {"id": "M1", "status": "completed",
+             "verification": {"passed": True, "tests_run": 3, "checks": first,
+                              "evidence_file": "gate-parent-M1.json"}},
+            {"id": "M2", "status": "completed",
+             "verification": {"passed": True, "tests_run": 3, "checks": second,
+                              "evidence_file": "gate-parent-M2.json"}},
+        ],
         "leaves": {
-            "S1": {"id": "S1", "status": "completed"},
-            "S2": {"id": "S2", "status": "completed"},
+            "S1": {"id": "S1", "status": "completed", "checks": first,
+                   "history": [{"action": "executed", "gate_pass": True,
+                                "evidence_file": "gate-S1-after.json"}]},
+            "S2": {"id": "S2", "status": "completed", "checks": second,
+                   "history": [{"action": "preverified", "gate_pass": True,
+                                "evidence_file": "gate-S2-before.json"}]},
         },
         "replans": 1,
     }
@@ -28,6 +40,7 @@ def good_case(directory):
         "model": "opencode/glm-5.3-flash-free",
         "profile": "hiergoal-free",
         "outcome": "PASS", "original_visible_tests_unchanged": True,
+        "parent_acceptance_verified": True,
         "final_independent": {"passed": True, "tests_run": 6},
         "final_visible": {"passed": True, "tests_run": 3},
         "estimated_visible_usd": None,
@@ -39,6 +52,10 @@ def good_case(directory):
     save(directory / "records.json", records)
     save(directory / "gate-final-independent.json", {"passed": True, "tests_run": 6})
     save(directory / "final-visible.json", {"passed": True, "tests_run": 3})
+    for name in ("gate-parent-M1.json", "gate-parent-M2.json",
+                 "gate-S1-after.json", "gate-S2-before.json"):
+        save(directory / name, {"passed": True, "tests_run": 3,
+                                "expected_tests": 3})
     save(directory / "01-plan.stream.jsonl", {
         "type": "result", "exit_code": 0, "text": "Completed",
         "tokens": {"input": 0, "output": 0}
@@ -56,6 +73,25 @@ class PublicReportTests(unittest.TestCase):
             self.assertIsNone(result["estimated_visible_usd"])
             self.assertFalse(result["token_usage_measured_on_all_calls"])
             self.assertNotIn("Completed", json.dumps(result))
+
+    def test_missing_parent_evidence_downgrades_pass(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            good_case(directory)
+            (directory / "gate-parent-M2.json").unlink()
+            result = compile_report(directory)
+            self.assertEqual(result["verified_report_outcome"], "UNCERTAIN")
+            self.assertIn("pass_claim_missing_acceptance_evidence", result["evidence_issues"])
+            self.assertFalse(result["parent_acceptance_evidence_verified"])
+
+    def test_missing_leaf_evidence_downgrades_pass(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            good_case(directory)
+            (directory / "gate-S1-after.json").unlink()
+            result = compile_report(directory)
+            self.assertEqual(result["verified_report_outcome"], "UNCERTAIN")
+            self.assertFalse(result["leaf_acceptance_evidence_verified"])
 
     def test_missing_trace_downgrades_pass(self):
         with tempfile.TemporaryDirectory() as tmp:

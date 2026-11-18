@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 from scripts.stream_report import parse_events
+from hiergoal.core import GATES
 
 
 class EvidenceError(ValueError):
@@ -102,8 +103,84 @@ def compile_report(run_directory: Path) -> dict:
     visible = records.get("final_visible") if isinstance(records.get("final_visible"), dict) else {}
     final_file = directory / "gate-final-independent.json"
     visible_file = directory / "final-visible.json"
-    gate_file_ok = final_file.is_file() and _load_object(final_file).get("passed") is True
-    visible_file_ok = visible_file.is_file() and _load_object(visible_file).get("passed") is True
+    gate_file_ok = final_file.is_file() and (
+        _load_object(final_file).get("passed") is True
+        and _load_object(final_file).get("tests_run") == len(GATES)
+    )
+    visible_file_ok = visible_file.is_file() and (
+        _load_object(visible_file).get("passed") is True
+        and _load_object(visible_file).get("tests_run") == 3
+    )
+    parent_evidence_ok = True
+    leaf_evidence_ok = True
+    observed_checks = []
+
+    for milestone in milestones:
+        if not isinstance(milestone, dict):
+            parent_evidence_ok = False
+            continue
+        mid = milestone.get("id")
+        contract = milestone.get("verification")
+        if not isinstance(mid, str) or not isinstance(contract, dict):
+            parent_evidence_ok = False
+            continue
+        checks = contract.get("checks")
+        filename = "gate-parent-" + mid + ".json"
+        if (contract.get("evidence_file") != filename
+                or not isinstance(checks, list) or len(checks) == 0
+                or len(set(checks)) != len(checks)
+                or any(check not in GATES for check in checks)
+                or contract.get("passed") is not True
+                or contract.get("tests_run") != len(checks)
+                or milestone.get("status") != "completed"):
+            parent_evidence_ok = False
+            continue
+        parent_file = directory / filename
+        if not parent_file.is_file():
+            parent_evidence_ok = False
+            continue
+        grade_data = _load_object(parent_file)
+        if (grade_data.get("passed") is not True
+                or grade_data.get("tests_run") != len(checks)
+                or grade_data.get("expected_tests") != len(checks)):
+            parent_evidence_ok = False
+        observed_checks.extend(checks)
+
+    for leaf in terminal_leaves:
+        if not isinstance(leaf, dict) or leaf.get("status") != "completed":
+            leaf_evidence_ok = False
+            continue
+        checks = leaf.get("checks")
+        history = leaf.get("history")
+        if (not isinstance(checks, list) or not checks
+                or any(check not in GATES for check in checks)
+                or not isinstance(history, list) or not history):
+            leaf_evidence_ok = False
+            continue
+        good = [item for item in history if isinstance(item, dict)
+                and item.get("gate_pass") is True]
+        if not good:
+            leaf_evidence_ok = False
+            continue
+        last = good[-1]
+        filename = last.get("evidence_file")
+        if (not isinstance(filename, str)
+                or filename not in (
+                    "gate-" + str(leaf.get("id")) + "-before.json",
+                    "gate-" + str(leaf.get("id")) + "-after.json"
+                )):
+            leaf_evidence_ok = False
+            continue
+        evidence_file = directory / filename
+        if not evidence_file.is_file():
+            leaf_evidence_ok = False
+            continue
+        grade_data = _load_object(evidence_file)
+        if (grade_data.get("passed") is not True
+                or grade_data.get("tests_run") != len(checks)
+                or grade_data.get("expected_tests") != len(checks)):
+            leaf_evidence_ok = False
+    gate_coverage_ok = len(observed_checks) == len(GATES) and set(observed_checks) == set(GATES)
 
     if status == "PASS":
         if not (
@@ -117,6 +194,8 @@ def compile_report(run_directory: Path) -> dict:
             and visible.get("tests_run") == 3
             and records.get("original_visible_tests_unchanged") is True
             and gate_file_ok and visible_file_ok
+            and records.get("parent_acceptance_verified") is True
+            and parent_evidence_ok and leaf_evidence_ok and gate_coverage_ok
         ):
             issues.append("pass_claim_missing_acceptance_evidence")
     declared = status
@@ -138,6 +217,9 @@ def compile_report(run_directory: Path) -> dict:
         "verified_report_outcome": result,
         "evidence_issues": sorted(set(issues)),
         "milestone_count": len(milestones),
+        "parent_acceptance_evidence_verified": parent_evidence_ok,
+        "leaf_acceptance_evidence_verified": leaf_evidence_ok,
+        "acceptance_gate_coverage_verified": gate_coverage_ok,
         "leaf_count_including_superseded": len(leaves),
         "terminal_leaves_completed": sum(item.get("status") == "completed" for item in terminal_leaves),
         "replans": state.get("replans"),
