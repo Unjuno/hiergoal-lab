@@ -177,6 +177,28 @@ class PlanContractTests(unittest.TestCase):
         self.assertEqual(state["leaves"]["S1"]["status"], "superseded")
         self.assertEqual(state["root"]["goal"], ROOT_GOAL)
 
+    def test_replanning_invalidates_completed_transitive_dependents(self):
+        from hiergoal.core import update_rollups
+        state = validate_plan(PLAN)
+        for leaf in state["leaves"].values():
+            leaf["status"] = "completed"
+        for milestone in state["milestones"]:
+            milestone["verification"] = {"passed": True}
+        state["leaves"]["S1"]["status"] = "failed"
+        replacement = replace_failed_leaf(
+            state, "S1", "Implement Decimal input validation and CSV parsing",
+            "Evidence shows prior CSV parser broke the contract",
+        )
+        self.assertEqual(replacement["id"], "S1r1")
+        self.assertEqual(state["leaves"]["S2"]["status"], "pending")
+        self.assertEqual(state["leaves"]["S3"]["status"], "pending")
+        self.assertEqual(state["leaves"]["S2"]["depends_on"], ["S1r1"])
+        self.assertEqual(state["leaves"]["S3"]["depends_on"], ["S2"])
+        self.assertEqual(state["leaves"]["S3"]["history"][-1]["action"],
+                         "dependency_invalidated")
+        self.assertTrue(all(m["verification"] is None for m in state["milestones"]))
+        self.assertEqual(state["root"]["status"], "active")
+
     def test_json_fence_supported(self):
         parsed = parse_object(chr(96)*3 + "json\n" + json.dumps(PLAN) + "\n" + chr(96)*3)
         self.assertEqual(parsed, PLAN)

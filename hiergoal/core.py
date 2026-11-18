@@ -169,10 +169,45 @@ def replace_failed_leaf(state: dict, failed_id: str, instruction: str, diagnosis
     }
     old["status"] = "superseded"
     state["leaves"][name] = new
-    for leaf in state["leaves"].values():
-        if leaf["status"] == "pending":
-            leaf["depends_on"] = [name if dep == failed_id else dep
-                                  for dep in leaf["depends_on"]]
+
+    # Replacing an upstream leaf invalidates previous completion evidence for
+    # every *transitive* dependent, including already-completed leaves.
+    # Invalidate the whole dependency cone rather than only rewriting pending
+    # references. The next execution will rerun their fixed acceptance gates
+    # and skip model work if they still pass.
+    invalidated = {name}
+    affected_parents = {old["parent"]}
+    changed = True
+    while changed:
+        changed = False
+        for leaf in state["leaves"].values():
+            if leaf["id"] in (failed_id, name) or leaf["status"] == "superseded":
+                continue
+            references = leaf["depends_on"]
+            if failed_id in references:
+                leaf["depends_on"] = [name if dep == failed_id else dep
+                                      for dep in references]
+                references = leaf["depends_on"]
+            if not any(dep in invalidated for dep in references):
+                continue
+            affected_parents.add(leaf["parent"])
+            if leaf["id"] not in invalidated:
+                invalidated.add(leaf["id"])
+                changed = True
+            if leaf["status"] in ("completed", "running"):
+                leaf["history"].append({
+                    "action": "dependency_invalidated",
+                    "cause": failed_id,
+                    "replacement": name,
+                })
+                leaf["status"] = "pending"
+            elif leaf["status"] == "failed":
+                # A separately failed leaf is not silently treated as recovered.
+                raise PlanError("Cannot supersede dependency of another failed leaf")
+
+    for milestone in state["milestones"]:
+        if milestone["id"] in affected_parents:
+            milestone["verification"] = None
     state["replans"] += 1
     update_rollups(state)
     return new
