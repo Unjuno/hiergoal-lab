@@ -276,7 +276,7 @@ class Controller:
             if not prior_protocol or prior_protocol != protocol_manifest(ROOT)["protocol_id"]:
                 self.close()
                 raise ExperimentStopped(
-                    "Experiment source or evaluator changed since this run began; 
+                    "Experiment source or evaluator changed since this run began; "
                     "start a fresh run instead of mixing protocol versions.", uncertain=False
                 )
             potentially_active = any(
