@@ -32,7 +32,23 @@ def check() -> dict:
     binary = shutil.which("hermes")
     cred = credential_location()
     base = os.environ.get("OPENAI_BASE_URL", "").strip()
-    direct = base in ("", "https://api.openai.com/v1", "https://api.openai.com/v1/")
+    allowed = ("", "https://api.openai.com/v1", "https://api.openai.com/v1/")
+    direct = base in allowed
+    if direct:
+        # Hermes loads its own .env even with --ignore-user-config.
+        # A hidden custom endpoint there would undermine direct-API attribution.
+        env_path = Path.home() / ".hermes" / ".env"
+        try:
+            env_lines = env_path.read_text(encoding="utf-8").splitlines()
+        except OSError:
+            env_lines = []
+        for line in env_lines:
+            match = re.match(r"^\s*(?:export\s+)?OPENAI_BASE_URL\s*=\s*(.*?)\s*$", line)
+            if match:
+                declared = match.group(1).strip().strip(chr(34) + chr(39))
+                if declared not in allowed:
+                    direct = False
+                    break
     version, version_ok = None, False
     if binary:
         try:
