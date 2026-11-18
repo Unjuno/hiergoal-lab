@@ -261,18 +261,22 @@ class Controller:
             self._acquire_lock()
             self.state = json.loads((self.directory / "state.json").read_text(encoding="utf-8"))
             if self.state["root"]["goal"] != ROOT_GOAL:
+                self.close()
                 raise ExperimentStopped("Immutable goal does not match current protocol", uncertain=False)
             self.records = json.loads((self.directory / "records.json").read_text(encoding="utf-8"))
             if (self.records.get("provider"), self.records.get("model"), self.records.get("profile")) != (
                 self.route_provider, self.route_model, self.route_profile
             ):
+                self.close()
                 raise ExperimentStopped("Cannot resume a run from another model/provider/profile", uncertain=False)
             if self.records.get("outcome") == "PASS":
+                self.close()
                 raise ExperimentStopped("This run is already complete; do not resume it", uncertain=False)
             prior_protocol = self.records.get("provenance", {}).get("protocol_id")
             if not prior_protocol or prior_protocol != protocol_manifest(ROOT)["protocol_id"]:
+                self.close()
                 raise ExperimentStopped(
-                    "Experiment source or evaluator changed since this run began; "
+                    "Experiment source or evaluator changed since this run began; 
                     "start a fresh run instead of mixing protocol versions.", uncertain=False
                 )
             potentially_active = any(
@@ -281,6 +285,7 @@ class Controller:
                 for call in self.records.get("calls", [])
             ) or any(leaf["status"] == "running" for leaf in self.state["leaves"].values())
             if potentially_active and not args.confirm_stopped:
+                self.close()
                 raise ExperimentStopped(
                     "An interrupted Hermes call may still be running. Verify it has stopped, "
                     "then explicitly pass --confirm-stopped when resuming.", uncertain=True
@@ -318,6 +323,7 @@ class Controller:
             pre = grade(self.workspace, list(GATES))
             save_json(self.directory / "initial_grading.json", pre)
             if pre["passed"] or pre["tests_run"] != len(GATES):
+                self.close()
                 raise ExperimentStopped("Initial fixture not reliably broken or grader failed", uncertain=False)
         self._save()
 
