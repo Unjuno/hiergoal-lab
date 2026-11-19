@@ -61,9 +61,10 @@ def summarize_batch(batch_dir: Path) -> dict:
         output_dir = batch_dir / "individual" / ("task-%02d" % i)
         candidates = list(output_dir.glob("hiergoal-*/records.json")) if output_dir.exists() else []
         if len(candidates) != 1:
+            attempted = task.get("run_state") in ("STARTED", "RETURNED")
             entries.append({
                 "index": i, "case_id": case_id, "repetition": repetition,
-                "status": "NOT_RUN" if not candidates else "UNCERTAIN",
+                "status": "UNCERTAIN" if attempted or len(candidates) > 1 else "NOT_RUN",
                 "model_calls": 0, "tool_calls": None, "replans": None,
                 "elapsed_hermes_seconds": None, "estimated_visible_usd": None,
                 "token_usage_measured": False, "verified_evidence": False,
@@ -213,8 +214,8 @@ def start_batch(args: argparse.Namespace, tasks: list[dict]) -> int:
             visible_spend = round(visible_spend + charge, 8)
         # A nonzero exit can be a genuine task FAIL, or infrastructure failure.
         # Stop on any UNCERTAIN to avoid unintentionally burning the full budget.
-        if row["status"] == "UNCERTAIN":
-            halt_reason = "Last task UNCERTAIN; review the raw run before continuing"
+        if row["status"] not in ("PASS", "FAIL"):
+            halt_reason = "Last task unverified; review the raw run before continuing"
             break
 
     metadata["status"] = "HALTED" if halt_reason else "FINISHED"

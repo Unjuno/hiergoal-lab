@@ -15,7 +15,7 @@ from tests.test_hiergoal_controller import PLAN
 def options(path, resume=None, confirm=False):
     return Namespace(
         output=path / "runs", resume=resume, model=DEFAULT_MODEL,
-        confirm_stopped=confirm
+        confirm_stopped=confirm, case="legacy"
     )
 
 
