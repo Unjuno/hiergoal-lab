@@ -85,6 +85,7 @@ class BenchmarkIntegrationTests(unittest.TestCase):
         self.assertEqual(summary["fail"], 0)
         self.assertEqual(summary["uncertain"], 0)
         self.assertEqual(summary["run_plan"]["scheduled"], 2)
+        self.assertEqual(summary["engineering_target"], "NOT_APPLICABLE")
         self.assertEqual(summary["not_run"], 0)
         self.assertGreaterEqual(summary["observed_total_subgoals"], 6)
         self.assertEqual(summary["observed_total_subgoals"], summary["observed_completed_subgoals"])

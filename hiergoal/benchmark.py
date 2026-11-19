@@ -132,6 +132,20 @@ def summarize_batch(batch_dir: Path) -> dict:
     tool_counts = [x["tool_calls"] for x in observed if isinstance(x["tool_calls"], int)]
     spend = [x["estimated_visible_usd"] for x in observed
              if isinstance(x["estimated_visible_usd"], (int, float))]
+    original_design = (
+        len(entries) == 8 and batch.get("repetitions") == 2
+        and sorted((row["case_id"], row["repetition"]) for row in entries)
+        == sorted((case_id, repetition) for case_id in CASE_IDS
+                  for repetition in (1, 2))
+    )
+    if not original_design:
+        engineering_target = "NOT_APPLICABLE"
+    elif len(observed) != 8 or any(row["status"] == "UNCERTAIN" for row in observed):
+        engineering_target = "UNCERTAIN"
+    elif len(passed) >= 6 and all(row["verified_evidence"] for row in passed):
+        engineering_target = "PASS"
+    else:
+        engineering_target = "FAIL"
     return {
         "schema_version": "1.0",
         "experiment": "Hermes hierarchical goals, 4 defect profiles, no comparator",
@@ -147,6 +161,10 @@ def summarize_batch(batch_dir: Path) -> dict:
         "fail": sum(x["status"] == "FAIL" for x in observed),
         "uncertain": sum(x["status"] == "UNCERTAIN" for x in observed),
         "observed_pass_fraction": (len(passed) / len(observed) if observed else None),
+        "engineering_target": engineering_target,
+        "engineering_target_definition": ("For preregistered 4 cases x 2 repeats: "
+                                          "at least 6 evidence-verified passes, "
+                                          "all 8 classifiable; not a statistical claim."),
         "median_hermes_seconds": (statistics.median(seconds) if seconds else None),
         "range_hermes_seconds": ([min(seconds), max(seconds)] if seconds else None),
         "median_tool_calls": (statistics.median(tool_counts) if tool_counts else None),
