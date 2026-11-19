@@ -29,6 +29,21 @@ If the check fails, follow the setup steps below. This is an **OpenCode free-mod
 
 **Issue-specific research contract:** [Conformance to Issue #156054](docs/issue-156054-conformance.md). This prototype is not a native Hermes /goal integration. Mid-term parent acceptance now requires fresh independent evidence; child completion alone is insufficient.
 
+## Preliminary multi-case benchmark (4 profiles × 2 runs)
+
+The benchmark uses the **same Issue #156054 hierarchical goal controller** across four initial bug distributions with two fresh repetitions each (8 actual Hermes runs). It is a preliminary operational test, **not** evidence that the hierarchy outperforms a flat goal. Read the [preregistered benchmark protocol](docs/benchmark_protocol_ja.md).
+
+~~~bash
+# Inspect the case schedule only: no model calls or billing
+python3 -m hiergoal.benchmark
+
+# After ONE successful paid pilot and only in an isolated local environment:
+python3 -m hiergoal.benchmark --run --backend luna \
+  --approve-paid-api --ack-unsandboxed \
+  --total-soft-budget-usd 6 --per-case-soft-budget-usd 1.5
+~~~
+
+Results are retained locally at `runs/benchmarks/benchmark-<id>/summary.json` and `schedule.json`. They include PASS/FAIL/UNCERTAIN per attempt, verified success count, median elapsed Hermes seconds, median visible tool calls, replans and nominal spend where measured. **Budget numbers are soft telemetry-based guards, not billing caps**. Never publish raw prompts, stderr or agent traces without redaction.
 ## Run with the original Luna / OpenAI API plan
 
 This is an explicitly opted-in alternative to the OpenCode Free ACP backend; it needs **only Hermes and an existing OpenAI API key**, not OpenCode or a community plugin.

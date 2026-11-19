@@ -13,6 +13,7 @@ from pathlib import Path
 PROTOCOL_PATHS = (
     "hiergoal/core.py",
     "hiergoal/cases.py",
+    "hiergoal/benchmark.py",
     "hiergoal/controller.py",
     "scripts/stream_report.py",
     "evaluation/test_release.py",

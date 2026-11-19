@@ -21,3 +21,6 @@ jobs:
         run: python -m hiergoal.controller --dry-run
       - name: Paid-route dry-run without inference
         run: python -m hiergoal.controller --backend luna --dry-run
+
+      - name: Benchmark schedule print only (no inference)
+        run: python -m hiergoal.benchmark
