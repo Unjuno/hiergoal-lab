@@ -66,6 +66,9 @@ def summarize_batch(batch_dir: Path) -> dict:
                 "index": i, "case_id": case_id, "repetition": repetition,
                 "status": "UNCERTAIN" if attempted or len(candidates) > 1 else "NOT_RUN",
                 "model_calls": 0, "tool_calls": None, "replans": None,
+                "subgoals_total": None, "subgoals_completed_status": None,
+                "milestones_total": None, "milestones_verified": None,
+                "preverified_leaves": None,
                 "elapsed_hermes_seconds": None, "estimated_visible_usd": None,
                 "token_usage_measured": False, "verified_evidence": False,
             })
@@ -86,12 +89,34 @@ def summarize_batch(batch_dir: Path) -> dict:
                       for c in calls if isinstance(c.get("elapsed_seconds"), (int, float)))
         tools = sum(int(c.get("tool_calls", 0))
                     for c in calls if isinstance(c.get("tool_calls"), int))
+        state = _load_json(run / "state.json")
+        leaves = state.get("leaves") if isinstance(state, dict) else None
+        milestones = state.get("milestones") if isinstance(state, dict) else None
+        active_leaves = [leaf for leaf in leaves.values() if isinstance(leaf, dict)
+                         and leaf.get("status") != "superseded"] if isinstance(leaves, dict) else []
+        milestone_list = [m for m in milestones if isinstance(m, dict)] if isinstance(milestones, list) else []
         entries.append({
             "index": i, "case_id": case_id, "repetition": repetition,
             "status": status,
             "model_calls": len(calls),
             "tool_calls": tools,
-            "replans": _load_json(run / "state.json").get("replans") if _load_json(run / "state.json") else None,
+            "replans": state.get("replans") if isinstance(state, dict) else None,
+            "subgoals_total": len(active_leaves) if isinstance(leaves, dict) else None,
+            "subgoals_completed_status": sum(
+                leaf.get("status") == "completed" for leaf in active_leaves
+            ) if isinstance(leaves, dict) else None,
+            "milestones_total": len(milestone_list) if isinstance(milestones, list) else None,
+            "milestones_verified": sum(
+                m.get("status") == "completed"
+                and isinstance(m.get("verification"), dict)
+                and m["verification"].get("passed") is True
+                for m in milestone_list
+            ) if isinstance(milestones, list) else None,
+            "preverified_leaves": sum(
+                any(isinstance(event, dict) and event.get("action") == "preverified"
+                    for event in leaf.get("history", []))
+                for leaf in active_leaves
+            ) if isinstance(leaves, dict) else None,
             "elapsed_hermes_seconds": round(seconds, 3),
             "estimated_visible_usd": rec.get("estimated_visible_usd") if rec else None,
             "token_usage_measured": bool(calls) and all(
@@ -125,6 +150,18 @@ def summarize_batch(batch_dir: Path) -> dict:
         "median_hermes_seconds": (statistics.median(seconds) if seconds else None),
         "range_hermes_seconds": ([min(seconds), max(seconds)] if seconds else None),
         "median_tool_calls": (statistics.median(tool_counts) if tool_counts else None),
+        "observed_replans": sum(x["replans"] for x in observed
+                                if isinstance(x["replans"], int)),
+        "verified_pass_after_replan": sum(
+            x["status"] == "PASS" and isinstance(x["replans"], int)
+            and x["replans"] > 0 for x in observed
+        ),
+        "observed_completed_subgoals": sum(x["subgoals_completed_status"] for x in observed
+                                           if isinstance(x["subgoals_completed_status"], int)),
+        "observed_total_subgoals": sum(x["subgoals_total"] for x in observed
+                                       if isinstance(x["subgoals_total"], int)),
+        "observed_verified_milestones": sum(x["milestones_verified"] for x in observed
+                                            if isinstance(x["milestones_verified"], int)),
         "estimated_visible_total_usd": (round(sum(spend), 8)
             if len(spend) == len(observed) and observed else None),
         "token_telemetry_complete": bool(observed) and all(
