@@ -363,7 +363,16 @@ class Controller:
         elapsed = time.monotonic()
         timed_out = False
         with stdout_path.open("w", encoding="utf-8") as out, stderr_path.open("w", encoding="utf-8") as err:
-            proc = subprocess.Popen(command, cwd=self.workspace, stdout=out, stderr=err)
+            try:
+                proc = subprocess.Popen(command, cwd=self.workspace, stdout=out, stderr=err)
+            except OSError as exc:
+                self.records["calls"][-1]["status"] = "launch_failed"
+                self.records["calls"][-1]["launch_error_type"] = type(exc).__name__
+                self._save()
+                raise ExperimentStopped(
+                    "Hermes invocation could not be started; inspect executable and permissions",
+                    uncertain=False
+                ) from exc
             self.records["calls"][-1]["status"] = "running"
             self.records["calls"][-1]["pid"] = proc.pid
             self._save()
