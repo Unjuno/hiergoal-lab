@@ -15,6 +15,7 @@ import re
 import shutil
 import signal
 import subprocess
+import tempfile
 import sys
 import time
 import uuid
@@ -594,11 +595,16 @@ def run(args: argparse.Namespace) -> int:
         print("Invalid route:", exc, file=sys.stderr)
         return 2
     if args.dry_run:
-        initial = grade(FIXTURE, list(GATES))
+        with tempfile.TemporaryDirectory() as tmp:
+            temporary_workspace = Path(tmp) / "workspace"
+            shutil.copytree(FIXTURE, temporary_workspace)
+            apply_case(temporary_workspace, args.case)
+            initial = grade(temporary_workspace, list(GATES))
         if initial["passed"] or initial["tests_run"] != len(GATES):
-            print("ERROR: source fixture is not a valid failing test case", file=sys.stderr)
+            print("ERROR: selected case is not a valid failing test case", file=sys.stderr)
             return 2
         print("DRY RUN PASS: source fixture fails the independent tests.")
+        print("Validated case:", args.case, CASE_DESCRIPTION[args.case])
         print("Configured provider:", route_provider, "model:", route_model,
               "profile:", route_profile or "isolated defaults")
         print("No Hermes / OpenCode / OpenAI inference calls made.")

@@ -32,6 +32,19 @@ class CaseProfiles(unittest.TestCase):
                 self.assertEqual(verdict["tests_run"], len(GATES))
                 self.assertFalse(verdict["passed"])
 
+    def test_every_case_supports_true_no_key_dry_run(self):
+        import subprocess
+        import sys
+        for case in CASE_IDS:
+            with self.subTest(case=case):
+                proc = subprocess.run(
+                    [sys.executable, "-m", "hiergoal.controller",
+                     "--backend", "luna", "--case", case, "--dry-run"],
+                    cwd=ROOT, capture_output=True, text=True, timeout=30,
+                )
+                self.assertEqual(proc.returncode, 0, proc.stderr)
+                self.assertIn("Validated case: " + case, proc.stdout)
+
     def test_invalid_case_refused(self):
         with tempfile.TemporaryDirectory() as folder:
             work = Path(folder) / "task"
