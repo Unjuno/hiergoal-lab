@@ -27,6 +27,7 @@ from hiergoal.core import (
 )
 from scripts.stream_report import parse_events
 from hiergoal.provenance import capture_provenance, protocol_manifest
+from hiergoal.cases import CASE_IDS, CASE_DESCRIPTION, apply_case
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "fixtures" / "ledger_release"
@@ -269,6 +270,9 @@ class Controller:
             ):
                 self.close()
                 raise ExperimentStopped("Cannot resume a run from another model/provider/profile", uncertain=False)
+            if self.records.get("case_id", "legacy") != args.case:
+                self.close()
+                raise ExperimentStopped("Cannot resume with a different benchmark case", uncertain=False)
             if self.records.get("outcome") == "PASS":
                 self.close()
                 raise ExperimentStopped("This run is already complete; do not resume it", uncertain=False)
@@ -307,9 +311,12 @@ class Controller:
             self._acquire_lock()
             self.workspace = self.directory / "workspace"
             shutil.copytree(FIXTURE, self.workspace)
+            apply_case(self.workspace, args.case)
             self.state = None
             self.records = {"experiment": "hermes-hiergoal-v1",
                             "backend": getattr(args, "backend", "free"),
+                            "case_id": args.case,
+                            "case_description": CASE_DESCRIPTION[args.case],
                             "provider": self.route_provider,
                             "model": self.route_model, "profile": self.route_profile,
                             "mode": "controlled-hierarchical-single-case", "calls": [],
@@ -647,6 +654,8 @@ def main() -> None:
     parser.add_argument("--hermes", default="hermes", help="Hermes binary path")
     parser.add_argument("--backend", choices=["free", "luna"], default="free",
                         help="free=OpenCode ACP; luna=direct paid OpenAI API")
+    parser.add_argument("--case", choices=CASE_IDS, default="legacy",
+                        help="Benchmark starting defect profile; same goal and gates")
     parser.add_argument("--model", default=None,
                         help="Model identifier; defaults to route-specific model")
     parser.add_argument("--approve-paid-api", action="store_true",

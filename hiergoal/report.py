@@ -205,6 +205,7 @@ def compile_report(run_directory: Path) -> dict:
         "study": "hierarchical Hermes goal execution, single-case observation",
         "source": "local run records + SHA256 fingerprints; not a signed attestation",
         "experiment": str(records.get("experiment", "unknown")),
+        "case_id": str(records.get("case_id", "legacy")),
         "provider": str(records.get("provider", "unknown")),
         "model": str(records.get("model", "unknown")),
         "profile": str(records.get("profile", "unknown")),
