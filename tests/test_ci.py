@@ -68,6 +68,7 @@ class CIRunnerTests(unittest.TestCase):
                     invoke.assert_not_called()
                 self.assertEqual(state["diagnostic_code"], "MISSING_OPENAI_API_KEY" if consent else "PAID_OPT_IN_REQUIRED")
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "The hosted CI adapter requires Linux")
     def test_fake_pilot_through_ci_wrapper_and_exporter(self):
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)

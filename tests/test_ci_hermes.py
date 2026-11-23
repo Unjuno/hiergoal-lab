@@ -24,10 +24,17 @@ if sys.argv[1:] == ["gateway", "stop", "--yes"]:
     "inherited_overrides": any(name in os.environ for name in
         ("HERMES_PROFILE", "HERMES_PROFILE_NAME", "HERMES_TUI_GATEWAY_URL"))}))
 if os.environ.get("FAKE_DETACHED"):
-    detached = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"],
+    program = "import ctypes, pathlib, time; "
+    if os.environ.get("FAKE_CHILD_NONDUMPABLE"):
+        program += "assert ctypes.CDLL(None).prctl(4, 0, 0, 0, 0) == 0; "
+    program += "pathlib.Path(" + repr(str(home / "child-ready")) + ").write_text('ready'); time.sleep(30)"
+    detached = subprocess.Popen([sys.executable, "-c", program],
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                                 start_new_session=True)
     (home / "detached.pid").write_text(str(detached.pid))
+    deadline = time.monotonic() + 3
+    while not (home / "child-ready").exists() and time.monotonic() < deadline:
+        time.sleep(0.01)
 print(json.dumps({"type": "result", "text": "visible-stream"}), flush=True)
 if os.environ.get("FAKE_SLEEP"):
     time.sleep(30)
@@ -35,6 +42,7 @@ raise SystemExit(int(os.environ.get("FAKE_EXIT_CODE", "0")))
 '''
 
 
+@unittest.skipUnless(sys.platform.startswith("linux"), "The hosted CI adapter requires Linux")
 class CiHermesAdapterTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -130,6 +138,39 @@ class CiHermesAdapterTests(unittest.TestCase):
         result = self.invoke(FAKE_EXIT_CODE="7")
         self.assertEqual(result.returncode, 7)
         self.assertTrue(self.metadata()[0]["cleanup_confirmed"])
+
+    def test_unrelated_unreadable_process_does_not_block_or_receive_cleanup(self):
+        ready = self.root / "foreign-ready"
+        foreign = subprocess.Popen([
+            sys.executable, "-c",
+            "import ctypes, pathlib, time; "
+            "assert ctypes.CDLL(None).prctl(4, 0, 0, 0, 0) == 0; "
+            f"pathlib.Path({str(ready)!r}).write_text('ready'); time.sleep(30)",
+        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            deadline = time.monotonic() + 3
+            while not ready.exists() and time.monotonic() < deadline:
+                time.sleep(0.01)
+            self.assertTrue(ready.exists())
+            result = self.invoke()
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIsNone(foreign.poll(), "Cleanup touched an unrelated process")
+            item = self.metadata()[0]
+            self.assertTrue(item["cleanup_confirmed"])
+            self.assertEqual(item["process_scope"], "owned_descendants")
+        finally:
+            foreign.terminate()
+            foreign.wait(timeout=3)
+
+    def test_unreadable_owned_detached_child_is_still_stopped(self):
+        result = self.invoke(FAKE_DETACHED="1", FAKE_CHILD_NONDUMPABLE="1")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        item = self.metadata()[0]
+        self.assertTrue(item["cleanup_confirmed"])
+        self.assertEqual(item["scoped_processes_terminated"], 1)
+        self.assertEqual(item["lingering_process_count"], 0)
+        child_pid = int(next(self.homes.glob("call-*/detached.pid")).read_text())
+        self.assertFalse((Path("/proc") / str(child_pid)).exists())
 
     def test_missing_private_home_fails_before_starting_hermes(self):
         env = self.env.copy()

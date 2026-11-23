@@ -91,6 +91,18 @@ def check_cli(binary: str, private_dir: Path) -> tuple[bool, str | None]:
     label = lines[0][:160] if lines else None
     valid = (version.returncode == help_result.returncode == 0
              and all(flag in help_result.stdout for flag in REQUIRED_FLAGS))
+    if valid:
+        # Exercise isolation and gateway cleanup on the actual hosted runner,
+        # without an API credential or inference prompt.
+        env.update(HIERGOAL_REAL_HERMES=str(Path(binary).resolve()),
+                   HIERGOAL_CI_HOMES=str(private_dir / "homes"),
+                   HIERGOAL_HERMES_TIMEOUT_SECONDS="120")
+        try:
+            code, _ = supervised([str(ROOT / "scripts/ci_hermes.py"), "--version"],
+                                 private_dir / "isolated-cli-check", env, 160)
+            valid = code == 0
+        except (OSError, subprocess.SubprocessError):
+            valid = False
     return valid, label
 
 
@@ -246,7 +258,7 @@ def execute(args: argparse.Namespace, state: dict) -> int:
         state["connection_status"] = smoke["status"]
         store(root / "ci-state.json", state)
         if smoke["status"] != "PASS":
-            state.update(status="TIMEOUT" if code == 124 else "ERROR", diagnostic_code=smoke["reason_code"])
+            state.update(status="TIMEOUT" if code in (124, 137, 143) else "ERROR", diagnostic_code=smoke["reason_code"])
             return 1
         if args.mode == "smoke":
             state.update(status="COMPLETE", diagnostic_code="VERIFIED_API_RESPONSE")

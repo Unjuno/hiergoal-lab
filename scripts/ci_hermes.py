@@ -7,6 +7,7 @@ No API keys, prompts, stderr, or environment contents enter cleanup metadata.
 """
 from __future__ import annotations
 
+import ctypes
 import json
 import os
 from pathlib import Path
@@ -15,6 +16,124 @@ import subprocess
 import sys
 import tempfile
 import time
+
+
+def _subreaper_enabled(*, enable: bool = False) -> bool:
+    """Keep detached descendants parented to this dedicated wrapper on Linux."""
+    try:
+        libc = ctypes.CDLL(None, use_errno=True)
+        libc.prctl.argtypes = [ctypes.c_int, ctypes.c_ulong, ctypes.c_ulong,
+                               ctypes.c_ulong, ctypes.c_ulong]
+        libc.prctl.restype = ctypes.c_int
+        if enable and libc.prctl(36, 1, 0, 0, 0) != 0:  # PR_SET_CHILD_SUBREAPER
+            return False
+        value = ctypes.c_int()
+        return (libc.prctl(37, ctypes.addressof(value), 0, 0, 0) == 0
+                and value.value == 1)  # PR_GET_CHILD_SUBREAPER
+    except (OSError, AttributeError):
+        return False
+
+
+def _owned_processes(owner_pid: int) -> list[int] | None:
+    """Walk only the subreaper's children, including adopted detached workers.
+
+    An unreadable unrelated runner process is outside this ownership tree.
+    Failure to inspect a known child remains unknown, never an empty result.
+    No process environment or command line is needed for this path.
+    """
+    if owner_pid != os.getpid() or not _subreaper_enabled():
+        return None
+    # Some minimal procfs implementations omit task/children entirely. The
+    # public stat parent IDs provide the same ownership relation without
+    # reading protected process environments.
+    if not (Path("/proc") / str(owner_pid) / "task" / str(owner_pid) / "children").is_file():
+        return _stat_owned_processes(owner_pid)
+    pending, seen, live = [owner_pid], {owner_pid}, []
+    while pending:
+        pid = pending.pop()
+        path = Path("/proc") / str(pid)
+        try:
+            if pid != owner_pid:
+                state = (path / "stat").read_text().rsplit(")", 1)[1].split()[0]
+                if state == "Z":
+                    continue
+                live.append(pid)
+            for task in (path / "task").iterdir():
+                try:
+                    children = (task / "children").read_text().split()
+                except (FileNotFoundError, ProcessLookupError):
+                    continue
+                for child in children:
+                    child_pid = int(child)
+                    if child_pid not in seen:
+                        seen.add(child_pid)
+                        pending.append(child_pid)
+        except (FileNotFoundError, ProcessLookupError):
+            # Exiting descendants are atomically reparented to the subreaper;
+            # the next scan sees them directly beneath this owner.
+            if pid == owner_pid:
+                return None
+        except (OSError, ValueError, IndexError):
+            return None
+    return live
+
+
+def _stat_owned_processes(owner_pid: int) -> list[int] | None:
+    parents, states = {}, {}
+    try:
+        for entry in Path("/proc").iterdir():
+            if not entry.name.isdigit():
+                continue
+            try:
+                fields = (entry / "stat").read_text().rsplit(")", 1)[1].split()
+                pid, parent, state = int(entry.name), int(fields[1]), fields[0]
+                states[pid] = state
+                parents.setdefault(parent, []).append(pid)
+            except (FileNotFoundError, ProcessLookupError):
+                continue
+        if owner_pid not in states:
+            return None
+        pending, seen, live = [owner_pid], {owner_pid}, []
+        while pending:
+            for child in parents.get(pending.pop(), []):
+                if child in seen:
+                    continue
+                seen.add(child)
+                if states[child] != "Z":
+                    live.append(child)
+                    pending.append(child)
+        return live
+    except (OSError, ValueError, IndexError):
+        return None
+
+
+def _reap_adopted_children() -> None:
+    # Called only after both directly managed Popen instances have been waited.
+    while True:
+        try:
+            pid, _ = os.waitpid(-1, os.WNOHANG)
+        except ChildProcessError:
+            return
+        if pid == 0:
+            return
+
+
+def _signal_owned_process(pid: int, owner_pid: int, sig: int) -> bool:
+    descriptor = None
+    try:
+        descriptor = os.pidfd_open(pid)
+        # Recheck ownership after pinning the process identity, including when
+        # a PID disappeared or was reused between the first scan and pidfd_open.
+        owned = _owned_processes(owner_pid)
+        if owned is None or pid not in owned:
+            return False
+        signal.pidfd_send_signal(descriptor, sig)
+        return True
+    except (OSError, AttributeError):
+        return False
+    finally:
+        if descriptor is not None:
+            os.close(descriptor)
 
 
 def _terminate_group(process: subprocess.Popen) -> None:
@@ -84,29 +203,41 @@ def _signal_home_process(pid: int, home: Path, sig: int) -> bool:
             os.close(descriptor)
 
 
-def _stop_home_processes(home: Path) -> tuple[list[int] | None, int]:
+def _stop_home_processes(home: Path, owner_pid: int | None = None) -> tuple[list[int] | None, int]:
     """Drain private workers left behind by an otherwise successful stop CLI.
 
     A Hermes managed worker can briefly outlive `gateway stop`. Nothing with
     this random home's marker belongs to another invocation. Bound both the
     graceful drain and escalation, and never target a PID by name alone.
     """
+    def discover():
+        if owner_pid is not None:
+            _reap_adopted_children()
+            return _owned_processes(owner_pid)
+        return _home_processes(home)
+
     terminated = set()
     for sig, grace_seconds in ((signal.SIGTERM, 3), (signal.SIGKILL, 2)):
         signalled_in_phase = set()
         deadline = time.monotonic() + grace_seconds
         while time.monotonic() < deadline:
-            remaining = _home_processes(home)
+            remaining = discover()
             if remaining == []:
-                return remaining, len(terminated)
+                # Repeat after any reparenting during the traversal. Once the
+                # subreaper has no children, no owned parent can spawn more.
+                if discover() == []:
+                    return remaining, len(terminated)
             for pid in remaining or []:
-                if pid not in signalled_in_phase and _signal_home_process(pid, home, sig):
+                signalled = (False if pid in signalled_in_phase else
+                             _signal_owned_process(pid, owner_pid, sig) if owner_pid is not None else
+                             _signal_home_process(pid, home, sig))
+                if signalled:
                     terminated.add(pid)
                     signalled_in_phase.add(pid)
             # During process exit, /proc/environ can briefly become unreadable
             # before /proc/stat identifies a zombie. Retry within the bound.
             time.sleep(0.05)
-    return _home_processes(home), len(terminated)
+    return discover(), len(terminated)
 
 
 def _private_home_env(home: Path) -> dict[str, str]:
@@ -118,13 +249,15 @@ def _private_home_env(home: Path) -> dict[str, str]:
     return env
 
 
-def cleanup_home(binary: Path, home: Path) -> dict:
+def cleanup_home(binary: Path, home: Path, *, owner_pid: int | None = None) -> dict:
     """Stop processes belonging to one caller-owned private CI home only.
 
     The caller must obtain `home` from its dedicated private homes directory,
     never from untrusted run data or an existing user's Hermes installation.
-    This helper can also finish interrupted cleanup from a workflow's final
-    step. It makes no inference request and never targets an entire host.
+    `owner_pid` is supplied only by the dedicated, active subreaper wrapper.
+    The standalone fallback retains conservative environment-marker discovery;
+    it cannot claim stopped if the original owner has died and scope is unknown.
+    This helper makes no inference request and never targets an entire host.
     """
     result = {
         "gateway_stop_returncode": None,
@@ -132,11 +265,13 @@ def cleanup_home(binary: Path, home: Path) -> dict:
         "cleanup_confirmed": False,
         "scoped_processes_terminated": 0,
         "lingering_process_count": None,
+        "process_scope": "owned_descendants" if owner_pid is not None else "home_marker",
     }
     if (not binary.is_absolute() or not binary.is_file()
             or binary.resolve() == Path(__file__).resolve()
             or not home.is_absolute() or not home.is_dir() or home.is_symlink()
-            or not home.name.startswith("call-")):
+            or not home.name.startswith("call-")
+            or (owner_pid is not None and (owner_pid != os.getpid() or not _subreaper_enabled()))):
         return result
     home = home.resolve()
     stop_process = None
@@ -151,7 +286,7 @@ def cleanup_home(binary: Path, home: Path) -> dict:
         except subprocess.TimeoutExpired:
             result["gateway_stop_timed_out"] = True
             _terminate_group(stop_process)
-        remaining, terminated = _stop_home_processes(home)
+        remaining, terminated = _stop_home_processes(home, owner_pid)
         result["scoped_processes_terminated"] = terminated
         result["lingering_process_count"] = len(remaining) if remaining is not None else None
         result["cleanup_confirmed"] = result["gateway_stop_returncode"] == 0 and remaining == []
@@ -188,6 +323,10 @@ def run(arguments: list[str]) -> int:
             raise ValueError
         base = base.resolve()
         base.mkdir(parents=True, exist_ok=True, mode=0o700)
+        if not _subreaper_enabled(enable=True):
+            print("CI Hermes adapter: Linux child supervision is unavailable; no invocation started.",
+                  file=sys.stderr)
+            return 2
         home = Path(tempfile.mkdtemp(prefix="call-", dir=base))
     except (KeyError, ValueError, OSError):
         print("CI Hermes adapter: invalid executable, private-home directory or timeout.", file=sys.stderr)
@@ -238,7 +377,7 @@ def run(arguments: list[str]) -> int:
         # stream-json's gateway is detached from the CLI process group. Stop it
         # explicitly, scoped to the NEW home, including after CLI failure.
         try:
-            cleanup = cleanup_home(binary, home)
+            cleanup = cleanup_home(binary, home, owner_pid=os.getpid())
         finally:
             for sig, previous in previous_handlers.items():
                 signal.signal(sig, previous)

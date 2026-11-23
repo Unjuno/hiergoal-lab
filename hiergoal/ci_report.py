@@ -85,6 +85,9 @@ REMEDIATION = {
     "MISSING_USAGE_TELEMETRY": "Review the pinned Hermes stream format and token usage collection before another paid run.",
     "BATCH_HALTED_REVIEW_EVIDENCE": "Inspect the per-attempt reports. Retain failed and uncertain attempts when interpreting the experiment.",
     "BATCH_WALL_TIME_LIMIT": "The batch reached its wall-time limit; unfinished attempts remain unclassified.",
+    "BATCH_WALL_TIME_LIMIT_OR_CANCELED": "The batch reached its wall-time limit or was canceled; retain partial evidence.",
+    "GATEWAY_CLEANUP_UNCONFIRMED": "Gateway shutdown was not confirmed; do not interpret this as a complete experiment.",
+    "HERMES_INSTALLATION_FAILED": "Review the pinned runtime installation step; no live experiment was started.",
 }
 
 
