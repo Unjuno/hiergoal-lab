@@ -1,6 +1,7 @@
 # HierGoal Lab — Hermes Issue #156054 Hierarchical Goal Research
 
 [![Offline CI](https://github.com/Unjuno/hiergoal-lab/actions/workflows/offline.yml/badge.svg)](https://github.com/Unjuno/hiergoal-lab/actions/workflows/offline.yml)
+[![Hermes CI](https://github.com/Unjuno/hiergoal-lab/actions/workflows/live-experiment.yml/badge.svg)](https://github.com/Unjuno/hiergoal-lab/actions/workflows/live-experiment.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 An experimental Python controller running real **Hermes Agent** instances through a three-level goal hierarchy: fixed long-term objective → model-proposed mid-term milestones → short-term executable tasks. The controller validates plans and dependencies, invokes Hermes, independently verifies results and replans failed leaves.
@@ -10,6 +11,14 @@ An experimental Python controller running real **Hermes Agent** instances throug
 **Current live experiment path:** to use the user's original OpenAI API/Luna plan, explicitly select `--backend luna` in the commands below. The free OpenCode route is optional and produces a separate dataset. Neither route's live inference has been proven by offline CI.
 
 **Independent re-audit (2026-11-18):** [findings and unresolved limitations](docs/re-audit-2026-11-18.md). Completed dependencies are now invalidated on local replanning and the public report requires independent parent and leaf acceptance evidence.
+
+## Run real Hermes experiments in GitHub Actions
+
+Register the repository Actions secret **`OPENAI_API_KEY`**, then open **Actions → Hermes live experiment → Run workflow**. Select `smoke` for the first real API connection check, `pilot` for one task, or `benchmark` for the existing four profiles × two repetitions. The initial nominal spend guard is USD 1; it is not a billing cap.
+
+The workflow installs an immutable Hermes revision with Python 3.14.10, runs the direct `openai-api` / `gpt-6-luna` path, and publishes verified JSON/CSV results and an Actions summary, including failed attempts. Each Hermes invocation gets a fresh home and explicit gateway cleanup. Raw prompts, traces, stderr, workspaces and credentials are excluded from uploaded artifacts.
+
+Push-triggered runs and manual `check` mode only verify the actual Hermes installation and CLI; they make **no inference requests**. A green check run is not evidence of successful API inference. See the [Japanese CI execution guide](docs/ci_experiments_ja.md) for setup, budgets, result retrieval and interpretation.
 
 ## Quick start: one command to verify, one command to run
 
@@ -23,7 +32,7 @@ bash scripts/experiment.sh --check
 bash scripts/experiment.sh --run
 ~~~
 
-If the check fails, follow the setup steps below. This is an **OpenCode free-model** configuration rather than the earlier paid OpenAI Luna route. Free eligibility is not guaranteed; verify current vendor terms. **No live experiment has been conducted by the repository automation.**
+If the check fails, follow the setup steps below. This local quick start uses the **OpenCode free-model** configuration. Free eligibility is not guaranteed; verify current vendor terms. The separate manual Actions workflow above uses the direct paid Luna route.
 
 **Status:** offline tests and synthetic-Hermes integration pass in GitHub Actions. **No actual Hermes + OpenCode model-inference experiment has been run in this environment.** No causal performance comparison or superiority claim is made.
 
@@ -63,11 +72,11 @@ bash scripts/experiment.sh --run --backend luna --approve-paid-api --pilot-budge
 
 Use a disposable VM/container or a restricted OS account: Hermes has shell and file tools. The `$3` local budget guard estimates **previously observed** standard-rate Luna usage, not an enforceable billing cap. It cannot cancel a model request after that request starts or account for all auxiliary calls. The model is pinned to `gpt-6-luna` via `openai-api`; normal `.env` credentials are used even with `--ignore-user-config`. Inspect actual charges in OpenAI Platform.
 
-One run means **one observational case**, not a comparative benchmark. Existing free-ACP mode is unchanged: `bash scripts/experiment.sh --run --backend free`. Keep traces separate by backend. Neither mode has been run with real model inference in CI.
+One run means **one observational case**, not a comparative benchmark. Existing free-ACP mode is unchanged: `bash scripts/experiment.sh --run --backend free`. Keep traces separate by backend. Real CI inference is verified only by the corresponding live-run evidence, not the offline badge.
 ## Requirements
 
 - macOS / Linux / Windows WSL2, Python 3.11+, Git
-- Hermes Agent >=0.22.2
+- Hermes Agent >=0.22.2 with its required Python runtime. The CI-pinned Hermes v0.23.3 requires Python 3.14; the controller's offline tests still support Python 3.11+.
 - Official **OpenCode v2 CLI** (separate runtime), installed with one of:
   - npm install -g @opencode/cli
   - brew install anomalyco/tap/opencode-v2

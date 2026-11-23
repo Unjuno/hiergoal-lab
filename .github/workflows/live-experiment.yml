@@ -1,0 +1,112 @@
+name: Hermes live experiment
+run-name: Hermes ${{ inputs.mode || 'check' }} · ${{ github.run_number }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'check: no API / smoke: API connection / pilot: 1 task / benchmark: 8 tasks'
+        type: choice
+        options: [smoke, pilot, benchmark, check]
+        default: smoke
+        required: true
+      soft_budget_usd:
+        description: 'Nominal token-cost stop threshold, including smoke (not a billing cap; max 12 USD)'
+        type: string
+        default: '1'
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/live-experiment.yml'
+      - 'ci/hermes.json'
+      - 'scripts/install_ci_hermes.sh'
+      - 'scripts/ci_hermes.py'
+      - 'hiergoal/ci.py'
+      - 'hiergoal/ci_report.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hiergoal-live-experiment
+  cancel-in-progress: false
+
+jobs:
+  experiment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      EXPERIMENT_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'check' }}
+      SOFT_BUDGET_USD: ${{ inputs.soft_budget_usd || '1' }}
+      CI_OUTPUT: ${{ github.workspace }}/runs/ci
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Initialize evidence before installing dependencies
+        run: >-
+          python3 -m hiergoal.ci --prepare --output "$CI_OUTPUT"
+          --mode "$EXPERIMENT_MODE" --soft-budget-usd "$SOFT_BUDGET_USD"
+      - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          version: '0.13.9'
+          enable-cache: false
+      - name: Install pinned real Hermes (no inference)
+        id: install
+        timeout-minutes: 20
+        run: bash scripts/install_ci_hermes.sh "$RUNNER_TEMP/hiergoal-hermes"
+      - name: Run CLI check or explicitly selected API experiment
+        id: experiment
+        timeout-minutes: 310
+        env:
+          # A push always selects check and never receives the API credential.
+          OPENAI_API_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.mode != 'check' && secrets.OPENAI_API_KEY || '' }}
+          OPENAI_BASE_URL: https://api.openai.com/v1
+        run: |
+          python -m hiergoal.ci --mode "$EXPERIMENT_MODE" \
+            --output "$CI_OUTPUT" --hermes "$HIERGOAL_REAL_HERMES" \
+            --soft-budget-usd "$SOFT_BUDGET_USD" --approve-paid-api
+      - name: Stop any remaining experiment gateways
+        if: ${{ always() && steps.install.outcome == 'success' }}
+        run: python -m hiergoal.ci --cleanup --output "$CI_OUTPUT" --hermes "$HIERGOAL_REAL_HERMES"
+      - name: Record setup failure
+        if: ${{ always() && steps.install.outcome != 'success' }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          from hiergoal.benchmark import store
+          path = Path(os.environ['CI_OUTPUT']) / 'ci-state.json'
+          state = json.loads(path.read_text()) if path.is_file() else {}
+          state.update(status='ERROR', diagnostic_code='HERMES_INSTALLATION_FAILED')
+          store(path, state)
+          PY
+      - name: Collect verified results and job summary
+        if: ${{ always() }}
+        env:
+          # Exact-value redaction is applied to exported metadata as defense in depth.
+          OPENAI_API_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.mode != 'check' && secrets.OPENAI_API_KEY || '' }}
+        run: python3 -m hiergoal.ci_report --run-root "$CI_OUTPUT"
+      - name: Upload curated results (including failures)
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: hermes-${{ env.EXPERIMENT_MODE }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: runs/ci/results/
+          if-no-files-found: error
+          retention-days: 14
+          include-hidden-files: false
+      - name: Apply evidence-based conclusion
+        if: ${{ always() }}
+        run: |
+          python3 - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          path = Path(os.environ['CI_OUTPUT']) / 'results' / 'ci-result.json'
+          result = json.loads(path.read_text()) if path.is_file() else {}
+          status = result.get('workflow_conclusion', 'UNCERTAIN')
+          print('Evidence conclusion:', status)
+          sys.exit(0 if status == 'PASS' else 1)
+          PY

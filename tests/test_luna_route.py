@@ -38,6 +38,7 @@ class LunaBackendSafety(unittest.TestCase):
         self.assertIn("--ignore-user-config", cmd)
         self.assertIn("gpt-6-luna", cmd)
         self.assertNotIn("hiergoal-free", cmd)
+        self.assertEqual(cmd[cmd.index("--source") + 1], "tool")
 
     def test_luna_does_not_accept_different_model(self):
         with self.assertRaisesRegex(ValueError, "only permits"):

@@ -80,7 +80,8 @@ def hermes_arguments(args: argparse.Namespace, workspace: Path, prompt_file: Pat
     command += ["--toolsets", toolsets, "--ignore-rules",
                 "--in", str(workspace), "--format", "stream-json",
                 "--max-turns", str(args.max_turns),
-                "--source", "hiergoal-lab",
+                # Gateway-backed Hermes accepts a fixed set of source labels.
+                "--source", "tool",
                 "--query-file", str(prompt_file), "--oneshot"]
     return command
 

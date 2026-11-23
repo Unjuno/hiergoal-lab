@@ -16,7 +16,7 @@ jobs:
       - name: Run offline unit tests
         run: python -m unittest discover -s tests -v
       - name: Check local setup scripts (no inference)
-        run: bash -n scripts/setup_opencode_free.sh scripts/smoke.sh scripts/experiment.sh
+        run: bash -n scripts/setup_opencode_free.sh scripts/smoke.sh scripts/experiment.sh scripts/install_ci_hermes.sh
       - name: No-key dry run
         run: python -m hiergoal.controller --dry-run
       - name: Paid-route dry-run without inference
