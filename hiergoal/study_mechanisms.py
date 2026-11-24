@@ -11,11 +11,16 @@ from __future__ import annotations
 import copy
 import json
 
-from hiergoal.study_protocol import digest
+from hiergoal.study_protocol import canonical, digest
 
 
 class InvalidAction(ValueError):
     """The responder proposed an action outside the fixed artifact protocol."""
+
+
+def same_json(left, right) -> bool:
+    """Compare finite JSON trees without equating Boolean, integer, and float values."""
+    return canonical(left) == canonical(right)
 
 
 def _text(value, name: str) -> str:
@@ -32,7 +37,7 @@ def validate_replan(plan: dict, leaf: dict, grades: dict, change: dict) -> tuple
     """
     if (not isinstance(plan, dict) or not isinstance(leaf, dict)
             or leaf.get("id") not in plan.get("leaves", {})
-            or plan["leaves"][leaf["id"]] != leaf):
+            or not same_json(plan["leaves"][leaf["id"]], leaf)):
         raise InvalidAction("Replan requires the current failed leaf")
     checks = leaf.get("checks")
     if (not isinstance(checks, list) or not checks
@@ -172,7 +177,7 @@ def evidence_from_events(events: list[dict], task) -> dict:
     reserved_root_keys = {"root", "root_contract", "objective", "gates", "dependencies", "acceptance_rules"}
 
     def observe_root(value):
-        if value != contract:
+        if not same_json(value, contract):
             evidence["root_preserved"] = False
             changed_roots.add(digest(value))
 
@@ -281,7 +286,7 @@ def evidence_from_events(events: list[dict], task) -> dict:
             counters["nonvacuous_events"] += 1
             for field in unrelated_fields:
                 unchanged = (field in baseline and field in event["after_solution"]
-                             and baseline[field] == event["after_solution"][field])
+                             and same_json(baseline[field], event["after_solution"][field]))
                 counters["unrelated_artifact_fields_checked"] += 1
                 counters["unrelated_artifact_fields_unchanged"] += int(unchanged)
                 counters["violations"] += int(not unchanged)
@@ -292,9 +297,9 @@ def evidence_from_events(events: list[dict], task) -> dict:
             counters = evidence["replanning"]
             counters["accepted"] += 1
             counters["parent_preserved_events"] += int(
-                before.get("milestones") == after.get("milestones")
+                same_json(before.get("milestones"), after.get("milestones"))
                 and set(before["leaves"]) == set(after["leaves"])
-                and all(value["parent"] == after["leaves"][ident]["parent"]
+                and all(same_json(value["parent"], after["leaves"][ident]["parent"])
                         for ident, value in before["leaves"].items()))
             owners = _owners(before)
             for gate in set(dependencies) - _related_gates(dependencies, target):
@@ -302,7 +307,7 @@ def evidence_from_events(events: list[dict], task) -> dict:
                     ident = owners[gate]
                     counters["unrelated_goals_checked"] += 1
                     counters["unrelated_goals_unchanged"] += int(
-                        before["leaves"][ident] == after["leaves"].get(ident))
+                        same_json(before["leaves"][ident], after["leaves"].get(ident)))
             evidence["trace"]["accepted_replans_with_failure_evidence"] += int(
                 any(event["public_grades"][gate]["passed"] is False for gate in leaf["checks"]))
             evidence["trace"]["post_fault_target_replans"] += int(

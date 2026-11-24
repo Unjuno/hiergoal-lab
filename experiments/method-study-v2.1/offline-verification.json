@@ -1,0 +1,583 @@
+{
+  "evidence_kind": "OFFLINE_SOFTWARE_VERIFICATION_NOT_MODEL_PERFORMANCE",
+  "host": {
+    "timestamp_utc": "2026-11-24T20:25:44.905959+00:00",
+    "git_commit": "2bdfde5caf2c52ce8cf58cffbd8f969c642ea636",
+    "working_tree_dirty": true,
+    "python": "3.12.14",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpu_clock_mhz_observed_range": [
+      2596.15,
+      2596.15
+    ],
+    "logical_cpus": 9,
+    "memory_bytes": 10451427328,
+    "batch_size": 1,
+    "model_hardware": "Provider-managed; not observable"
+  },
+  "unit_tests": {
+    "passed": 242,
+    "failed": 0,
+    "seconds_single_observation": 33.269,
+    "log_sha256": "a64bb54d49a4e42c5577642b444d9d3955a51c968d1c4828c91f8ad241aeb9a0"
+  },
+  "source_file_sha256": {
+    "hiergoal/study_protocol.py": "cf838402c622c422395c4c8a64f66380bed30e1fb644f04cf5d5370fc005b6b7",
+    "hiergoal/study_tasks.py": "298022f469ac5e05d30a8f58a81406eaeaf93ae5590c36666e9fd55b0adb8e8b",
+    "hiergoal/study_api.py": "c430dd0e70dcb19afb72679f96831e539758c190d30ee38995862a1a9194171c",
+    "hiergoal/study.py": "ce67974461e382db18858e91cd902bffc8d55442c0b96797905cc8cbeb768545",
+    "hiergoal/study_analysis.py": "1a25e0d7a96551899769186ed3afc7fef9a740401a876fc68e70dd72094dbf79",
+    "hiergoal/study_planning.py": "0adcac1a659e92b6f6e91a2fa5c5656fb5a6c4ed13bf5374a3f0e1917604497d",
+    "hiergoal/study_scale.py": "a5ba2ef203dc1dd42bc7d04d5c9d694a5e4fa8c4813b03acc1dac8fcd7f62714",
+    "hiergoal/study_mechanisms.py": "c49fb65c2334f2041fd2afe31f934aad35fc00748a470c630bf91701c96b0558",
+    "docs/method_study_ja.md": "cc5847423bba93375643b009fa49befc114ee9776dfecd8ca0ea2475a716b949",
+    "docs/method_requirements_audit_ja.md": "353060c6a3534d92cd17d9416f5eb67ed792336d49ac71749d39be64f15cab11",
+    ".github/workflows/method-study.yml": "9f1c143b22a44a167677bd48805fe8b93128f07336311678f409fff62caa6275"
+  },
+  "test_file_sha256": {
+    "tests/test_benchmark.py": "ddb7ca271acc3286374f0baf30cda10e705732ac1d31d63c1b1f199c96d3a63f",
+    "tests/test_cases.py": "5642244a99af06113b364550ea6384ec5ad6a57eefac42f38c6e3d02115fd070",
+    "tests/test_ci.py": "08a93f8238cfe2da3272a65e4c20b33f2c1ce1f9ec267e6fe691656e84453322",
+    "tests/test_ci_hermes.py": "568e2385f1022ba5022e35d2538b852cea80ec8ee5626e597d6424d5b22d9c8f",
+    "tests/test_ci_report.py": "4a3729bb0fac9f5e27560a41470b849a8b0494111e6b1a84770d5575e9f35888",
+    "tests/test_hiergoal_controller.py": "dd308035157996fbfa444636365a940764055162ccda6f77d55aca2ed9996547",
+    "tests/test_luna_integration.py": "7be9445ec4a37576cea489587ee32d3f5b8a39d39f6824c6cda65bb664af4f51",
+    "tests/test_luna_route.py": "de5a02f00a936fbe073a9715fa724ed2de45f0e398cac0b5dd8462a70d281cb8",
+    "tests/test_native_todo.py": "9f09687b3413d34c2896b2515a2e618f23b45bf516fb10abcadd47cb8b3bfceb",
+    "tests/test_offline.py": "da3480a0f9c273daab6f17c19b27713bd5055c44fe2e4bf83f089f4e1135fc7c",
+    "tests/test_preflight.py": "e7cfc71d6f001ba6e89dcfeb04c1b29c6c5192d1ad7291774a5f364a3b3d3686",
+    "tests/test_preflight_luna.py": "9571c569baa88d2bc051e56ba89ed5653c10087a9eb880489f1d6b7d92228972",
+    "tests/test_provenance.py": "74a33c5944044527eb79a4b2e55d5bef037f41ab9225aca87d819735f7dc556e",
+    "tests/test_recovery.py": "00b595ca5bf8caa6671a96564a4b71b4653783de6e33b642e63cc914c5c4b59c",
+    "tests/test_report.py": "f9754ad88b5aa7d7d227285451518ce4b38adc955d1650f694b0092921492ab8",
+    "tests/test_runner_integration.py": "173ac7d34ce120a736e31996def3797560376bc575645bb91f9c72b359c115c2",
+    "tests/test_study_adversarial.py": "b786138d39b8787a200f7775595c8d2e453e8e3c64c9f5cb8113f13aec178112",
+    "tests/test_study_analysis.py": "25844a1d057970fe1bce77c46668401fe30d9af52da8a3af76334918ae5197d7",
+    "tests/test_study_api.py": "7b0e3da28de660d577227b1d00e82a5efec1473c603eb3043d895bd52af71a1f",
+    "tests/test_study_budget_replay.py": "6ed498bbc8860bedae72275eadd39e27248d9169f8c473f810690f6bfa0365ec",
+    "tests/test_study_profiles.py": "f22685971d31e6693b76fd7132e9e077e1cbed689df89cc62a592019466fbc21",
+    "tests/test_study_reaudit.py": "63e41e08d88dc5bc956ace48a878b9ab340c2b07abbdc092998a8c8fab0fb195",
+    "tests/test_study_requirements.py": "5a6d5929c81a7707e5cb83c0f52db9d0eaee81a92b0b8811b90050a98536cb4e",
+    "tests/test_study_runner.py": "22c707898f544ff131a6a7a1d13ed461328f43f179bedb18c41afa1d45afeb0b",
+    "tests/test_study_scale.py": "652e359c808ebaed87174841aa459f2573b4ac6b2160dd2c6b22bdfb6453e04f",
+    "tests/test_study_tasks.py": "6a5b99393f7995541031d952b230b9ce0142b8b57d1f6053dc513698e23dfe8f"
+  },
+  "profiles": [
+    {
+      "profile": "pilot",
+      "scheduled": 18,
+      "completed_and_audited": 18,
+      "status_counts": {
+        "PASS": 18
+      },
+      "audit_counts": {
+        "PASS": 18
+      },
+      "actual_api_requests": 0,
+      "fault_triggered": 9,
+      "domain_fault_delivered": 9,
+      "forced_fault_delivered": 0,
+      "accepted_post_fault_target_replans": 3,
+      "unrelated_goal_comparisons": 0,
+      "unrelated_artifact_comparisons": 0,
+      "artifact_locality_violations": 0,
+      "invalidated_goals": 8,
+      "reverified_goals": 8,
+      "maximum_total_goals": 6,
+      "maximum_leaves": 3,
+      "maximum_root_edge_depth": 2,
+      "maximum_dependency_edges": 3,
+      "requirement_statuses": [
+        {
+          "id": "R1",
+          "key": "forced_subgoal_recovery",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R2",
+          "key": "traceable_hierarchy",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R3",
+          "key": "immutable_root",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R4",
+          "key": "diverse_tasks",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R5",
+          "key": "locality",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R6",
+          "key": "necessary_bounded_replanning",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R7",
+          "key": "independent_evaluation",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R8",
+          "key": "scale_coverage",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R9",
+          "key": "repeat_stability",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        }
+      ],
+      "live_manifest_protocol_id": "2aa4a830a43d9cc13d2078b7700e4b06adaa6e475a2e44ebdd3daf3b4ab2ff85",
+      "live_prepared_not_run": 18,
+      "seconds_single_observation": 0.336476
+    },
+    {
+      "profile": "study",
+      "scheduled": 216,
+      "completed_and_audited": 216,
+      "status_counts": {
+        "PASS": 216
+      },
+      "audit_counts": {
+        "PASS": 216
+      },
+      "actual_api_requests": 0,
+      "fault_triggered": 108,
+      "domain_fault_delivered": 108,
+      "forced_fault_delivered": 0,
+      "accepted_post_fault_target_replans": 36,
+      "unrelated_goal_comparisons": 0,
+      "unrelated_artifact_comparisons": 0,
+      "artifact_locality_violations": 0,
+      "invalidated_goals": 102,
+      "reverified_goals": 102,
+      "maximum_total_goals": 6,
+      "maximum_leaves": 3,
+      "maximum_root_edge_depth": 2,
+      "maximum_dependency_edges": 3,
+      "requirement_statuses": [
+        {
+          "id": "R1",
+          "key": "forced_subgoal_recovery",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R2",
+          "key": "traceable_hierarchy",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R3",
+          "key": "immutable_root",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R4",
+          "key": "diverse_tasks",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R5",
+          "key": "locality",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R6",
+          "key": "necessary_bounded_replanning",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R7",
+          "key": "independent_evaluation",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R8",
+          "key": "scale_coverage",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R9",
+          "key": "repeat_stability",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        }
+      ],
+      "live_manifest_protocol_id": "e813e98baaaca8b2969d4447ed8a5d1d862728d0ff9c670dd15f8b3610c4ebe7",
+      "live_prepared_not_run": 216,
+      "seconds_single_observation": 3.085289
+    },
+    {
+      "profile": "mechanism",
+      "scheduled": 108,
+      "completed_and_audited": 108,
+      "status_counts": {
+        "PASS": 108
+      },
+      "audit_counts": {
+        "PASS": 108
+      },
+      "actual_api_requests": 0,
+      "fault_triggered": 54,
+      "domain_fault_delivered": 54,
+      "forced_fault_delivered": 54,
+      "accepted_post_fault_target_replans": 18,
+      "unrelated_goal_comparisons": 72,
+      "unrelated_artifact_comparisons": 180,
+      "artifact_locality_violations": 0,
+      "invalidated_goals": 108,
+      "reverified_goals": 108,
+      "maximum_total_goals": 11,
+      "maximum_leaves": 8,
+      "maximum_root_edge_depth": 2,
+      "maximum_dependency_edges": 8,
+      "requirement_statuses": [
+        {
+          "id": "R1",
+          "key": "forced_subgoal_recovery",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R2",
+          "key": "traceable_hierarchy",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R3",
+          "key": "immutable_root",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R4",
+          "key": "diverse_tasks",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R5",
+          "key": "locality",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R6",
+          "key": "necessary_bounded_replanning",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R7",
+          "key": "independent_evaluation",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R8",
+          "key": "scale_coverage",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R9",
+          "key": "repeat_stability",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        }
+      ],
+      "live_manifest_protocol_id": "9fc22656a855120abe41432f91417e42bbc75897035819bbb6c5da337477b14b",
+      "live_prepared_not_run": 108,
+      "seconds_single_observation": 5.701434
+    },
+    {
+      "profile": "scale",
+      "scheduled": 252,
+      "completed_and_audited": 252,
+      "status_counts": {
+        "PASS": 252
+      },
+      "audit_counts": {
+        "PASS": 252
+      },
+      "actual_api_requests": 0,
+      "fault_triggered": 126,
+      "domain_fault_delivered": 126,
+      "forced_fault_delivered": 126,
+      "accepted_post_fault_target_replans": 42,
+      "unrelated_goal_comparisons": 606,
+      "unrelated_artifact_comparisons": 1566,
+      "artifact_locality_violations": 0,
+      "invalidated_goals": 312,
+      "reverified_goals": 312,
+      "maximum_total_goals": 73,
+      "maximum_leaves": 48,
+      "maximum_root_edge_depth": 4,
+      "maximum_dependency_edges": 120,
+      "requirement_statuses": [
+        {
+          "id": "R1",
+          "key": "forced_subgoal_recovery",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R2",
+          "key": "traceable_hierarchy",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R3",
+          "key": "immutable_root",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R4",
+          "key": "diverse_tasks",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R5",
+          "key": "locality",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R6",
+          "key": "necessary_bounded_replanning",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R7",
+          "key": "independent_evaluation",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R8",
+          "key": "scale_coverage",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R9",
+          "key": "repeat_stability",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        }
+      ],
+      "live_manifest_protocol_id": "a4ea2a67a0608f8668b256eecbb939418f35ac79d1066baf1909775eb2fadca2",
+      "live_prepared_not_run": 252,
+      "seconds_single_observation": 26.266308
+    },
+    {
+      "profile": "reliability",
+      "scheduled": 720,
+      "completed_and_audited": 720,
+      "status_counts": {
+        "PASS": 720
+      },
+      "audit_counts": {
+        "PASS": 720
+      },
+      "actual_api_requests": 0,
+      "fault_triggered": 360,
+      "domain_fault_delivered": 360,
+      "forced_fault_delivered": 0,
+      "accepted_post_fault_target_replans": 120,
+      "unrelated_goal_comparisons": 0,
+      "unrelated_artifact_comparisons": 0,
+      "artifact_locality_violations": 0,
+      "invalidated_goals": 340,
+      "reverified_goals": 340,
+      "maximum_total_goals": 6,
+      "maximum_leaves": 3,
+      "maximum_root_edge_depth": 2,
+      "maximum_dependency_edges": 3,
+      "requirement_statuses": [
+        {
+          "id": "R1",
+          "key": "forced_subgoal_recovery",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R2",
+          "key": "traceable_hierarchy",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R3",
+          "key": "immutable_root",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R4",
+          "key": "diverse_tasks",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R5",
+          "key": "locality",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R6",
+          "key": "necessary_bounded_replanning",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R7",
+          "key": "independent_evaluation",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R8",
+          "key": "scale_coverage",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN"
+        },
+        {
+          "id": "R9",
+          "key": "repeat_stability",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN"
+        }
+      ],
+      "live_manifest_protocol_id": "b032206102df85e86a052c033c4585b93636311dd5b09c2d4642451698c02cde",
+      "live_prepared_not_run": 720,
+      "seconds_single_observation": 10.660374
+    }
+  ],
+  "actual_api_requests": 0,
+  "interpretation": "Oracle responses use reference solutions. All empirical decisions must remain UNCERTAIN. Finite benchmark thresholds are frozen design criteria, not population guarantees.",
+  "total_simulated_trajectories": 1314,
+  "nine_requirement_apparatus_coverage": {
+    "R1": {
+      "profile": "mechanism",
+      "engineering_status": "PASS",
+      "empirical_status": "UNCERTAIN"
+    },
+    "R2": {
+      "profile": "mechanism",
+      "engineering_status": "PASS",
+      "empirical_status": "UNCERTAIN"
+    },
+    "R3": {
+      "profile": "scale",
+      "engineering_status": "PASS",
+      "empirical_status": "UNCERTAIN"
+    },
+    "R4": {
+      "profile": "mechanism",
+      "engineering_status": "PASS",
+      "empirical_status": "UNCERTAIN"
+    },
+    "R5": {
+      "profile": "mechanism",
+      "engineering_status": "PASS",
+      "empirical_status": "UNCERTAIN"
+    },
+    "R6": {
+      "profile": "mechanism",
+      "engineering_status": "PASS",
+      "empirical_status": "UNCERTAIN"
+    },
+    "R7": {
+      "profile": "scale",
+      "engineering_status": "PASS",
+      "empirical_status": "UNCERTAIN"
+    },
+    "R8": {
+      "profile": "scale",
+      "engineering_status": "PASS",
+      "empirical_status": "UNCERTAIN"
+    },
+    "R9": {
+      "profile": "reliability",
+      "engineering_status": "PASS",
+      "empirical_status": "UNCERTAIN"
+    }
+  }
+}

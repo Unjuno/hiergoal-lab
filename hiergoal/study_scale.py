@@ -526,7 +526,13 @@ class ScaleTask:
             changed = [target]
         else:
             target = f"{cid}_assignments"
-            after_solution[target][0]["start"] = -1
+            # Assignment order is semantically irrelevant. Select the job from
+            # authoritative task metadata, then locate its submitted record;
+            # equivalent array orderings must receive the same intervention.
+            target_job = self._components[cid].public_spec()["environment"]["jobs"][0]["task_id"]
+            assignment = next(item for item in after_solution[target]
+                              if item["task_id"] == target_job)
+            assignment["start"] = -1
             changed = [target]
         self._subgoal_faults += 1
         component_grades = self._components[cid].grade(
@@ -541,6 +547,9 @@ class ScaleTask:
             domain_delivered=True,
             raw_after={f"{cid}_{gate}": value for gate, value in component_grades.items()},
         )
+        if self.family == "scheduling":
+            info["target_entity"] = {"component": cid, "kind": "job", "task_id": target_job}
+            info["target_field"] = {"artifact_field": target, "field": "start"}
         return after_solution, info
 
 

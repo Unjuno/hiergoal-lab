@@ -11,7 +11,7 @@ The new method study compares `flat_retry`, `hierarchy_fixed`, and `hierarchy_ad
 with the same model, public feedback, artifact tools, and resource ceilings. Fixed and
 adaptive hierarchies share their initial plan. Persistent environment updates and
 forced substantive subgoal faults test recovery; withheld final grading and
-semantic trace replay determine success. The v2 audit covers all nine requested
+semantic trace replay determine success. The v2.1 audit covers all nine requested
 requirements, including nonempty unrelated branches, bounded replanning, scaling,
 and repeated outcomes.
 
@@ -34,7 +34,7 @@ The scale profile reaches **73 total goals, 48 leaves, 5 hierarchy levels, and
 isolate depth while holding leaf count fixed. Repeated calls and scaled variants
 do not become independent task samples.
 
-**Readiness:** all 228 offline regression tests and 1,314 oracle-driven
+**Readiness:** all 242 offline regression tests and 1,314 oracle-driven
 trajectories across all five profiles passed local verification and semantic
 replay. The no-key workflow repeats these checks. See the verification record
 below for conditions and evidence. Oracle results are software checks, not model-performance measurements.
@@ -59,10 +59,11 @@ benchmark criteria, empirical evidence, and unresolved scientific uncertainty.
 
 See the [Japanese research protocol and commands](docs/method_study_ja.md),
 [nine-requirement audit](docs/method_requirements_audit_ja.md),
+[v2.1 follow-up audit and regression evidence](docs/method_reaudit_v2_1_ja.md),
 [completed readiness checks](docs/method_study_readiness_ja.md), and
-[frozen v2 study manifest](experiments/method-study-v2/study-manifest.json).
-The previous v1 manifests are historical and cannot be run against changed v2
-sources; prepare a new output directory instead of reusing old traces.
+[frozen v2.1 study manifest](experiments/method-study-v2.1/study-manifest.json).
+The previous v1 and v2 manifests are historical and cannot be run against changed
+v2.1 sources; prepare a new output directory instead of reusing old traces.
 
 ## Earlier Hermes integration experiment
 

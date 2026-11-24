@@ -167,6 +167,17 @@ def _replayed(row: dict) -> bool:
     return row["audit"] == "PASS" and _evidence_value(row, "trace_replayed") is True
 
 
+def _independent_grade_receipt_valid(row: dict) -> bool:
+    """Require a grade disposition, including legitimate noncandidate failures."""
+    called = _evidence_value(row, "final_grade_called")
+    passed = _evidence_value(row, "final_grade_passed")
+    if type(called) is not bool:
+        return False
+    if not called:
+        return row["status"] != "PASS" and passed is None
+    return row["outcome"] is not None and type(passed) is bool and passed is bool(row["outcome"])
+
+
 def _validate_manifest(manifest: dict) -> tuple[list[dict], dict]:
     if not isinstance(manifest, dict) or manifest.get("schema_version") not in SCHEMAS:
         raise AnalysisError(f"manifest schema_version must be one of {SCHEMAS}")
@@ -543,10 +554,7 @@ def _design_blockers(manifest: dict, rows: list[dict]) -> list[str]:
             blockers.append("missing_or_unknown_v2_evidence_contract")
         if any(not _replayed(row) or _evidence_value(row, "root_preserved") is not True for row in rows):
             blockers.append("missing_or_invalid_replay_and_root_evidence")
-        if any(_evidence_value(row, "final_grade_called") not in (True, False)
-               or (row["status"] == "PASS" and
-                   (_evidence_value(row, "final_grade_called") is not True
-                    or _evidence_value(row, "final_grade_passed") is not True)) for row in rows):
+        if any(not _independent_grade_receipt_valid(row) for row in rows):
             blockers.append("missing_or_invalid_independent_grade_evidence")
     if manifest["profile"] in DESCRIPTIVE_PROFILES:
         # A separate descriptive profile never inherits or relaxes the frozen
@@ -763,6 +771,8 @@ def _finite_blockers(manifest: dict, rows: list[dict], issues: list[dict], profi
         blockers.append("incomplete_profile_outcomes")
     if any(not _replayed(row) for row in rows):
         blockers.append("incomplete_profile_replay_evidence")
+    if any(not _independent_grade_receipt_valid(row) for row in rows):
+        blockers.append("missing_or_invalid_independent_grade_evidence")
     if issues:
         blockers.append("record_validity_issues")
     if any(_evidence_value(row, "root_preserved") is None or row["protocol_ok"] is None for row in rows):
@@ -1046,33 +1056,60 @@ def _requirement_evidence(manifest: dict, rows: list[dict], issues: list[dict],
         ["Coverage includes unsuccessful trials and is not a success claim.",
          "Three selected synthetic families do not establish broad real-world task generalization."], empirical_required=True)
 
-    local_rows = [row for row in adaptive if _replayed(row) and (_evidence_value(row, "replanning", "accepted") or 0) > 0]
-    locality_measured, locality_failures = [], 0
-    for row in local_rows:
-        values = [_evidence_value(row, *path) for path in (
-            ("replanning", "unrelated_goals_checked"), ("replanning", "unrelated_goals_unchanged"),
-            ("execution_locality", "unrelated_artifact_fields_checked"),
-            ("execution_locality", "unrelated_artifact_fields_unchanged"),
-            ("execution_locality", "violations"), ("execution_locality", "nonvacuous_events"),
-            ("replanning", "parent_preserved_events"))]
-        if all(value is not None for value in values):
-            goals, unchanged_goals, artifacts, unchanged_artifacts, violations, events, parents = values
-            locality_failures += int(goals != unchanged_goals or artifacts != unchanged_artifacts or violations > 0
-                                     or parents != _evidence_value(row, "replanning", "accepted"))
-            if goals > 0 and artifacts > 0 and events > 0:
-                locality_measured.append(row)
-    locality = _coverage_status(len(local_rows), len(locality_measured), failures=locality_failures,
-                               exercised=all(_replayed(row) for row in adaptive))
+    plan_rows = [row for row in adaptive if _replayed(row) and (_evidence_value(row, "replanning", "accepted") or 0) > 0]
+    fault_rows = [row for row in adaptive if row["condition"] == "fault"]
+    audited_fault_rows = [row for row in fault_rows if _replayed(row)]
+    artifact_rows = [row for row in audited_fault_rows if row["fault_delivered"] is True]
+    plan_measured, artifact_measured = set(), set()
+    plan_failures, artifact_failures = set(), set()
+    for row in plan_rows:
+        goals, unchanged, parents = (_evidence_value(row, "replanning", name) for name in
+                                    ("unrelated_goals_checked", "unrelated_goals_unchanged", "parent_preserved_events"))
+        if ((goals is not None and unchanged is not None and goals != unchanged)
+                or (parents is not None and parents != _evidence_value(row, "replanning", "accepted"))):
+            plan_failures.add(row["trial_id"])
+        if all(value is not None for value in (goals, unchanged, parents)) and goals > 0:
+            plan_measured.add(row["trial_id"])
+    # Artifact repairs remain observable when every replan is rejected. Their
+    # violations must never be filtered by the accepted-plan comparison set.
+    for row in audited_fault_rows:
+        checked, unchanged, violations, events = (_evidence_value(row, "execution_locality", name) for name in
+            ("unrelated_artifact_fields_checked", "unrelated_artifact_fields_unchanged", "violations", "nonvacuous_events"))
+        if ((checked is not None and unchanged is not None and checked != unchanged)
+                or (violations is not None and violations > 0)):
+            artifact_failures.add(row["trial_id"])
+        if (row["fault_delivered"] is True and all(value is not None for value in (checked, unchanged, violations, events))
+                and checked > 0 and events > 0):
+            artifact_measured.add(row["trial_id"])
+    plan_eligibility_known = sum(_replayed(row) and _evidence_value(row, "replanning", "accepted") is not None for row in adaptive)
+    artifact_eligibility_known = sum(_replayed(row) and row["fault_delivered"] is not None for row in fault_rows)
+    plan_locality = _coverage_status(len(plan_rows), len(plan_measured), failures=len(plan_failures),
+                                    exercised=plan_eligibility_known == len(adaptive))
+    artifact_locality = _coverage_status(len(artifact_rows), len(artifact_measured), failures=len(artifact_failures),
+                                        exercised=artifact_eligibility_known == len(fault_rows))
+    locality_failures = plan_failures | artifact_failures
+    locality = "FAIL" if locality_failures else (
+        "PASS" if plan_locality == artifact_locality == "PASS" and all(_replayed(row) for row in adaptive) else "UNCERTAIN")
+    if issues:
+        plan_locality = "UNCERTAIN" if plan_locality == "PASS" else plan_locality
+        artifact_locality = "UNCERTAIN" if artifact_locality == "PASS" else artifact_locality
     add("R5", "locality", "Unrelated goals and artifact fields preserved", locality,
-        "Nonempty comparisons in exercised adaptive replan trials; plan edits and subsequent artifact repairs are measured separately.",
-        {"adaptive_trials_with_accepted_replans": len(local_rows), "nonvacuous_locality_trials": len(locality_measured),
-         "trials_with_locality_violation": locality_failures,
+        "Plan comparisons cover accepted adaptive revisions; artifact comparisons cover audited adaptive fault paths independently of whether a revision was accepted. Both comparison sets must be nonempty.",
+        {"plan_locality_status": plan_locality, "artifact_locality_status": artifact_locality,
+         "adaptive_plan_eligibility_known_trials": plan_eligibility_known,
+         "adaptive_trials_with_accepted_replans": len(plan_rows), "nonvacuous_plan_locality_trials": len(plan_measured),
+         "assigned_adaptive_fault_trials": len(fault_rows), "audited_adaptive_fault_trials": len(audited_fault_rows),
+         "fault_delivery_known_trials": artifact_eligibility_known,
+         "delivered_adaptive_fault_trials": len(artifact_rows), "nonvacuous_artifact_locality_trials": len(artifact_measured),
+         "nonvacuous_locality_trials": len(plan_measured & artifact_measured),
+         "trials_with_plan_locality_violation": len(plan_failures), "trials_with_artifact_locality_violation": len(artifact_failures),
+         "trials_with_locality_violation": len(locality_failures),
          "unrelated_goals_checked": total(adaptive, "replanning", "unrelated_goals_checked"),
          "unrelated_goals_unchanged": total(adaptive, "replanning", "unrelated_goals_unchanged"),
-         "unrelated_artifact_fields_checked": total(adaptive, "execution_locality", "unrelated_artifact_fields_checked"),
-         "unrelated_artifact_fields_unchanged": total(adaptive, "execution_locality", "unrelated_artifact_fields_unchanged"),
-         "artifact_locality_violations": total(adaptive, "execution_locality", "violations"),
-         "nonvacuous_artifact_events": total(adaptive, "execution_locality", "nonvacuous_events"),
+         "unrelated_artifact_fields_checked": total(fault_rows, "execution_locality", "unrelated_artifact_fields_checked"),
+         "unrelated_artifact_fields_unchanged": total(fault_rows, "execution_locality", "unrelated_artifact_fields_unchanged"),
+         "artifact_locality_violations": total(fault_rows, "execution_locality", "violations"),
+         "nonvacuous_artifact_events": total(fault_rows, "execution_locality", "nonvacuous_events"),
          "dependency_invalidation_events": total(adaptive, "dependencies", "invalidation_events"),
          "invalidated_goals": total(adaptive, "dependencies", "invalidated_goals"),
          "reverified_goals": total(adaptive, "dependencies", "reverified_goals")},
@@ -1429,8 +1466,13 @@ def _render_mechanisms(summary: dict, lines: list[str]) -> None:
             ("dependencies", "invalidated_goals"), ("dependencies", "reverified_goals"))]
         lines.append(f"| {_md(row['arm'])} | {_md(row['condition'])} | " + " | ".join(cells) + " |")
     criteria = {item["id"]: item["evidence"] for item in summary["requirement_evidence"]["criteria"]}
-    trace, root, grades = criteria["R2"], criteria["R3"], criteria["R7"]
-    lines.extend(["", f"Replayed hierarchical checkpoints: {trace['checkpoint_events']}; leaf state transitions: {trace['leaf_state_transitions']}; "
+    trace, root, locality, grades = criteria["R2"], criteria["R3"], criteria["R5"], criteria["R7"]
+    lines.extend(["", f"R5 plan-locality evidence: {locality['plan_locality_status']}, "
+                  f"{locality['nonvacuous_plan_locality_trials']}/{locality['adaptive_trials_with_accepted_replans']} accepted-revision trials with nonempty comparisons. "
+                  f"Artifact-locality evidence: {locality['artifact_locality_status']}, "
+                  f"{locality['nonvacuous_artifact_locality_trials']}/{locality['delivered_adaptive_fault_trials']} delivered-fault trials with nonempty comparisons. "
+                  "Artifact violations remain included when every replan response was rejected; plan and artifact denominators are separate.", "",
+                  f"Replayed hierarchical checkpoints: {trace['checkpoint_events']}; leaf state transitions: {trace['leaf_state_transitions']}; "
                   f"milestone state transitions: {trace['milestone_state_transitions']}; accepted replans with failure evidence: {trace['accepted_replans_with_failure_evidence']}. "
                   f"Recorded host fault causes: {trace['host_failure_causes_recorded']}; recorded model diagnoses: {trace['model_diagnoses_recorded']} (text provenance, not causal validation).", "",
                   f"Root checked in {root['root_checked_trials']}/{root['scheduled_trials']} trials; explicit edit requests: {root['explicit_edit_requests']}; "

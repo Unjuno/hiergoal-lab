@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Synthetic analysis checks only: these tests make no model/API calls.
+"""Offline analysis and replay checks: these tests make no model/API calls.
 
 Fixtures labeled ``openai`` exercise the decision algorithm, not empirical
 research.  Their outcomes must never be presented as observed model success.
@@ -7,7 +7,9 @@ research.  Their outcomes must never be presented as observed model success.
 import copy
 import json
 import random
+import tempfile
 import unittest
+from pathlib import Path
 
 from hiergoal.study_analysis import AnalysisError, analyze, render_markdown
 
@@ -550,6 +552,82 @@ class StudyAnalysisTests(unittest.TestCase):
         self.assertEqual(criteria["R5"]["engineering_status"], "FAIL")
         self.assertEqual(criteria["R5"]["evidence"]["artifact_locality_violations"], 1)
 
+    def test_locality_keeps_plan_and_artifact_eligibility_separate(self):
+        manifest = make_manifest()
+        results = attach_synthetic_replay_evidence(manifest, make_results(manifest))
+        target_id = find_trial(manifest)["trial_id"]
+        target = next(row for row in results if row["trial_id"] == target_id)
+        target["replans"] = 0
+        target["mechanism_evidence"]["replanning"].update(
+            accepted=0, rejected=1, parent_preserved_events=0,
+            unrelated_goals_checked=0, unrelated_goals_unchanged=0)
+        target["mechanism_evidence"]["trace"].update(
+            accepted_replans_with_failure_evidence=0, post_fault_target_replans=0, model_diagnoses_recorded=0)
+        criterion = criteria_by_id(analyze(manifest, results))["R5"]
+        self.assertEqual(criterion["engineering_status"], "PASS")
+        self.assertEqual(criterion["evidence"]["adaptive_trials_with_accepted_replans"], 35)
+        self.assertEqual(criterion["evidence"]["delivered_adaptive_fault_trials"], 36)
+        self.assertEqual(criterion["evidence"]["nonvacuous_artifact_locality_trials"], 36)
+        target["mechanism_evidence"]["execution_locality"].update(
+            unrelated_artifact_fields_checked=0, unrelated_artifact_fields_unchanged=0, nonvacuous_events=0)
+        criterion = criteria_by_id(analyze(manifest, results))["R5"]
+        self.assertEqual(criterion["engineering_status"], "UNCERTAIN")
+        self.assertEqual(criterion["evidence"]["plan_locality_status"], "PASS")
+        self.assertEqual(criterion["evidence"]["artifact_locality_status"], "UNCERTAIN")
+        target["mechanism_evidence"]["execution_locality"].update(
+            unrelated_artifact_fields_checked=2, unrelated_artifact_fields_unchanged=2, nonvacuous_events=1)
+        target["mechanism_evidence"]["replanning"].pop("accepted")
+        criterion = criteria_by_id(analyze(manifest, results))["R5"]
+        self.assertEqual(criterion["engineering_status"], "UNCERTAIN")
+        self.assertEqual(criterion["evidence"]["plan_locality_status"], "UNCERTAIN")
+
+    def test_replayed_artifact_violation_after_rejected_replan_cannot_pass_locality(self):
+        from hiergoal.study import OracleResponder, prepare, run
+        from hiergoal.study_protocol import canonical
+
+        class RejectThenModifyUnrelated(OracleResponder):
+            def __init__(self):
+                super().__init__()
+                self.mutated_task = None
+
+            def respond(self, role, payload, **kwargs):
+                record = super().respond(role, payload, **kwargs)
+                if role == "replan" and self.mutated_task is None and self.task.family == "code_repair":
+                    self.mutated_task = self.task
+                    record["text"] = '{"root":"Replace the immutable objective."}'
+                elif role == "execute" and self.task is self.mutated_task:
+                    reply = json.loads(record["text"])
+                    component = payload["current_leaf"]["checks"][0].split("_")[0]
+                    field = next(key for key in reply["patch"] if key.endswith("_base") and not key.startswith(component + "_"))
+                    # A different representation of the same valid expression
+                    # keeps final grading successful but violates preservation.
+                    reply["patch"][field] = "(" + reply["patch"][field] + ") + 0"
+                    record["text"] = canonical(reply)
+                return record
+
+        with tempfile.TemporaryDirectory() as folder:
+            directory = Path(folder)
+            prepare(directory, profile="mechanism", backend="oracle", model="OFFLINE_ORACLE")
+            summary = run(directory, responder=RejectThenModifyUnrelated())
+            results = json.loads((directory / "results.json").read_text())
+            self.assertEqual(len(results), 108)
+            self.assertTrue(all(row["status"] == row["audit"] == "PASS" for row in results))
+            self.assertEqual(sum(row["actual_calls"] for row in results), 0)
+            changed = [row for row in results if row["mechanism_evidence"]["execution_locality"]["violations"]]
+            self.assertEqual(len(changed), 1)
+            self.assertTrue(changed[0]["recovered"])
+            self.assertEqual(changed[0]["mechanism_evidence"]["replanning"]["accepted"], 0)
+            self.assertEqual(changed[0]["mechanism_evidence"]["replanning"]["rejected"], 1)
+            self.assertEqual(summary["validation"]["issues"], [])
+            criterion = criteria_by_id(summary)["R5"]
+            self.assertEqual(criterion["status"], "FAIL")
+            self.assertEqual(criterion["engineering_status"], "FAIL")
+            self.assertEqual(criterion["evidence"]["plan_locality_status"], "PASS")
+            self.assertEqual(criterion["evidence"]["artifact_locality_status"], "FAIL")
+            self.assertEqual(criterion["evidence"]["trials_with_artifact_locality_violation"], 1)
+            self.assertEqual(criterion["evidence"]["trials_with_locality_violation"], 1)
+            self.assertGreater(criterion["evidence"]["artifact_locality_violations"], 0)
+
     def test_v2_requires_critical_replay_root_and_independent_grade_evidence(self):
         for field in ("mechanism_evidence", "audit", "trace_replayed", "root_preserved", "final_grade_called"):
             with self.subTest(field=field):
@@ -771,6 +849,43 @@ class StudyAnalysisTests(unittest.TestCase):
                 summary = analyze(manifest, results)
                 self.assertEqual(summary["repeat_stability"]["finite_repeatability"]["decision"], "UNCERTAIN")
                 self.assertEqual(criteria_by_id(summary)["R9"]["status"], "UNCERTAIN")
+
+    def test_finite_profiles_require_independent_grade_receipts(self):
+        for profile in ("scale", "reliability"):
+            for missing in (("final_grade_called",), ("final_grade_passed",), ("final_grade_called", "final_grade_passed")):
+                with self.subTest(profile=profile, missing=missing):
+                    if profile == "scale":
+                        manifest, results = synthetic_scale_case()
+                    else:
+                        manifest = make_manifest(repeats=10, profile=profile)
+                        results = attach_synthetic_replay_evidence(manifest, make_results(manifest, lambda trial: True))
+                    freeze_synthetic_finite_thresholds(manifest)
+                    for name in missing:
+                        results[0]["mechanism_evidence"].pop(name)
+                    summary = analyze(manifest, results)
+                    finite = (summary["scale"]["finite_resilience"] if profile == "scale" else
+                              summary["repeat_stability"]["finite_repeatability"])
+                    self.assertEqual(finite["decision"], "UNCERTAIN")
+                    self.assertIn("missing_or_invalid_independent_grade_evidence", finite["eligibility_blockers"])
+
+    def test_finite_profiles_keep_valid_budget_failures_without_hidden_grade(self):
+        for profile in ("scale", "reliability"):
+            with self.subTest(profile=profile):
+                if profile == "scale":
+                    manifest, results = synthetic_scale_case()
+                else:
+                    manifest = make_manifest(repeats=10, profile=profile)
+                    results = attach_synthetic_replay_evidence(manifest, make_results(manifest, lambda trial: True))
+                freeze_synthetic_finite_thresholds(manifest)
+                target_id = find_trial(manifest, instance=1)["trial_id"]
+                target = next(row for row in results if row["trial_id"] == target_id)
+                synthetic_failure(target)
+                target["mechanism_evidence"].update(final_grade_called=False, final_grade_passed=None)
+                summary = analyze(manifest, results)
+                finite = (summary["scale"]["finite_resilience"] if profile == "scale" else
+                          summary["repeat_stability"]["finite_repeatability"])
+                self.assertEqual(summary["validation"]["issues"], [])
+                self.assertEqual(finite["decision"], "PASS")
 
 
 if __name__ == "__main__":

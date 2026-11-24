@@ -337,6 +337,47 @@ class ScaleAcceptanceAndFaults(unittest.TestCase):
             self.assertFalse(all_pass(forced_left.grade(a)))
             self.assertFalse(all_pass(forced_right.grade(b)))
 
+    def test_forced_schedule_fault_targets_same_job_after_equivalent_array_reordering(self):
+        left, right = make_task("scheduling", 0), make_task("scheduling", 0)
+        original = left.reference_solution()
+        reordered = copy.deepcopy(original)
+        for field, entries in reordered.items():
+            if field.endswith("_assignments"):
+                entries.reverse()
+        self.assertNotEqual(original, reordered)
+        self.assertTrue(all_pass(left.grade(original, hidden=True)))
+        self.assertTrue(all_pass(right.grade(reordered, hidden=True)))
+        root, specification = left.root_contract, left.public_spec()
+        damaged_left, receipt_left = left.inject_subgoal_fault(original)
+        damaged_right, receipt_right = right.inject_subgoal_fault(reordered)
+        self.assertEqual(receipt_left["target_gate"], receipt_right["target_gate"])
+        self.assertEqual(receipt_left["target_entity"], receipt_right["target_entity"])
+        self.assertEqual(receipt_left["target_field"], receipt_right["target_field"])
+        cid = receipt_left["target_component"]
+        artifact_field = receipt_left["target_gate"]
+        expected_job = specification["environment"]["components"][cid]["jobs"][0]["task_id"]
+        self.assertEqual(receipt_left["target_entity"],
+                         {"component": cid, "kind": "job", "task_id": expected_job})
+        self.assertEqual(receipt_left["target_field"],
+                         {"artifact_field": artifact_field, "field": "start"})
+        for task, before, after, receipt in (
+            (left, original, damaged_left, receipt_left),
+            (right, reordered, damaged_right, receipt_right),
+        ):
+            before_jobs = {entry["task_id"]: entry for entry in before[artifact_field]}
+            after_jobs = {entry["task_id"]: entry for entry in after[artifact_field]}
+            self.assertEqual({job for job in before_jobs if before_jobs[job] != after_jobs[job]},
+                             {expected_job})
+            self.assertEqual(after_jobs[expected_job], {**before_jobs[expected_job], "start": -1})
+            self.assertTrue(receipt["domain_fault_delivered"])
+            self.assertFalse(task.grade(after)[artifact_field]["passed"])
+            self.assertEqual(root, task.root_contract)
+            self.assertEqual(specification, task.public_spec())
+            self.assertEqual(receipt["environment_before"], receipt["environment_after"])
+            self.assertTrue(receipt["unaffected_artifacts_unchanged"])
+            self.assertEqual(task.artifact_projection(before, receipt["unrelated_component_gates"]),
+                             task.artifact_projection(after, receipt["unrelated_component_gates"]))
+
     def test_code_reuses_bounded_interpreter_and_private_probes_stay_private(self):
         task = make_task("code_repair", 2, depth=5)
         for source in (

@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 SCHEMA = "hiergoal.study.v2"
+PROTOCOL_REVISION = "v2.1"
 ARMS = ("flat_retry", "hierarchy_fixed", "hierarchy_adaptive")
 FAMILIES = ("code_repair", "data_transform", "scheduling")
 CONDITIONS = ("normal", "fault")
@@ -129,7 +130,8 @@ def build_manifest(profile="pilot", backend="openai", model="gpt-6-luna",
             trials.append({**block, "arm": arm,
                            "trial_id": f"{block['block_id']}-{arm}"})
     manifest = {
-        "schema_version": SCHEMA, "profile": profile, "backend": backend,
+        "schema_version": SCHEMA, "protocol_revision": PROTOCOL_REVISION,
+        "profile": profile, "backend": backend,
         "model": model, "reasoning_effort": "low", "endpoint": "https://api.openai.com/v1/responses",
         "schedule_seed": schedule_seed, "task_seed": 1729,
         "randomness_note": "Schedule/task seeds are not model sampling seeds.",

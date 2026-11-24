@@ -21,7 +21,7 @@ from hiergoal.study_protocol import (
     validate_manifest,
 )
 from hiergoal.study_tasks import make_task
-from hiergoal.study_mechanisms import InvalidAction, validate_replan, replan_decision, evidence_from_events
+from hiergoal.study_mechanisms import InvalidAction, validate_replan, replan_decision, evidence_from_events, same_json
 from hiergoal.study_planning import validate_plan, plan_prompt, statuses, active_leaf, milestone_statuses
 
 
@@ -229,7 +229,7 @@ def validate_budget_evidence(event, counts, limits, task, solution, plan, histor
     elif kind == "prompt_bytes":
         role, payload = evidence.get("role"), evidence.get("blocked_request")
         expected = action_prompt(role, task, solution, grades, plan, active_leaf(plan, grades), history)
-        valid = (limit == limits["max_prompt_bytes"] and payload == expected and
+        valid = (limit == limits["max_prompt_bytes"] and same_json(payload, expected) and
                  observed == len(canonical(payload).encode("utf-8")) and observed > limit)
     else:
         valid = False
@@ -489,7 +489,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                           "fault", "sham_checkpoint", "replan", "replan_decision", "request_failed", "final_grade", "result", "rejected", "termination"}
         for index, event in enumerate(events):
             content = {k: v for k, v in event.items() if k != "event_sha256"}
-            if (event["sequence"] != index or event["previous_sha256"] != previous or
+            if (type(event["sequence"]) is not int or event["sequence"] != index or event["previous_sha256"] != previous or
                 event["event_sha256"] != digest(content) or event["root_sha256"] != root_hash):
                 raise ValueError("Broken trace chain or root invariant")
             previous = event["event_sha256"]
@@ -501,7 +501,11 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
             if index == 0 and kind != "initial":
                 raise ValueError("Missing initial evidence")
             if kind == "initial":
-                if index != 0 or event["trial"] != trial or event["protocol_id"] != manifest["protocol_id"] or event["root_contract"] != task.root_contract or event["solution"] != solution or event["public_spec"] != task.public_spec() or event["public_grades"] != task.grade(solution):
+                if (index != 0 or not same_json(event["trial"], trial) or event["protocol_id"] != manifest["protocol_id"]
+                        or not same_json(event["root_contract"], task.root_contract)
+                        or not same_json(event["solution"], solution)
+                        or not same_json(event["public_spec"], task.public_spec())
+                        or not same_json(event["public_grades"], task.grade(solution))):
                     raise ValueError("Initial evidence mismatch")
             elif kind == "request_started":
                 if not response_consumed or decision_context is not None:
@@ -514,7 +518,8 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                     raise ValueError("Request started after its measured allowance was exhausted")
                 if len(canonical(event["request"]).encode("utf-8")) > limits["max_prompt_bytes"]:
                     raise ValueError("Request started above its prompt byte allowance")
-                if pending is not None or event["request"].get("root_contract") != task.root_contract or event["request"].get("task") != task.public_spec():
+                if (pending is not None or not same_json(event["request"].get("root_contract"), task.root_contract)
+                        or not same_json(event["request"].get("task"), task.public_spec())):
                     raise ValueError("Overlapping request or changed root")
                 if event["role"] not in ("plan", "execute", "replan"):
                     raise ValueError("Unexpected request role")
@@ -522,16 +527,19 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                     raise ValueError("Unexpected initial planning request")
                 expected_prompt = action_prompt(event["role"], task, solution, task.grade(solution), plan,
                                                 active_leaf(plan, task.grade(solution)), history)
-                if event["request"] != expected_prompt:
+                if not same_json(event["request"], expected_prompt):
                     raise ValueError("Responder context differs from the frozen prompt and observed history")
                 if event["role"] != "plan":
                     if trial["arm"] != "flat_retry" and (plan is None or shared_plan_count != 1):
                         raise ValueError("Hierarchical execution requires its shared validated plan")
-                    if event["request"].get("artifact") != solution or event["request"].get("public_feedback") != task.grade(solution):
+                    if (not same_json(event["request"].get("artifact"), solution)
+                            or not same_json(event["request"].get("public_feedback"), task.grade(solution))):
                         raise ValueError("Responder received stale artifact or feedback")
-                    if event["role"] == "execute" and (event["request"].get("plan") != plan or event["request"].get("current_leaf") != active_leaf(plan, task.grade(solution))):
+                    if event["role"] == "execute" and (not same_json(event["request"].get("plan"), plan)
+                            or not same_json(event["request"].get("current_leaf"), active_leaf(plan, task.grade(solution)))):
                         raise ValueError("Responder received a different treatment plan")
-                    if event["role"] == "replan" and (trial["arm"] != "hierarchy_adaptive" or event["request"].get("leaf") != active_leaf(plan, task.grade(solution))):
+                    if event["role"] == "replan" and (trial["arm"] != "hierarchy_adaptive"
+                            or not same_json(event["request"].get("leaf"), active_leaf(plan, task.grade(solution)))):
                         raise ValueError("Replanning the wrong or unauthorized leaf")
                     if event["role"] == "replan" and (authorized_replan != event["request"]["leaf"]["id"] or replan_attempts >= manifest["limits"]["max_replans"]):
                         raise ValueError("Replan is unnecessary or exceeds its allowance")
@@ -540,12 +548,14 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 authorized_replan = None
                 pending = {"role": event["role"], "request": event["request"]}
             elif kind == "response":
-                if event["request"].get("root_contract") != task.root_contract or event["request"].get("task") != task.public_spec():
+                if (not same_json(event["request"].get("root_contract"), task.root_contract)
+                        or not same_json(event["request"].get("task"), task.public_spec())):
                     raise ValueError("Prompt root changed")
                 if event["reused_shared_plan"]:
-                    if event["role"] != "plan" or pending is not None:
-                        raise ValueError("Only shared planning may be reused")
-                elif pending != {"role": event["role"], "request": event["request"]}:
+                    if (event["role"] != "plan" or pending is not None or not response_consumed
+                            or latest_reply is not None or counts["calls"] != 0 or shared_plan_count != 0):
+                        raise ValueError("A shared response must occupy the sole initial planning slot")
+                elif not same_json(pending, {"role": event["role"], "request": event["request"]}):
                     raise ValueError("Response has no matching request")
                 pending, latest_reply = None, event
                 response_consumed = False
@@ -562,7 +572,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                     counts["actual_calls"] += 1
                     counts["actual_input_tokens"] += record["input_tokens"]
                     counts["actual_output_tokens"] += record["output_tokens"]
-                if bool(record["simulated"]) != (manifest["backend"] != "openai"):
+                if record["simulated"] is not (manifest["backend"] != "openai"):
                     raise ValueError("Simulated/live evidence mismatch")
             elif kind == "shared_plan":
                 shared_plan_count += 1
@@ -574,13 +584,21 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 response_consumed = True
                 shared_path = directory / "plans" / (event["key"] + ".json")
                 shared = json.loads(shared_path.read_text(encoding="utf-8"))
-                if shared["protocol_id"] != manifest["protocol_id"] or shared["plan"] != plan or shared["error"] != event["error"] or shared["request"] != plan_prompt(task):
+                if (shared["protocol_id"] != manifest["protocol_id"]
+                        or not same_json(shared["plan"], plan)
+                        or not same_json(shared["error"], event["error"])
+                        or not same_json(shared["request"], plan_prompt(task))):
                     raise ValueError("Shared planning evidence mismatch")
+                if shared["record"] is not None:
+                    if (latest_reply is None or latest_reply["role"] != "plan"
+                            or not same_json(shared["record"], latest_reply["record"])
+                            or not same_json(shared["request"], latest_reply["request"])):
+                        raise ValueError("Shared plan response differs from the recorded planning response")
+                elif latest_reply is not None:
+                    raise ValueError("Shared plan discarded a recorded planning response")
                 if plan is not None:
-                    if latest_reply is None or latest_reply["role"] != "plan" or plan != validate_plan(object_reply(latest_reply["record"]), task):
+                    if latest_reply is None or latest_reply["role"] != "plan" or not same_json(plan, validate_plan(object_reply(latest_reply["record"]), task)):
                         raise ValueError("Initial plan does not match model output")
-                    if shared["protocol_id"] != manifest["protocol_id"] or shared["plan"] != plan or shared["record"] != latest_reply["record"] or shared["request"] != plan_prompt(task):
-                        raise ValueError("Shared plan evidence differs across paired arms")
                 elif event["error"] and event["error"]["status"] == "FAIL" and shared["record"] is not None:
                     try:
                         validate_plan(object_reply(shared["record"]), task)
@@ -589,15 +607,15 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                     else:
                         raise ValueError("Valid planning response incorrectly classified as failed")
             elif kind == "patch":
-                if response_consumed or latest_reply is None or latest_reply["role"] != "execute" or event["action"] != object_reply(latest_reply["record"]):
+                if response_consumed or latest_reply is None or latest_reply["role"] != "execute" or not same_json(event["action"], object_reply(latest_reply["record"])):
                     raise ValueError("Patch does not match the model output")
                 response_consumed = True
-                if event["before_solution"] != solution:
+                if not same_json(event["before_solution"], solution):
                     raise ValueError("Stale artifact")
                 before_grades = task.grade(solution)
                 prior_leaf = copy.deepcopy(active_leaf(plan, before_grades))
                 solution = apply_patch(solution, event["action"])
-                if solution != event["after_solution"]:
+                if not same_json(solution, event["after_solution"]):
                     raise ValueError("Patch replay mismatch")
                 counts["patch_actions"] += 1
                 history.append({"action": event["action"], "public_feedback": task.grade(solution)})
@@ -605,22 +623,25 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                                     "leaf": prior_leaf, "failure_introduced": False}
             elif kind == "checkpoint":
                 if (event["solution_sha256"] != digest(solution) or event["environment_sha256"] != digest(task.public_spec()) or
-                    event["public_grades"] != task.grade(solution) or event["plan"] != plan or
-                    event["leaf_statuses"] != statuses(plan, task.grade(solution)) or
-                    event["milestone_statuses"] != milestone_statuses(plan, task.grade(solution)) or
+                    not same_json(event["public_grades"], task.grade(solution)) or not same_json(event["plan"], plan) or
+                    not same_json(event["leaf_statuses"], statuses(plan, task.grade(solution))) or
+                    not same_json(event["milestone_statuses"], milestone_statuses(plan, task.grade(solution))) or
                     event["root_status"] != ("awaiting_final_verification" if all(g["passed"] for g in task.grade(solution).values()) else "active")):
                     raise ValueError("Unreproducible or stale verification")
             elif kind == "fault":
                 if fault_seen or trial["condition"] != "fault" or not all(g["passed"] for g in task.grade(solution).values()):
                     raise ValueError("Invalid fault checkpoint")
                 before_spec = task.public_spec()
-                if event["before_solution"] != solution or event["before_spec"] != before_spec or event["before_grades"] != task.grade(solution):
+                if (not same_json(event["before_solution"], solution) or not same_json(event["before_spec"], before_spec)
+                        or not same_json(event["before_grades"], task.grade(solution))):
                     raise ValueError("Fault pre-state mismatch")
                 before_grades = task.grade(solution)
                 solution, fault, after_grades, delivered, introduced = inject_trial_fault(task, solution, trial)
-                if event["after_solution"] != solution or event["after_spec"] != task.public_spec() or event["fault"] != fault or event["delivered"] != delivered or event["after_grades"] != task.grade(solution):
+                if (not same_json(event["after_solution"], solution) or not same_json(event["after_spec"], task.public_spec())
+                        or not same_json(event["fault"], fault) or event["delivered"] is not delivered
+                        or not same_json(event["after_grades"], task.grade(solution))):
                     raise ValueError("Fault replay mismatch")
-                if event["fault_kind"] != trial.get("fault_kind", "environment") or event["public_failure_introduced"] != introduced:
+                if event["fault_kind"] != trial.get("fault_kind", "environment") or event["public_failure_introduced"] is not introduced:
                     raise ValueError("Fault kind or impact changed")
                 decision_context = {"source": "fault", "before_grades": before_grades,
                                     "leaf": copy.deepcopy(active_leaf(plan, after_grades)), "failure_introduced": introduced}
@@ -630,12 +651,12 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                     raise ValueError("Replan decision has no fresh observation")
                 grades = task.grade(solution)
                 for key, value in decision_context.items():
-                    if event.get(key) != value:
+                    if not same_json(event.get(key), value):
                         raise ValueError("Replan decision context mismatch")
                 choice = replan_decision(decision_context["before_grades"], grades,
                                          decision_context["leaf"], fault_delivered=decision_context["failure_introduced"])
-                if (any(event.get(key) != value for key, value in choice.items()) or
-                    event["after_grades"] != grades or event["public_grades"] != grades or
+                if (any(not same_json(event.get(key), value) for key, value in choice.items()) or
+                    not same_json(event["after_grades"], grades) or not same_json(event["public_grades"], grades) or
                     event["solution_sha256"] != digest(solution) or event["environment_sha256"] != digest(task.public_spec())):
                     raise ValueError("Replan necessity was not derived from current evidence")
                 leaf = decision_context["leaf"]
@@ -644,11 +665,13 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 authorized_replan = leaf["id"] if choice["needed"] else None
                 decision_context = None
             elif kind == "sham_checkpoint":
-                if checkpoint_seen or trial["condition"] != "normal" or not all(g["passed"] for g in task.grade(solution).values()) or event["public_spec"] != task.public_spec() or event["public_grades"] != task.grade(solution):
+                if (checkpoint_seen or trial["condition"] != "normal" or not all(g["passed"] for g in task.grade(solution).values())
+                        or not same_json(event["public_spec"], task.public_spec())
+                        or not same_json(event["public_grades"], task.grade(solution))):
                     raise ValueError("Invalid sham checkpoint")
                 checkpoint_seen = True
             elif kind == "replan":
-                if trial["arm"] != "hierarchy_adaptive" or event["before_plan"] != plan:
+                if trial["arm"] != "hierarchy_adaptive" or not same_json(event["before_plan"], plan):
                     raise ValueError("Unauthorized plan change")
                 if (latest_reply is None or latest_reply["role"] != "replan" or
                     event["leaf_id"] != latest_reply["request"]["leaf"]["id"] or
@@ -662,14 +685,15 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 change = object_reply(latest_reply["record"])
                 expected, diagnosis = validate_replan(plan, leaf, task.grade(solution), change)
                 response_consumed = True
-                if expected != event["after_plan"] or diagnosis != event["diagnosis"]:
+                if not same_json(expected, event["after_plan"]) or diagnosis != event["diagnosis"]:
                     raise ValueError("Replan changed unrelated goals or acceptance rules")
-                if event["solution_sha256"] != digest(solution) or event["environment_sha256"] != digest(task.public_spec()) or event["public_grades"] != task.grade(solution):
+                if (event["solution_sha256"] != digest(solution) or event["environment_sha256"] != digest(task.public_spec())
+                        or not same_json(event["public_grades"], task.grade(solution))):
                     raise ValueError("Replan used stale evidence")
                 plan = expected
                 counts["replans"] += 1
             elif kind == "request_failed":
-                if not event["reused"] and pending != {"role": event["role"], "request": event["request"]}:
+                if not event["reused"] and not same_json(pending, {"role": event["role"], "request": event["request"]}):
                     raise ValueError("Failed request lacks matching start")
                 counts["calls"] += 1
                 counts["input_tokens"] = counts["output_tokens"] = None
@@ -686,7 +710,10 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 hidden = task.grade(solution, hidden=True)
                 public = task.grade(solution)
                 final_pass = all(g["passed"] for g in hidden.values()) and all(g["passed"] for g in public.values())
-                if not checkpoint_seen or event["solution"] != solution or event["public_spec"] != task.public_spec() or event["hidden_grades"] != hidden or event["public_grades"] != public or event["passed"] != final_pass:
+                if (not checkpoint_seen or not same_json(event["solution"], solution)
+                        or not same_json(event["public_spec"], task.public_spec())
+                        or not same_json(event["hidden_grades"], hidden) or not same_json(event["public_grades"], public)
+                        or event["passed"] is not final_pass):
                     raise ValueError("Independent final grade mismatch")
             elif kind == "result":
                 if index != len(events) - 1:
@@ -695,6 +722,10 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
             elif kind == "termination":
                 if termination is not None:
                     raise ValueError("Multiple termination reasons")
+                expected_status = {"BudgetExhausted": "FAIL", "InvalidAction": "FAIL",
+                                   "TransportError": "UNCERTAIN", "ApparatusError": "UNCERTAIN"}.get(event["reason"])
+                if expected_status is None or event["status"] != expected_status:
+                    raise ValueError("Unknown termination reason or unsupported terminal status")
                 termination = event
                 if event["reason"] == "BudgetExhausted":
                     validate_budget_evidence(event, counts, manifest["limits"], task, solution, plan, history, elapsed)
@@ -720,23 +751,24 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 response_consumed = True
                 rejected_actions += 1
                 history.append({"role": "replan", "feedback": event["reason"]} if event["role"] == "replan" else {"feedback": event["reason"]})
-        if terminal is None or pending is not None or decision_context is not None or result != {**terminal, "trace_final_sha256": previous}:
+        if (terminal is None or pending is not None or decision_context is not None
+                or not same_json(result, {**terminal, "trace_final_sha256": previous})):
             raise ValueError("Missing or changed terminal result")
-        if any(result[k] != v for k, v in counts.items()):
+        if any(not same_json(result[k], v) for k, v in counts.items()):
             raise ValueError("Accounting mismatch")
-        if result["observed_models"] != observed_models or (manifest["backend"] == "openai" and len(observed_models) > 1):
+        if not same_json(result["observed_models"], observed_models) or (manifest["backend"] == "openai" and len(observed_models) > 1):
             raise ValueError("Model changed within a trial")
         # Count issued requests even if transport fails or their response exceeds
         # the remaining allowance; those attempts still consumed exposure.
-        if (result["replan_attempts"] != replan_attempts or
-            result["rejected_actions"] != rejected_actions or
+        if (not same_json(result["replan_attempts"], replan_attempts) or
+            not same_json(result["rejected_actions"], rejected_actions) or
             result["replan_attempts"] > manifest["limits"]["max_replans"]):
             raise ValueError("Replan/rejection accounting mismatch")
         if (result["final_artifact_sha256"] != digest(solution) or
             result["final_environment_sha256"] != digest(task.public_spec()) or
             abs(result["elapsed_seconds"] - elapsed) > 1e-8):
             raise ValueError("Final artifact/environment or logical time mismatch")
-        if result["fault_delivered"] != delivered or result["fault_triggered"] != fault_seen:
+        if result["fault_delivered"] is not delivered or result["fault_triggered"] is not fault_seen:
             raise ValueError("Fault accounting mismatch")
         expected_success = True if result["status"] == "PASS" else False if result["status"] == "FAIL" else None
         if result["success"] is not expected_success or result["recovered"] is not (expected_success if delivered else None):
