@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 SCHEMA = "hiergoal.study.v2"
-PROTOCOL_REVISION = "v2.1"
+PROTOCOL_REVISION = "v2.2"
 ARMS = ("flat_retry", "hierarchy_fixed", "hierarchy_adaptive")
 FAMILIES = ("code_repair", "data_transform", "scheduling")
 CONDITIONS = ("normal", "fault")

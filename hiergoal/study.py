@@ -411,7 +411,9 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
                 trace.add("patch", action=action, before_solution=before, after_solution=solution)
                 checkpoint()
                 history.append({"action": action, "public_feedback": grades})
-                need_replan = decide(before_grades, leaf)
+                # An accepted patch may invalidate an earlier dependency. Decide
+                # against the same post-patch leaf that the next iteration will use.
+                need_replan = decide(before_grades, active_leaf(plan, grades))
             except InvalidAction as exc:
                 result["rejected_actions"] += 1
                 trace.add("rejected", role="execute", reason=str(exc))
@@ -613,14 +615,14 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 if not same_json(event["before_solution"], solution):
                     raise ValueError("Stale artifact")
                 before_grades = task.grade(solution)
-                prior_leaf = copy.deepcopy(active_leaf(plan, before_grades))
                 solution = apply_patch(solution, event["action"])
                 if not same_json(solution, event["after_solution"]):
                     raise ValueError("Patch replay mismatch")
                 counts["patch_actions"] += 1
-                history.append({"action": event["action"], "public_feedback": task.grade(solution)})
+                after_grades = task.grade(solution)
+                history.append({"action": event["action"], "public_feedback": after_grades})
                 decision_context = {"source": "patch", "before_grades": before_grades,
-                                    "leaf": prior_leaf, "failure_introduced": False}
+                                    "leaf": copy.deepcopy(active_leaf(plan, after_grades)), "failure_introduced": False}
             elif kind == "checkpoint":
                 if (event["solution_sha256"] != digest(solution) or event["environment_sha256"] != digest(task.public_spec()) or
                     not same_json(event["public_grades"], task.grade(solution)) or not same_json(event["plan"], plan) or

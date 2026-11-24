@@ -38,7 +38,7 @@ do not become independent task samples.
 trajectories across all five profiles passed local verification and semantic
 replay. The no-key workflow repeats these checks. See the verification record
 below for conditions and evidence. Oracle results are software checks, not model-performance measurements.
-**No live model study has been started by this change.**
+The first v2.1 live pilot revealed a replay inconsistency when an accepted patch invalidated an upstream leaf. v2.2 selects the post-patch executable leaf for both decision and replay; see [the pilot regression fix](docs/method_pilot_fix_v2_2_ja.md). The earlier offline counts above refer to v2.1. No new live trial is started by this fix.
 
 ```bash
 # No API calls or key required:
@@ -63,7 +63,7 @@ See the [Japanese research protocol and commands](docs/method_study_ja.md),
 [completed readiness checks](docs/method_study_readiness_ja.md), and
 [frozen v2.1 study manifest](experiments/method-study-v2.1/study-manifest.json).
 The previous v1 and v2 manifests are historical and cannot be run against changed
-v2.1 sources; prepare a new output directory instead of reusing old traces.
+newer sources; prepare a new output directory instead of reusing old traces.
 
 ## Earlier Hermes integration experiment
 
