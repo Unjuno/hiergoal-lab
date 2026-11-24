@@ -1,0 +1,92 @@
+name: Method validation study
+run-name: Method study ${{ inputs.mode || 'prepare' }} · ${{ inputs.profile || 'pilot' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'prepare: offline checks only / run: explicitly execute the selected API study'
+        type: choice
+        options: [prepare, run]
+        default: prepare
+        required: true
+      profile:
+        description: 'pilot: 18 dev trials / study: 216 heldout trials'
+        type: choice
+        options: [pilot, study]
+        default: pilot
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - 'hiergoal/study*.py'
+      - 'tests/test_study*.py'
+      - 'docs/method_study_ja.md'
+      - '.github/workflows/method-study.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hiergoal-live-experiment
+  cancel-in-progress: false
+
+jobs:
+  study:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    env:
+      STUDY_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'prepare' }}
+      STUDY_PROFILE: ${{ inputs.profile || 'pilot' }}
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Offline regression tests (no credential)
+        run: python3 -m unittest discover -s tests -v
+      - name: Exercise every method and scenario offline (no credential)
+        run: python3 -m hiergoal.study check --profile pilot --output runs/method-check
+      - name: Freeze manifest before any model request
+        run: python3 -m hiergoal.study prepare --profile "$STUDY_PROFILE" --output runs/method-study
+      - name: Execute only the explicitly selected live study
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'run' }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: https://api.openai.com/v1
+        run: python3 -m hiergoal.study run --output runs/method-study --execute --approve-paid-api
+      - name: Recheck all retained evidence including incomplete runs
+        if: ${{ always() }}
+        run: |
+          if test -f runs/method-study/manifest.json; then
+            python3 -m hiergoal.study collect --output runs/method-study
+            cat runs/method-study/summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload protocol, traces, artifacts and analysis
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: method-study-${{ env.STUDY_MODE }}-${{ env.STUDY_PROFILE }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            runs/method-study/
+            runs/method-check/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: false
+      - name: Require complete audited execution when live was requested
+        if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.mode == 'run' }}
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('runs/method-study')
+          manifest = json.loads((root / 'manifest.json').read_text())
+          results = json.loads((root / 'results.json').read_text())
+          complete = len(results) == len(manifest['trials']) and all(
+              r.get('status') in ('PASS', 'FAIL') and r.get('audit') == 'PASS'
+              for r in results)
+          # A scientifically negative result is a valid completed experiment.
+          # Missing or unauditable evidence is an infrastructure failure.
+          print('Complete audited experiment:', complete)
+          raise SystemExit(0 if complete else 1)
+          PY

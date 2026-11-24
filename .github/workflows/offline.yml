@@ -24,3 +24,9 @@ jobs:
 
       - name: Benchmark schedule print only (no inference)
         run: python -m hiergoal.benchmark
+
+      - name: Method comparison apparatus check (simulated, no inference)
+        run: python -m hiergoal.study check --profile pilot --output runs/method-offline
+
+      - name: Freeze heldout method study without running it
+        run: python -m hiergoal.study prepare --profile study --output runs/method-prepared

@@ -1,8 +1,49 @@
-# HierGoal Lab — Hermes Issue #156054 Hierarchical Goal Research
+# HierGoal Lab — Hierarchical Goal Control Research
 
 [![Offline CI](https://github.com/Unjuno/hiergoal-lab/actions/workflows/offline.yml/badge.svg)](https://github.com/Unjuno/hiergoal-lab/actions/workflows/offline.yml)
 [![Hermes CI](https://github.com/Unjuno/hiergoal-lab/actions/workflows/live-experiment.yml/badge.svg)](https://github.com/Unjuno/hiergoal-lab/actions/workflows/live-experiment.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
+## Method validation study — Hermes is optional
+
+The research target is **evidence-driven hierarchical goal control and local replanning**.
+The new method study compares `flat_retry`, `hierarchy_fixed`, and `hierarchy_adaptive`
+with the same model, public feedback, artifact tools, and resource ceilings. Fixed and
+adaptive hierarchies share their initial plan. Persistent environment updates test
+recovery; withheld final grading and replayed evidence determine success.
+
+| Profile | Tasks | Conditions | Methods | Repeats | Scheduled trials |
+| --- | --- | --- | --- | --- | ---: |
+| `pilot` | 3 development tasks, one per family | normal / fault | 3 | 1 | 18 |
+| `study` | 12 heldout tasks, four per family | normal / fault | 3 | 3 | 216 |
+
+The task families are bounded code-expression repair, data transformation, and
+resource scheduling. These are controlled synthetic tasks, not a general autonomy
+benchmark. The final analysis retains failures and missing outcomes, clusters
+repeats by task, reports paired contrasts and uncertainty, and separates functional
+feasibility from evidence of an advantage over the controls.
+
+**Readiness:** 170 offline tests and all 216 oracle-driven apparatus trajectories
+passed. Oracle results are software checks, not model-performance measurements.
+**No live model study has been started by this change.**
+
+```bash
+# No API calls or key required:
+python -m unittest discover -s tests -v
+python -m hiergoal.study check --profile pilot --output runs/method-check
+python -m hiergoal.study prepare --profile study --output runs/method-ready
+```
+
+For later execution, use **Actions → Method validation study**. Its default
+`mode=prepare` runs only offline checks and prepares a frozen manifest. Only an
+explicit manual `mode=run` receives `OPENAI_API_KEY` and starts the chosen profile.
+Pushes never start live inference. The initial live profile should be `pilot`.
+
+See the [Japanese research protocol and commands](docs/method_study_ja.md),
+[completed readiness checks](docs/method_study_readiness_ja.md), and
+[frozen study manifest](experiments/method-study-v1/study-manifest.json).
+
+## Earlier Hermes integration experiment
 
 An experimental Python controller running real **Hermes Agent** instances through a three-level goal hierarchy: fixed long-term objective → model-proposed mid-term milestones → short-term executable tasks. The controller validates plans and dependencies, invokes Hermes, independently verifies results and replans failed leaves.
 
