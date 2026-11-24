@@ -76,6 +76,90 @@ def find_trial(manifest, *, arm="hierarchy_adaptive", condition="fault", instanc
                 and trial["family"] == family)
 
 
+def attach_synthetic_replay_evidence(manifest, results, *, forced=False, nonvacuous=True):
+    """Exercise report rules with explicit synthetic receipts, not real traces."""
+    manifest.update(schema_version="hiergoal.study.v2", evidence_contract="all-nine-v2",
+                    limits={"max_replans": 3})
+    assignments = {trial["trial_id"]: trial for trial in manifest["trials"]}
+    for trial in manifest["trials"]:
+        trial["fault_kind"] = "forced_subgoal" if forced else "environment"
+    for row in results:
+        trial = assignments[row["trial_id"]]
+        hierarchy = trial["arm"] != "flat_retry"
+        fault = trial["condition"] == "fault"
+        replan = int(trial["arm"] == "hierarchy_adaptive" and fault)
+        checked = 2 * replan if nonvacuous else 0
+        row.update(audit="PASS", fault_triggered=fault, replans=replan, replan_attempts=replan)
+        row["mechanism_evidence"] = {
+            "trace_replayed": True, "root_preserved": True,
+            "final_grade_called": True, "final_grade_passed": row["success"],
+            "tree": {"goal_count": 7 if hierarchy else 1, "leaf_count": 4 if hierarchy else 0,
+                     "max_depth_edges": 2 if hierarchy else 0, "dependency_edges": 2 if hierarchy else 0,
+                     "dependency_density": 1 / 3 if hierarchy else 0},
+            "trace": {"checkpoint_events": 3, "leaf_state_transitions": 4 if hierarchy else 0,
+                      "milestone_state_transitions": 2 if hierarchy else 0,
+                      "accepted_replans_with_failure_evidence": replan,
+                      "post_fault_target_replans": replan,
+                      "failure_causes_recorded": int(fault), "model_diagnoses_recorded": replan},
+            "root_changes": {"explicit_edit_requests": 0, "rejected_edit_requests": 0, "actual_changes": 0},
+            "replanning": {"attempted": replan, "accepted": replan, "rejected": 0, "unnecessary": 0,
+                           "parent_preserved_events": replan, "unrelated_goals_checked": checked,
+                           "unrelated_goals_unchanged": checked, "decision_events": replan,
+                           "needed_decisions": replan, "deferred_progress_decisions": 0},
+            "execution_locality": {"unrelated_artifact_fields_checked": checked,
+                                   "unrelated_artifact_fields_unchanged": checked,
+                                   "violations": 0, "nonvacuous_events": replan if nonvacuous else 0},
+            "dependencies": {"invalidation_events": replan, "invalidated_goals": 2 * replan,
+                             "reverified_goals": 2 * replan},
+            "fault": {"triggered": fault, "delivered": row["fault_delivered"], "no_impact": False,
+                      "forced": forced and fault, "domain_delivered": fault},
+        }
+    return results
+
+
+def criteria_by_id(summary):
+    return {item["id"]: item for item in summary["requirement_evidence"]["criteria"]}
+
+
+def freeze_synthetic_finite_thresholds(manifest):
+    manifest["analysis"]["finite_diagnostics"] = {
+        "scale": {"minimum_setting_success": 0.80, "maximum_paired_drop": 0.10,
+                  "baseline": {"size": "small", "depth": 3, "density": "sparse"},
+                  "stress": {"size": "large", "depth": 5, "density": "dense"}},
+        "reliability": {"required_repeats": 10, "minimum_task_condition_success": 0.90},
+    }
+
+
+def synthetic_scale_case(backend="openai"):
+    manifest = make_manifest(instances=7, repeats=2, profile="scale", backend=backend)
+    settings = (("small", 3, "sparse"), ("medium", 3, "sparse"), ("large", 3, "sparse"),
+                ("small", 4, "sparse"), ("small", 5, "sparse"), ("small", 3, "dense"), ("large", 5, "dense"))
+    for trial in manifest["trials"]:
+        size, depth, density = settings[trial["instance"]]
+        trial["scale"] = {"size": size, "depth": depth, "density": density}
+        trial["source_instance"] = 0
+    results = attach_synthetic_replay_evidence(manifest, make_results(manifest, lambda trial: True), forced=True)
+    assignments = {trial["trial_id"]: trial for trial in manifest["trials"]}
+    for row in results:
+        trial = assignments[row["trial_id"]]
+        if trial["arm"] == "flat_retry":
+            continue
+        setting = trial["scale"]
+        components = {"small": 2, "medium": 4, "large": 8}[setting["size"]]
+        leaves = components * (setting["depth"] + 1)
+        edges = leaves - 1 if setting["density"] == "sparse" else leaves * (leaves - 1) // 2
+        row["mechanism_evidence"]["tree"].update(
+            goal_count=1 + components * (setting["depth"] - 2) + leaves,
+            leaf_count=leaves, max_depth_edges=setting["depth"] - 1,
+            dependency_edges=edges, dependency_density=2 * edges / (leaves * (leaves - 1)))
+    return manifest, results
+
+
+def synthetic_failure(row):
+    row.update(status="FAIL", success=False, recovered=False if row["fault_delivered"] else None)
+    row["mechanism_evidence"]["final_grade_passed"] = False
+
+
 class StudyAnalysisTests(unittest.TestCase):
     def test_synthetic_advantage_exercises_both_primary_pass_criteria(self):
         manifest = make_manifest()
@@ -416,6 +500,277 @@ class StudyAnalysisTests(unittest.TestCase):
                 manifest["analysis"][field] = value
                 with self.assertRaises(AnalysisError):
                     analyze(manifest, [])
+
+    def test_nine_requirements_are_explicit_and_unrun_data_cannot_pass(self):
+        manifest = make_manifest()
+        summary = analyze(manifest, [])
+        criteria = criteria_by_id(summary)
+        self.assertEqual(set(criteria), {f"R{number}" for number in range(1, 10)})
+        self.assertTrue(all(item["status"] == "UNCERTAIN" for item in criteria.values()))
+        self.assertTrue(all(item["engineering_status"] == "UNCERTAIN" for item in criteria.values()))
+        self.assertIn("Nine requirement evidence rules", render_markdown(summary))
+        self.assertIn("Zero checked objects cannot establish locality", render_markdown(summary))
+        self.assertEqual(summary["scale"]["scheduled_settings"], 0)
+
+    def test_legacy_success_flags_do_not_substitute_for_replayed_mechanisms(self):
+        manifest = make_manifest()
+        summary = analyze(manifest, make_results(manifest))
+        self.assertEqual(summary["decision"], "PASS")  # Existing v1 algorithm fixture only.
+        self.assertTrue(all(item["engineering_status"] == "UNCERTAIN"
+                            for item in summary["requirement_evidence"]["criteria"]))
+
+    def test_simulated_mechanisms_are_software_evidence_not_model_recovery(self):
+        manifest = make_manifest(instances=2, repeats=3, backend="oracle", profile="mechanism")
+        results = attach_synthetic_replay_evidence(manifest, make_results(manifest, lambda trial: True), forced=True)
+        summary = analyze(manifest, results)
+        criteria = criteria_by_id(summary)
+        for identifier in ("R1", "R2", "R3", "R4", "R5", "R6", "R7", "R9"):
+            self.assertEqual(criteria[identifier]["engineering_status"], "PASS", identifier)
+        self.assertEqual(criteria["R1"]["status"], "UNCERTAIN")
+        self.assertEqual(criteria["R1"]["empirical_status"], "UNCERTAIN")
+        self.assertEqual(criteria["R9"]["status"], "UNCERTAIN")
+        self.assertEqual(summary["decision"], "UNCERTAIN")
+        self.assertEqual(summary["design"]["scheduled_trials"], 108)
+        self.assertEqual(summary["design"]["task_clusters"], 6)
+        self.assertEqual(summary["primary_contrasts"], [])
+        self.assertEqual(len(summary["descriptive_contrasts"]), 4)
+        self.assertTrue(all(item["ci"] is None and item["test"] is None for item in summary["descriptive_contrasts"]))
+        json.dumps(summary, allow_nan=False)
+
+    def test_locality_requires_nonempty_goal_and_artifact_comparisons(self):
+        for nonvacuous, expected in ((False, "UNCERTAIN"), (True, "PASS")):
+            with self.subTest(nonvacuous=nonvacuous):
+                manifest = make_manifest()
+                results = attach_synthetic_replay_evidence(manifest, make_results(manifest), nonvacuous=nonvacuous)
+                self.assertEqual(criteria_by_id(analyze(manifest, results))["R5"]["engineering_status"], expected)
+        target = next(row for row in results if row["mechanism_evidence"]["replanning"]["accepted"])
+        target["mechanism_evidence"]["execution_locality"].update(
+            unrelated_artifact_fields_unchanged=1, violations=1)
+        criteria = criteria_by_id(analyze(manifest, results))
+        self.assertEqual(criteria["R5"]["engineering_status"], "FAIL")
+        self.assertEqual(criteria["R5"]["evidence"]["artifact_locality_violations"], 1)
+
+    def test_v2_requires_critical_replay_root_and_independent_grade_evidence(self):
+        for field in ("mechanism_evidence", "audit", "trace_replayed", "root_preserved", "final_grade_called"):
+            with self.subTest(field=field):
+                manifest = make_manifest()
+                results = attach_synthetic_replay_evidence(manifest, make_results(manifest))
+                target = next(row for row in results if row["status"] == "PASS")
+                if field in ("mechanism_evidence", "audit"):
+                    target.pop(field)
+                else:
+                    target["mechanism_evidence"][field] = False
+                summary = analyze(manifest, results)
+                self.assertEqual(summary["decision"], "UNCERTAIN")
+                self.assertFalse(summary["confirmatory_eligible"])
+                self.assertEqual(summary["primary_contrasts"][0]["estimate"], 1)
+
+    def test_budget_failure_can_legitimately_have_no_hidden_final_grade(self):
+        manifest = make_manifest()
+        results = attach_synthetic_replay_evidence(manifest, make_results(manifest))
+        target = next(row for row in results if row["status"] == "FAIL")
+        target["mechanism_evidence"].update(final_grade_called=False, final_grade_passed=None)
+        summary = analyze(manifest, results)
+        self.assertEqual(summary["validation"]["issues"], [])
+        self.assertEqual(summary["decision"], "PASS")
+        self.assertEqual(criteria_by_id(summary)["R7"]["evidence"]["no_final_grade"], 1)
+
+    def test_fault_diagnostics_distinguish_no_impact_untriggered_and_unknown(self):
+        manifest = make_manifest()
+        results = make_results(manifest)
+        assignments = {trial["trial_id"]: trial for trial in manifest["trials"]}
+        for row in results:
+            row["fault_triggered"] = assignments[row["trial_id"]]["condition"] == "fault"
+        baseline = analyze(manifest, results)
+        for instance, trigger in enumerate((False, True, None)):
+            trial_id = find_trial(manifest, instance=instance)["trial_id"]
+            next(row for row in results if row["trial_id"] == trial_id).update(
+                fault_triggered=trigger, fault_delivered=False, recovered=None)
+        summary = analyze(manifest, results)
+        recovery = next(row for row in summary["recovery"] if row["arm"] == "hierarchy_adaptive")
+        self.assertEqual(recovery["assigned"], 36)
+        self.assertEqual(recovery["delivered"], 33)
+        self.assertEqual(recovery["triggered_no_impact"], 1)
+        self.assertEqual(recovery["untriggered"], 1)
+        self.assertEqual(recovery["trigger_unknown"], 1)
+        self.assertEqual(summary["primary_contrasts"], baseline["primary_contrasts"])
+
+    def test_scale_is_descriptive_and_uses_its_actual_clusters_and_factor_levels(self):
+        manifest, results = synthetic_scale_case()
+        summary = analyze(manifest, results)
+        self.assertEqual(summary["design"]["scheduled_trials"], 252)
+        self.assertEqual(summary["design"]["task_clusters"], 21)
+        self.assertEqual(summary["scale"]["scheduled_settings"], 7)
+        self.assertEqual(summary["scale"]["scheduled_levels"]["requested_depth_levels"], [3, 4, 5])
+        self.assertEqual(summary["scale"]["observed_tree_values"]["max_depth_edges"], [2, 3, 4])
+        self.assertEqual(criteria_by_id(summary)["R8"]["engineering_status"], "PASS")
+        self.assertEqual(summary["decision"], "UNCERTAIN")
+        self.assertIn("scale_is_descriptive_only", summary["eligibility_blockers"])
+        self.assertNotIn("study_requires_216_scheduled_trials", summary["eligibility_blockers"])
+        self.assertEqual(summary["primary_contrasts"], [])
+        self.assertTrue(all(item["task_clusters"] == 21 and item["ci"] is None and item["test"] is None
+                            for item in summary["descriptive_contrasts"]))
+        markdown = render_markdown(summary)
+        self.assertIn("7 scale settings and 21 distinct task IDs", markdown)
+        self.assertIn("not a full factorial design", markdown)
+        self.assertNotIn("## Co-primary", markdown)
+        self.assertIn("This schedule has 21 task clusters", markdown)
+
+    def test_reliability_retains_clusters_and_distinguishes_mixed_from_missing(self):
+        manifest = make_manifest(repeats=10, profile="reliability")
+        failed_id = find_trial(manifest, repeat=2)["trial_id"]
+        results = attach_synthetic_replay_evidence(manifest, make_results(manifest,
+            lambda trial: trial["trial_id"] != failed_id))
+        summary = analyze(manifest, results)
+        self.assertEqual(summary["design"]["scheduled_trials"], 720)
+        self.assertEqual(summary["design"]["task_clusters"], 12)
+        self.assertEqual(summary["repeat_stability"]["minimum_scheduled_repeats"], 10)
+        target = next(row for row in summary["repeat_stability"]["by_arm_condition"]
+                      if row["arm"] == "hierarchy_adaptive" and row["condition"] == "fault")
+        self.assertEqual(target["complete_task_clusters"], 12)
+        self.assertEqual(target["clusters_all_repeats_passed"], 11)
+        self.assertEqual(target["clusters_with_mixed_complete_outcomes"], 1)
+        self.assertEqual(target["clusters_all_repeats_failed"], 0)
+        self.assertEqual(criteria_by_id(summary)["R9"]["engineering_status"], "PASS")
+        self.assertEqual(criteria_by_id(summary)["R9"]["status"], "UNCERTAIN")
+        partial = analyze(manifest, [row for row in results if row["trial_id"] != failed_id])
+        target = next(row for row in partial["repeat_stability"]["by_arm_condition"]
+                      if row["arm"] == "hierarchy_adaptive" and row["condition"] == "fault")
+        self.assertEqual(target["complete_task_clusters"], 11)
+        self.assertEqual(target["clusters_with_mixed_complete_outcomes"], 0)
+        self.assertEqual(criteria_by_id(partial)["R9"]["engineering_status"], "UNCERTAIN")
+        self.assertEqual(len(summary["by_family_arm_condition_repeat"]), 180)
+
+    def test_unnecessary_or_over_limit_replan_requests_fail_the_policy_requirement(self):
+        for field, value in (("unnecessary", 1), ("attempted", 4)):
+            with self.subTest(field=field):
+                manifest = make_manifest()
+                results = attach_synthetic_replay_evidence(manifest, make_results(manifest))
+                target = next(row for row in results if row["mechanism_evidence"]["replanning"]["accepted"])
+                target["mechanism_evidence"]["replanning"][field] = value
+                self.assertEqual(criteria_by_id(analyze(manifest, results))["R6"]["engineering_status"], "FAIL")
+
+    def test_invalid_mechanism_measurements_are_not_silently_coerced(self):
+        for group, name, value in (("tree", "goal_count", True), ("tree", "dependency_density", 1.1),
+                                    ("replanning", "attempted", -1), ("fault", "forced", "true")):
+            with self.subTest(group=group, name=name):
+                manifest = make_manifest()
+                results = attach_synthetic_replay_evidence(manifest, make_results(manifest))
+                results[0]["mechanism_evidence"][group][name] = value
+                with self.assertRaises(AnalysisError):
+                    analyze(manifest, results)
+
+    def test_certification_only_invalidation_is_not_forced_domain_recovery(self):
+        manifest = make_manifest(instances=2, profile="mechanism")
+        results = attach_synthetic_replay_evidence(manifest, make_results(manifest, lambda trial: True), forced=True)
+        for row in results:
+            row["mechanism_evidence"]["fault"]["domain_delivered"] = False
+        recovery = criteria_by_id(analyze(manifest, results))["R1"]
+        self.assertGreater(recovery["evidence"]["adaptive_forced_recovered"], 0)
+        self.assertEqual(recovery["evidence"]["adaptive_forced_domain_recovered"], 0)
+        self.assertEqual(recovery["engineering_status"], "UNCERTAIN")
+
+    def test_scale_factors_cannot_change_inside_a_task_cluster(self):
+        manifest = make_manifest(profile="scale")
+        for trial in manifest["trials"]:
+            trial["scale"] = {"size": "small", "depth": 3, "density": "sparse"}
+        manifest["trials"][0]["scale"] = {"size": "large", "depth": 5, "density": "dense"}
+        with self.assertRaisesRegex(AnalysisError, "inconsistent scale or fault covariates"):
+            analyze(manifest, [])
+
+    def test_artifact_recovery_without_target_revision_does_not_pass_r1(self):
+        manifest = make_manifest(instances=2, profile="mechanism")
+        results = attach_synthetic_replay_evidence(manifest, make_results(manifest, lambda trial: True), forced=True)
+        for row in results:
+            row["mechanism_evidence"]["trace"]["post_fault_target_replans"] = 0
+        criterion = criteria_by_id(analyze(manifest, results))["R1"]
+        self.assertGreater(criterion["evidence"]["adaptive_forced_domain_recovered"], 0)
+        self.assertEqual(criterion["evidence"]["adaptive_forced_modified_domain_recovered"], 0)
+        self.assertEqual(criterion["status"], "FAIL")
+
+    def test_conflicting_validity_flags_cannot_preserve_an_engineering_root_pass(self):
+        manifest = make_manifest()
+        results = attach_synthetic_replay_evidence(manifest, make_results(manifest))
+        results[0]["invariant_ok"] = False
+        criterion = criteria_by_id(analyze(manifest, results))["R3"]
+        self.assertEqual(criterion["engineering_status"], "UNCERTAIN")
+        self.assertEqual(criterion["evidence"]["verification_issue_trials"], 1)
+        self.assertEqual(criterion["evidence"]["actual_root_changes"], 0)
+
+    def test_synthetic_finite_scale_threshold_and_paired_drop_fail_separately(self):
+        for failed_instances, expected, setting_pass, drop_pass in (
+            ((), "PASS", True, True), ((1,), "PASS", True, True),
+            ((1, 1), "FAIL", False, True), ((6,), "FAIL", True, False),
+            ((0, 6), "PASS", True, True),
+        ):
+            with self.subTest(failed_instances=failed_instances):
+                manifest, results = synthetic_scale_case()
+                freeze_synthetic_finite_thresholds(manifest)
+                counts = {}
+                for instance in failed_instances:
+                    repeat = counts.get(instance, 0) + 1
+                    counts[instance] = repeat
+                    target_id = find_trial(manifest, instance=instance, repeat=repeat)["trial_id"]
+                    synthetic_failure(next(row for row in results if row["trial_id"] == target_id))
+                summary = analyze(manifest, results)
+                finite = summary["scale"]["finite_resilience"]
+                self.assertEqual(finite["decision"], expected)
+                self.assertEqual(finite["criteria"]["every_setting_meets_success_threshold"], setting_pass)
+                self.assertEqual(finite["criteria"]["paired_drop_within_margin"], drop_pass)
+                self.assertEqual(finite["paired_baseline_to_stress"]["observed_pairs"], 6)
+                self.assertEqual(criteria_by_id(summary)["R8"]["status"], expected)
+                self.assertEqual(summary["decision"], "UNCERTAIN")
+                self.assertEqual(finite["scientific_sufficiency_status"], "UNCERTAIN")
+        self.assertIn("Finite scale-resilience benchmark", render_markdown(summary))
+
+    def test_finite_scale_missing_simulated_and_unassessed_locality_cannot_pass(self):
+        for defect in ("missing", "oracle", "no_locality", "locality_violation"):
+            with self.subTest(defect=defect):
+                manifest, results = synthetic_scale_case("oracle" if defect == "oracle" else "openai")
+                freeze_synthetic_finite_thresholds(manifest)
+                if defect == "missing":
+                    results.pop()  # Even an excluded comparator/normal cell stays required.
+                elif defect in ("no_locality", "locality_violation"):
+                    target_id = find_trial(manifest)["trial_id"]
+                    evidence = next(row for row in results if row["trial_id"] == target_id)["mechanism_evidence"]["execution_locality"]
+                    if defect == "no_locality":
+                        evidence.update(unrelated_artifact_fields_checked=0, unrelated_artifact_fields_unchanged=0, nonvacuous_events=0)
+                    else:
+                        evidence.update(unrelated_artifact_fields_unchanged=1, violations=1)
+                finite = analyze(manifest, results)["scale"]["finite_resilience"]
+                self.assertEqual(finite["decision"], "FAIL" if defect == "locality_violation" else "UNCERTAIN")
+
+    def test_synthetic_finite_repeatability_accepts_nine_but_rejects_eight_of_ten(self):
+        for failures, expected in ((0, "PASS"), (1, "PASS"), (2, "FAIL")):
+            with self.subTest(failures=failures):
+                manifest = make_manifest(repeats=10, profile="reliability")
+                results = attach_synthetic_replay_evidence(manifest, make_results(manifest, lambda trial: True))
+                freeze_synthetic_finite_thresholds(manifest)
+                for repeat in range(1, failures + 1):
+                    target_id = find_trial(manifest, repeat=repeat)["trial_id"]
+                    synthetic_failure(next(row for row in results if row["trial_id"] == target_id))
+                summary = analyze(manifest, results)
+                finite = summary["repeat_stability"]["finite_repeatability"]
+                self.assertEqual(finite["decision"], expected)
+                self.assertEqual(criteria_by_id(summary)["R9"]["status"], expected)
+                self.assertEqual(finite["adaptive_task_condition_cells"], 24)
+                self.assertEqual(summary["repeat_stability"]["sufficiency_status"], "UNCERTAIN")
+                self.assertEqual(summary["decision"], "UNCERTAIN")
+        self.assertIn("Finite repeatability benchmark", render_markdown(summary))
+
+    def test_finite_repeatability_missing_simulated_and_invalid_records_stay_uncertain(self):
+        for defect in ("missing", "oracle", "protocol"):
+            with self.subTest(defect=defect):
+                manifest = make_manifest(repeats=10, profile="reliability", backend="oracle" if defect == "oracle" else "openai")
+                results = attach_synthetic_replay_evidence(manifest, make_results(manifest, lambda trial: True))
+                freeze_synthetic_finite_thresholds(manifest)
+                if defect == "missing":
+                    results.pop()
+                elif defect == "protocol":
+                    results[0]["protocol_ok"] = False
+                summary = analyze(manifest, results)
+                self.assertEqual(summary["repeat_stability"]["finite_repeatability"]["decision"], "UNCERTAIN")
+                self.assertEqual(criteria_by_id(summary)["R9"]["status"], "UNCERTAIN")
 
 
 if __name__ == "__main__":

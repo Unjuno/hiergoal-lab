@@ -9,13 +9,19 @@
 The research target is **evidence-driven hierarchical goal control and local replanning**.
 The new method study compares `flat_retry`, `hierarchy_fixed`, and `hierarchy_adaptive`
 with the same model, public feedback, artifact tools, and resource ceilings. Fixed and
-adaptive hierarchies share their initial plan. Persistent environment updates test
-recovery; withheld final grading and replayed evidence determine success.
+adaptive hierarchies share their initial plan. Persistent environment updates and
+forced substantive subgoal faults test recovery; withheld final grading and
+semantic trace replay determine success. The v2 audit covers all nine requested
+requirements, including nonempty unrelated branches, bounded replanning, scaling,
+and repeated outcomes.
 
 | Profile | Tasks | Conditions | Methods | Repeats | Scheduled trials |
 | --- | --- | --- | --- | --- | ---: |
 | `pilot` | 3 development tasks, one per family | normal / fault | 3 | 1 | 18 |
 | `study` | 12 heldout tasks, four per family | normal / fault | 3 | 3 | 216 |
+| `mechanism` | 6 composed tasks with independent branches | normal / forced subgoal fault | 3 | 3 | 108 |
+| `scale` | 3 families × 7 prescribed configurations | normal / forced subgoal fault | 3 | 2 | 252 |
+| `reliability` | The same 12 heldout tasks as `study` | normal / fault | 3 | 10 | 720 |
 
 The task families are bounded code-expression repair, data transformation, and
 resource scheduling. These are controlled synthetic tasks, not a general autonomy
@@ -23,14 +29,23 @@ benchmark. The final analysis retains failures and missing outcomes, clusters
 repeats by task, reports paired contrasts and uncertainty, and separates functional
 feasibility from evidence of an advantage over the controls.
 
-**Readiness:** 170 offline tests and all 216 oracle-driven apparatus trajectories
-passed. Oracle results are software checks, not model-performance measurements.
+The scale profile reaches **73 total goals, 48 leaves, 5 hierarchy levels, and
+120 direct dependency edges**. Depth changes add validation work; they do not
+isolate depth while holding leaf count fixed. Repeated calls and scaled variants
+do not become independent task samples.
+
+**Readiness:** all 228 offline regression tests and 1,314 oracle-driven
+trajectories across all five profiles passed local verification and semantic
+replay. The no-key workflow repeats these checks. See the verification record
+below for conditions and evidence. Oracle results are software checks, not model-performance measurements.
 **No live model study has been started by this change.**
 
 ```bash
 # No API calls or key required:
 python -m unittest discover -s tests -v
-python -m hiergoal.study check --profile pilot --output runs/method-check
+for profile in pilot study mechanism scale reliability; do
+  python -m hiergoal.study check --profile "$profile" --output "runs/method-check-$profile"
+done
 python -m hiergoal.study prepare --profile study --output runs/method-ready
 ```
 
@@ -38,10 +53,16 @@ For later execution, use **Actions → Method validation study**. Its default
 `mode=prepare` runs only offline checks and prepares a frozen manifest. Only an
 explicit manual `mode=run` receives `OPENAI_API_KEY` and starts the chosen profile.
 Pushes never start live inference. The initial live profile should be `pilot`.
+Use the other profiles separately for mechanism, method comparison, scale, and
+repeatability. The report separates engineering coverage, finite observed
+benchmark criteria, empirical evidence, and unresolved scientific uncertainty.
 
 See the [Japanese research protocol and commands](docs/method_study_ja.md),
+[nine-requirement audit](docs/method_requirements_audit_ja.md),
 [completed readiness checks](docs/method_study_readiness_ja.md), and
-[frozen study manifest](experiments/method-study-v1/study-manifest.json).
+[frozen v2 study manifest](experiments/method-study-v2/study-manifest.json).
+The previous v1 manifests are historical and cannot be run against changed v2
+sources; prepare a new output directory instead of reusing old traces.
 
 ## Earlier Hermes integration experiment
 

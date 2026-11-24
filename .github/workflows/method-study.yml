@@ -11,9 +11,9 @@ on:
         default: prepare
         required: true
       profile:
-        description: 'pilot: 18 dev trials / study: 216 heldout trials'
+        description: 'pilot 18 / study 216 / mechanism 108 / scale 252 / reliability 720 trials'
         type: choice
-        options: [pilot, study]
+        options: [pilot, study, mechanism, scale, reliability]
         default: pilot
         required: true
   push:
@@ -22,6 +22,7 @@ on:
       - 'hiergoal/study*.py'
       - 'tests/test_study*.py'
       - 'docs/method_study_ja.md'
+      - 'docs/method_requirements_audit_ja.md'
       - '.github/workflows/method-study.yml'
 
 permissions:
@@ -34,7 +35,7 @@ concurrency:
 jobs:
   study:
     runs-on: ubuntu-24.04
-    timeout-minutes: 330
+    timeout-minutes: 360
     env:
       STUDY_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'prepare' }}
       STUDY_PROFILE: ${{ inputs.profile || 'pilot' }}
@@ -45,8 +46,8 @@ jobs:
           persist-credentials: false
       - name: Offline regression tests (no credential)
         run: python3 -m unittest discover -s tests -v
-      - name: Exercise every method and scenario offline (no credential)
-        run: python3 -m hiergoal.study check --profile pilot --output runs/method-check
+      - name: Exercise selected profile offline (no credential)
+        run: python3 -m hiergoal.study check --profile "$STUDY_PROFILE" --output runs/method-check
       - name: Freeze manifest before any model request
         run: python3 -m hiergoal.study prepare --profile "$STUDY_PROFILE" --output runs/method-study
       - name: Execute only the explicitly selected live study

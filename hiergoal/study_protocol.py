@@ -13,15 +13,27 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-SCHEMA = "hiergoal.study.v1"
+SCHEMA = "hiergoal.study.v2"
 ARMS = ("flat_retry", "hierarchy_fixed", "hierarchy_adaptive")
 FAMILIES = ("code_repair", "data_transform", "scheduling")
 CONDITIONS = ("normal", "fault")
+PROFILES = ("pilot", "study", "mechanism", "scale", "reliability")
+SCALE_SETTINGS = (
+    {"size": "small", "depth": 3, "density": "sparse"},
+    {"size": "medium", "depth": 3, "density": "sparse"},
+    {"size": "large", "depth": 3, "density": "sparse"},
+    {"size": "small", "depth": 4, "density": "sparse"},
+    {"size": "small", "depth": 5, "density": "sparse"},
+    {"size": "small", "depth": 3, "density": "dense"},
+    {"size": "large", "depth": 5, "density": "dense"},
+)
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_FILES = (
     "hiergoal/study_protocol.py", "hiergoal/study_tasks.py", "hiergoal/study_api.py",
     "hiergoal/study.py", "hiergoal/study_analysis.py",
-    "docs/method_study_ja.md", ".github/workflows/method-study.yml",
+    "hiergoal/study_planning.py", "hiergoal/study_scale.py", "hiergoal/study_mechanisms.py",
+    "docs/method_study_ja.md", "docs/method_requirements_audit_ja.md",
+    ".github/workflows/method-study.yml",
 )
 LIMITS = {
     "max_calls": 12, "max_replans": 3, "max_output_tokens": 2048,
@@ -29,6 +41,28 @@ LIMITS = {
     "request_timeout_seconds": 90, "trial_timeout_seconds": 1200,
     "batch_timeout_seconds": 18000,
 }
+
+
+def make_trial_task(trial, seed=1729):
+    """One fresh environment per trial; never reuse mutable task state."""
+    if trial.get("scale"):
+        from hiergoal.study_scale import make_task
+        setting = trial["scale"]
+        return make_task(trial["family"], trial["source_instance"], split=trial["split"], seed=seed,
+                         scale=setting["size"], depth=setting["depth"], density=setting["density"])
+    from hiergoal.study_tasks import make_task
+    return make_task(trial["family"], trial["instance"], split=trial["split"], seed=seed)
+
+
+def profile_limits(profile):
+    limits = copy.deepcopy(LIMITS)
+    if profile == "mechanism":
+        limits.update(max_calls=24, max_replans=4, max_output_tokens=4096,
+                      max_total_tokens=128000, max_prompt_bytes=128000, trial_timeout_seconds=1800)
+    if profile == "scale":
+        limits.update(max_calls=64, max_replans=8, max_output_tokens=8192,
+                      max_total_tokens=512000, max_prompt_bytes=384000, trial_timeout_seconds=1800)
+    return limits
 
 
 def canonical(value) -> str:
@@ -55,22 +89,31 @@ def source_hashes() -> dict:
 
 def build_manifest(profile="pilot", backend="openai", model="gpt-6-luna",
                    schedule_seed=1729) -> dict:
-    from hiergoal.study_tasks import make_task
-    if profile not in ("pilot", "study") or backend not in ("openai", "oracle", "scripted"):
+    if profile not in PROFILES or backend not in ("openai", "oracle", "scripted"):
         raise ValueError("Unknown study profile/backend")
     if not isinstance(model, str) or not model.strip() or len(model) > 100:
         raise ValueError("Invalid model identifier")
-    split, instances, repeats = (("dev", 1, 1) if profile == "pilot"
-                                else ("heldout", 4, 3))
+    split, instances, repeats = {
+        "pilot": ("dev", 1, 1), "study": ("heldout", 4, 3),
+        "mechanism": ("heldout", 2, 3), "scale": ("heldout", len(SCALE_SETTINGS), 2),
+        "reliability": ("heldout", 4, 10),
+    }[profile]
     tasks, blocks = {}, []
     for family in FAMILIES:
         for instance in range(instances):
-            task = make_task(family, instance, split=split, seed=1729)
+            specification = {"family": family, "instance": instance, "split": split,
+                             "fault_kind": "forced_subgoal" if profile in ("mechanism", "scale") else "environment"}
+            if profile in ("mechanism", "scale"):
+                specification.update(scale=copy.deepcopy(SCALE_SETTINGS[instance] if profile == "scale" else SCALE_SETTINGS[0]),
+                                     source_instance=0 if profile == "scale" else instance)
+            task = make_trial_task(specification)
             tasks[task.task_id] = {
-                "task_id": task.task_id, "family": family, "instance": instance,
-                "split": split, "seed": 1729, "root_sha256": digest(task.root_contract),
+                **specification, "task_id": task.task_id,
+                "seed": 1729, "root_sha256": digest(task.root_contract),
                 "initial_public_spec_sha256": digest(task.public_spec()),
             }
+            if hasattr(task, "topology_stats"):
+                tasks[task.task_id]["planned_tree"] = task.topology_stats()
             for repeat in range(1, repeats + 1):
                 for condition in CONDITIONS:
                     blocks.append({**tasks[task.task_id], "repeat": repeat,
@@ -90,9 +133,15 @@ def build_manifest(profile="pilot", backend="openai", model="gpt-6-luna",
         "model": model, "reasoning_effort": "low", "endpoint": "https://api.openai.com/v1/responses",
         "schedule_seed": schedule_seed, "task_seed": 1729,
         "randomness_note": "Schedule/task seeds are not model sampling seeds.",
-        "limits": copy.deepcopy(LIMITS), "tasks": list(tasks.values()), "trials": trials,
+        "limits": profile_limits(profile), "tasks": list(tasks.values()), "trials": trials,
+        "evidence_contract": "all-nine-v2",
         "analysis": {"minimum_effect": 0.10, "confidence": 0.95,
-                     "bootstrap_samples": 5000, "seed": 20261125},
+                     "bootstrap_samples": 5000, "seed": 20261125,
+                     "finite_diagnostics": {
+                         "scale": {"minimum_setting_success": 0.80, "maximum_paired_drop": 0.10,
+                                   "baseline": {"size": "small", "depth": 3, "density": "sparse"},
+                                   "stress": {"size": "large", "depth": 5, "density": "dense"}},
+                         "reliability": {"required_repeats": 10, "minimum_task_condition_success": 0.90}}},
         "planning": "Shared once per task/repeat, blinded to condition; logically charged to each hierarchical arm.",
         "source_file_sha256": source_hashes(),
     }

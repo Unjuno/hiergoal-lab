@@ -7,7 +7,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,8 +25,24 @@ jobs:
       - name: Benchmark schedule print only (no inference)
         run: python -m hiergoal.benchmark
 
-      - name: Method comparison apparatus check (simulated, no inference)
-        run: python -m hiergoal.study check --profile pilot --output runs/method-offline
+      - name: Check all five method profiles (simulated, no inference)
+        run: |
+          for profile in pilot study mechanism scale reliability; do
+            python -m hiergoal.study check --profile "$profile" --output "runs/method-offline-$profile"
+          done
 
       - name: Freeze heldout method study without running it
         run: python -m hiergoal.study prepare --profile study --output runs/method-prepared
+
+      - name: Retain apparatus summaries and audited results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: offline-method-coverage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            runs/method-offline-*/summary.*
+            runs/method-offline-*/results.json
+            runs/method-offline-*/host.json
+            runs/method-offline-*/manifest.json
+          if-no-files-found: error
+          retention-days: 30

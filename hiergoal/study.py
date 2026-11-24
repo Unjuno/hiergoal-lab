@@ -11,24 +11,24 @@ import argparse
 import copy
 import csv
 import json
-import re
+import math
 import time
 from pathlib import Path
 
 from hiergoal.study_api import OpenAIResponder, TransportError
 from hiergoal.study_protocol import (
-    ARMS, SCHEMA, build_manifest, canonical, digest, host_metadata, save,
+    ARMS, SCHEMA, PROFILES, build_manifest, canonical, digest, host_metadata, save, make_trial_task,
     validate_manifest,
 )
 from hiergoal.study_tasks import make_task
-
-
-class InvalidAction(ValueError):
-    pass
+from hiergoal.study_mechanisms import InvalidAction, validate_replan, replan_decision, evidence_from_events
+from hiergoal.study_planning import validate_plan, plan_prompt, statuses, active_leaf, milestone_statuses
 
 
 class BudgetExhausted(RuntimeError):
-    pass
+    def __init__(self, message, *, evidence=None):
+        super().__init__(message)
+        self.evidence = evidence
 
 
 def object_reply(record: dict) -> dict:
@@ -51,105 +51,6 @@ def text_field(value, name, maximum=1200) -> str:
     if not isinstance(value, str) or not 5 <= len(value.strip()) <= maximum:
         raise InvalidAction(f"{name} must contain 5..{maximum} characters")
     return value.strip()
-
-
-def validate_plan(value: dict, task) -> dict:
-    if set(value) != {"milestones"} or not isinstance(value["milestones"], list):
-        raise InvalidAction("Only milestones may be proposed; root is immutable")
-    if not 2 <= len(value["milestones"]) <= 4:
-        raise InvalidAction("Use 2..4 milestones")
-    leaves, milestones, owners = {}, [], {}
-    for item in value["milestones"]:
-        if not isinstance(item, dict) or set(item) != {"id", "title", "subgoals"}:
-            raise InvalidAction("Invalid milestone fields")
-        mid = item["id"]
-        if not isinstance(mid, str) or not re.fullmatch(r"M[1-4]", mid) or any(m["id"] == mid for m in milestones):
-            raise InvalidAction("Milestone IDs must be unique M1..M4")
-        milestones.append({"id": mid, "title": text_field(item["title"], "title")})
-        if not isinstance(item["subgoals"], list) or not item["subgoals"]:
-            raise InvalidAction("Empty milestone")
-        for raw in item["subgoals"]:
-            if not isinstance(raw, dict) or set(raw) != {"id", "instruction", "checks", "depends_on"}:
-                raise InvalidAction("Invalid subgoal fields")
-            sid = raw["id"]
-            if not isinstance(sid, str) or not re.fullmatch(r"S[1-8]", sid) or sid in leaves:
-                raise InvalidAction("Subgoal IDs must be unique S1..S8")
-            checks, deps = raw["checks"], raw["depends_on"]
-            if not isinstance(checks, list) or len(checks) != 1 or not isinstance(checks[0], str) or checks[0] not in task.gates or checks[0] in owners:
-                raise InvalidAction("Assign each known gate to exactly one leaf")
-            if not isinstance(deps, list) or any(not isinstance(d, str) for d in deps) or len(set(deps)) != len(deps):
-                raise InvalidAction("Invalid dependencies")
-            leaves[sid] = {"id": sid, "parent": mid,
-                           "instruction": text_field(raw["instruction"], "instruction"),
-                           "checks": checks[:], "depends_on": deps[:], "revision": 0}
-            owners[checks[0]] = sid
-    if set(owners) != set(task.gates) or not 3 <= len(leaves) <= 8:
-        raise InvalidAction("Missing gate coverage")
-    visiting, visited = set(), set()
-    def ancestors(sid):
-        if sid not in leaves or sid in visiting:
-            raise InvalidAction("Cyclic or dangling dependency")
-        visiting.add(sid)
-        result = set()
-        for dep in leaves[sid]["depends_on"]:
-            result.add(dep)
-            result.update(ancestors(dep))
-        visiting.remove(sid)
-        visited.add(sid)
-        return result
-    for sid in leaves:
-        reachable = ancestors(sid)
-        gate = leaves[sid]["checks"][0]
-        if any(owners[dep] not in reachable for dep in task.dependencies.get(gate, [])):
-            raise InvalidAction("Plan omitted an authoritative task dependency")
-    return {"milestones": milestones, "leaves": leaves}
-
-
-def plan_prompt(task) -> dict:
-    return {"root_contract": task.root_contract, "task": task.public_spec(),
-            "gates": task.gates, "gate_dependencies": task.dependencies,
-            "instruction": (
-                'Return JSON {"milestones":[{"id":"M1","title":"...",'
-                '"subgoals":[{"id":"S1","instruction":"...","checks":["gate_id"],'
-                '"depends_on":[]}]}]}. Use 2..4 milestones M1..M4 and exactly one '
-                'leaf per gate, unique S1..S8. Preserve gate dependency ordering. '
-                'Give executable task-specific instructions, never edit root or acceptance rules. '
-                'The environment may change; objectives refer to the current authoritative state.'
-            )}
-
-
-def statuses(plan, grades) -> dict:
-    if plan is None:
-        return {}
-    output = {}
-    def done(sid):
-        if sid not in output:
-            leaf = plan["leaves"][sid]
-            passed = all(grades[c]["passed"] for c in leaf["checks"])
-            dependencies = all(done(d) == "completed" for d in leaf["depends_on"])
-            output[sid] = "completed" if passed and dependencies else "pending"
-        return output[sid]
-    for sid in plan["leaves"]:
-        done(sid)
-    return output
-
-
-def active_leaf(plan, grades):
-    if plan is None:
-        return None
-    state = statuses(plan, grades)
-    return next((leaf for leaf in plan["leaves"].values()
-                 if state[leaf["id"]] != "completed" and
-                 all(state[d] == "completed" for d in leaf["depends_on"])), None)
-
-
-def milestone_statuses(plan, grades):
-    if plan is None:
-        return {}
-    children = statuses(plan, grades)
-    return {mid["id"]: ("completed" if all(children[leaf["id"]] == "completed"
-                      for leaf in plan["leaves"].values() if leaf["parent"] == mid["id"])
-                      else "pending") for mid in plan["milestones"]}
 
 
 def apply_patch(solution: dict, action: dict) -> dict:
@@ -193,6 +94,13 @@ class OracleResponder:
         if self.task is None:
             raise ValueError("Offline oracle requires explicit task binding")
         if role == "plan":
+            if hasattr(self.task, "hierarchy_spec"):
+                reply = {"instructions": {gate: "Satisfy current requirement: " + description
+                                          for gate, description in self.task.gates.items()}}
+                return {"text": canonical(reply), "input_tokens": 100, "output_tokens": 100,
+                        "elapsed_seconds": 0.0, "response_id": None, "model": "OFFLINE_ORACLE",
+                        "status": "completed", "simulated": True,
+                        "usage": {"input_tokens": 100, "output_tokens": 100}}
             gates = list(self.task.gates)
             owners = {g: "S" + str(i + 1) for i, g in enumerate(gates)}
             members = [{"id": owners[g], "instruction": "Satisfy current requirement: " + self.task.gates[g],
@@ -216,8 +124,11 @@ class OracleResponder:
 
 
 def request_record(backend, role, payload, limits, on_start=None):
-    if len(canonical(payload).encode("utf-8")) > limits["max_prompt_bytes"]:
-        raise BudgetExhausted("Prompt byte limit reached")
+    size = len(canonical(payload).encode("utf-8"))
+    if size > limits["max_prompt_bytes"]:
+        raise BudgetExhausted("Prompt byte limit reached", evidence={
+            "kind": "prompt_bytes", "observed": size, "limit": limits["max_prompt_bytes"],
+            "role": role, "blocked_request": payload})
     if on_start:
         on_start(role, payload)
     record = backend.respond(role, copy.deepcopy(payload), max_output_tokens=limits["max_output_tokens"])
@@ -242,13 +153,88 @@ def prepare_plan(task, trial, manifest, backend, directory, on_start=None):
         value["record"] = request_record(backend, "plan", payload, manifest["limits"], on_start)
         value["plan"] = validate_plan(object_reply(value["record"]), task)
     except InvalidAction as exc:
-        value["error"] = {"status": "FAIL", "diagnostic": str(exc)}
+        value["error"] = {"status": "FAIL", "diagnostic": str(exc), "reason": "InvalidAction"}
     except TransportError as exc:
         value["error"] = {"status": "UNCERTAIN", "diagnostic": str(exc)}
     except BudgetExhausted as exc:
-        value["error"] = {"status": "FAIL", "diagnostic": str(exc)}
+        value["error"] = {"status": "FAIL", "diagnostic": str(exc), "reason": "BudgetExhausted", "budget": exc.evidence}
     save(path, value)  # Also persist a failed plan: no selective reroll.
     return value, False
+
+
+def inject_trial_fault(task, solution, trial):
+    kind = trial.get("fault_kind", "environment")
+    before_spec, before_grades, before_solution = task.public_spec(), task.grade(solution), copy.deepcopy(solution)
+    if kind == "forced_subgoal":
+        updated, receipt = task.inject_subgoal_fault(solution)
+    elif kind == "environment":
+        updated, receipt = task.inject_fault(solution)
+    else:
+        raise ValueError("Unsupported frozen fault intervention")
+    grades = task.grade(updated)
+    introduced = (all(g["passed"] for g in before_grades.values()) and not all(g["passed"] for g in grades.values()))
+    changed = digest(before_spec) != digest(task.public_spec()) or digest(before_solution) != digest(updated)
+    delivered = bool(changed and introduced and receipt.get("domain_fault_delivered", receipt.get("delivered", True)))
+    if kind == "forced_subgoal" and (not delivered or digest(before_spec) != digest(task.public_spec())):
+        raise ValueError("Forced subgoal intervention did not preserve environment and fail a domain gate")
+    return updated, receipt, grades, delivered, introduced
+
+
+def action_prompt(role, task, solution, grades, plan, leaf, history):
+    if role == "plan":
+        return plan_prompt(task)
+    common = {"root_contract": task.root_contract, "task": task.public_spec(),
+              "artifact": solution, "public_feedback": grades, "history": history[-4:]}
+    if role == "replan":
+        return {**common, "leaf": copy.deepcopy(leaf),
+                "instruction": 'Return JSON {"diagnosis":"specific observed cause",'
+                               '"revised_instruction":"different executable local instruction"}. '
+                               'Revise ONLY this failed leaf instruction; keep root, parent, gates and dependencies.'}
+    if role != "execute":
+        raise ValueError("Unknown responder role")
+    return {**common, "gates": task.gates, "gate_dependencies": task.dependencies,
+            "instruction": (
+                'Return JSON {"patch":{"existing_top_level_artifact_field": "replacement value"},'
+                '"explanation":"brief change rationale"}. You may replace any artifact fields in '
+                'every method. Use the current authoritative environment and all feedback to choose '
+                'a repair. The evaluator, not self-reported success, decides completion. '
+                'If current_leaf is present, prioritize that instruction and its dependencies; '
+                'otherwise choose the next repair directly from the root task and feedback. '
+                'Do not include root, plan, or grading changes. No external tools are available.'),
+            "current_leaf": copy.deepcopy(leaf), "plan": copy.deepcopy(plan)}
+
+
+def validate_budget_evidence(event, counts, limits, task, solution, plan, history, elapsed):
+    evidence = event.get("budget")
+    if not isinstance(evidence, dict):
+        raise ValueError("Budget exhaustion has no measured evidence")
+    kind, observed, limit = evidence.get("kind"), evidence.get("observed"), evidence.get("limit")
+    if isinstance(observed, bool) or not isinstance(observed, (float, int)) or not math.isfinite(observed):
+        raise ValueError("Invalid budget observation")
+    grades = task.grade(solution)
+    needs_work = not all(g["passed"] for g in grades.values())
+    if kind == "calls":
+        valid = limit == limits["max_calls"] and observed == counts["calls"] and observed >= limit and needs_work
+    elif kind in ("tokens_before", "tokens_after"):
+        valid = (limit == limits["max_total_tokens"] and counts["input_tokens"] is not None
+                 and counts["output_tokens"] is not None
+                 and observed == counts["input_tokens"] + counts["output_tokens"]
+                 and (observed > limit if kind.endswith("after") else observed >= limit and needs_work))
+    elif kind in ("time_before", "time_after"):
+        wall = event.get("wall_seconds")
+        valid = (limit == limits["trial_timeout_seconds"] and isinstance(wall, (int, float))
+                 and not isinstance(wall, bool) and math.isfinite(wall)
+                 and observed <= max(wall, elapsed) + 1e-6
+                 and (observed > limit if kind.endswith("after") else observed >= limit and needs_work))
+    elif kind == "prompt_bytes":
+        role, payload = evidence.get("role"), evidence.get("blocked_request")
+        expected = action_prompt(role, task, solution, grades, plan, active_leaf(plan, grades), history)
+        valid = (limit == limits["max_prompt_bytes"] and payload == expected and
+                 observed == len(canonical(payload).encode("utf-8")) and observed > limit)
+    else:
+        valid = False
+    if not valid:
+        raise ValueError("Budget exhaustion contradicts measured execution")
 
 
 def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
@@ -260,6 +246,7 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
     result = {"trial_id": trial["trial_id"], "status": "UNCERTAIN", "success": None,
               "protocol_id": manifest["protocol_id"], "backend": backend.kind,
               "fault_assigned": trial["condition"] == "fault", "fault_triggered": False,
+              "fault_kind": trial.get("fault_kind", "environment"),
               "fault_delivered": False, "recovered": None,
               "invariant_ok": True, "protocol_ok": True,
               "calls": 0, "input_tokens": 0, "output_tokens": 0,
@@ -278,6 +265,13 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
     def request_started(role, payload):
         pending_request.update(role=role, request=copy.deepcopy(payload), reused=False)
         trace.add("request_started", role=role, request=payload)
+        if role == "replan":
+            result["replan_attempts"] += 1
+
+    def ensure_root():
+        if digest(task.root_contract) != root_hash:
+            result["invariant_ok"] = False
+            raise TransportError("Immutable root changed")
 
     def charge(record, role, payload, *, reused=False):
         pending_request.clear()
@@ -294,18 +288,25 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
         trace.add("response", role=role, request=payload, record=record,
                   reused_shared_plan=reused, logical_call=result["calls"])
         if result["input_tokens"] + result["output_tokens"] > limits["max_total_tokens"]:
-            raise BudgetExhausted("Measured logical token allowance exceeded on last response")
+            raise BudgetExhausted("Measured logical token allowance exceeded on last response", evidence={
+                "kind": "tokens_after", "observed": result["input_tokens"] + result["output_tokens"], "limit": limits["max_total_tokens"]})
         if (time.monotonic() - started > limits["trial_timeout_seconds"] or
                 result["elapsed_seconds"] > limits["trial_timeout_seconds"]):
-            raise BudgetExhausted("Trial time allowance exceeded on last response")
+            raise BudgetExhausted("Trial time allowance exceeded on last response", evidence={
+                "kind": "time_after", "observed": max(time.monotonic() - started, result["elapsed_seconds"]), "limit": limits["trial_timeout_seconds"]})
+        ensure_root()
 
     def check_budget():
         if result["calls"] >= limits["max_calls"]:
-            raise BudgetExhausted("Logical request allowance exhausted")
+            raise BudgetExhausted("Logical request allowance exhausted", evidence={
+                "kind": "calls", "observed": result["calls"], "limit": limits["max_calls"]})
         if result["input_tokens"] + result["output_tokens"] >= limits["max_total_tokens"]:
-            raise BudgetExhausted("Measured logical token allowance exhausted")
-        if time.monotonic() - started >= limits["trial_timeout_seconds"]:
-            raise BudgetExhausted("Trial time allowance exhausted")
+            raise BudgetExhausted("Measured logical token allowance exhausted", evidence={
+                "kind": "tokens_before", "observed": result["input_tokens"] + result["output_tokens"], "limit": limits["max_total_tokens"]})
+        elapsed = max(time.monotonic() - started, result["elapsed_seconds"])
+        if elapsed >= limits["trial_timeout_seconds"]:
+            raise BudgetExhausted("Trial time allowance exhausted", evidence={
+                "kind": "time_before", "observed": elapsed, "limit": limits["trial_timeout_seconds"]})
 
     def checkpoint():
         trace.add("checkpoint", solution_sha256=digest(solution),
@@ -313,6 +314,14 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
                   leaf_statuses=statuses(plan, grades), milestone_statuses=milestone_statuses(plan, grades),
                   root_status="awaiting_final_verification" if all(g["passed"] for g in grades.values()) else "active",
                   plan=plan)
+
+    def decide(before_grades, leaf, *, failure_introduced=False, source="patch"):
+        choice = replan_decision(before_grades, grades, leaf, fault_delivered=failure_introduced)
+        trace.add("replan_decision", source=source, leaf=leaf, leaf_id=leaf["id"] if leaf else None,
+                  before_grades=before_grades, after_grades=grades, public_grades=grades,
+                  failure_introduced=failure_introduced, **choice,
+                  solution_sha256=digest(solution), environment_sha256=digest(task.public_spec()))
+        return choice["needed"]
 
     try:
         if backend.kind == "oracle":
@@ -327,13 +336,15 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
                 transport_failure = shared["error"]["status"] == "UNCERTAIN"
                 if transport_failure and reused:
                     pending_request.update(role="plan", request=shared["request"], reused=True)
-                raise TransportError(shared["error"]["diagnostic"]) if transport_failure else InvalidAction(shared["error"]["diagnostic"])
+                if transport_failure:
+                    raise TransportError(shared["error"]["diagnostic"])
+                if shared["error"].get("reason") == "BudgetExhausted":
+                    raise BudgetExhausted(shared["error"]["diagnostic"], evidence=shared["error"]["budget"])
+                raise InvalidAction(shared["error"]["diagnostic"])
             plan = copy.deepcopy(shared["plan"])
         checkpoint()
         while True:
-            if digest(task.root_contract) != root_hash:
-                result["invariant_ok"] = False
-                raise TransportError("Immutable root changed")
+            ensure_root()
             if all(g["passed"] for g in grades.values()):
                 if not checkpoint_done:
                     before_spec, before_grades = task.public_spec(), copy.deepcopy(grades)
@@ -341,23 +352,22 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
                     if trial["condition"] == "fault":
                         result["fault_triggered"] = True
                         before = copy.deepcopy(solution)
-                        solution, fault = task.inject_fault(solution)
-                        grades = task.grade(solution)
-                        delivered = (digest(before_spec) != digest(task.public_spec()) and
-                                     all(g["passed"] for g in before_grades.values()) and
-                                     not all(g["passed"] for g in grades.values()))
+                        solution, fault, grades, delivered, introduced = inject_trial_fault(task, solution, trial)
+                        ensure_root()
                         result["fault_delivered"] = delivered
                         trace.add("fault", before_solution=before, after_solution=solution,
                                   before_spec=before_spec, after_spec=task.public_spec(),
                                   before_grades=before_grades, after_grades=grades,
-                                  fault=fault, delivered=delivered)
-                        need_replan = delivered
+                                  fault=fault, delivered=delivered, fault_kind=trial.get("fault_kind", "environment"),
+                                  public_failure_introduced=introduced)
+                        need_replan = decide(before_grades, active_leaf(plan, grades), failure_introduced=introduced, source="fault")
                     else:
                         trace.add("sham_checkpoint", public_spec=before_spec, public_grades=grades)
                     checkpoint()
                     if not all(g["passed"] for g in grades.values()):
                         continue
                 final = task.grade(solution, hidden=True)
+                ensure_root()
                 passed = all(g["passed"] for g in final.values())
                 trace.add("final_grade", solution=solution, public_spec=task.public_spec(),
                           public_grades=grades, hidden_grades=final, passed=passed)
@@ -369,26 +379,14 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
             if plan is not None and leaf is None:
                 raise TransportError("No executable leaf despite an incomplete root")
             if arm == "hierarchy_adaptive" and need_replan and result["replan_attempts"] < limits["max_replans"]:
-                payload = {"root_contract": task.root_contract, "task": task.public_spec(),
-                           "leaf": copy.deepcopy(leaf), "public_feedback": grades,
-                           "artifact": solution, "history": history[-4:],
-                           "instruction": 'Return JSON {"diagnosis":"specific observed cause",'
-                                          '"revised_instruction":"different executable local instruction"}. '
-                                          'Revise ONLY this failed leaf instruction; keep root, parent, gates and dependencies.'}
+                payload = action_prompt("replan", task, solution, grades, plan, leaf, history)
                 record = request_record(backend, "replan", payload, limits, request_started)
                 charge(record, "replan", payload)
-                result["replan_attempts"] += 1
                 need_replan = False
                 try:
                     change = object_reply(record)
-                    if set(change) != {"diagnosis", "revised_instruction"}:
-                        raise InvalidAction("Replan may change only diagnosis and the failed instruction")
-                    diagnosis = text_field(change["diagnosis"], "diagnosis")
-                    instruction = text_field(change["revised_instruction"], "revised_instruction")
-                    if instruction == leaf["instruction"]:
-                        raise InvalidAction("Replan did not revise the instruction")
                     before = copy.deepcopy(plan)
-                    leaf["instruction"], leaf["revision"] = instruction, leaf["revision"] + 1
+                    plan, diagnosis = validate_replan(plan, leaf, grades, change)
                     result["replans"] += 1
                     trace.add("replan", leaf_id=leaf["id"], diagnosis=diagnosis,
                               before_plan=before, after_plan=plan, public_grades=grades,
@@ -399,41 +397,31 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
                     trace.add("rejected", role="replan", reason=str(exc))
                     history.append({"role": "replan", "feedback": str(exc)})
                 continue
-            payload = {"root_contract": task.root_contract, "task": task.public_spec(),
-                       "gates": task.gates, "gate_dependencies": task.dependencies,
-                       "artifact": solution, "public_feedback": grades, "history": history[-4:],
-                       "instruction": (
-                           'Return JSON {"patch":{"existing_top_level_artifact_field": "replacement value"},'
-                           '"explanation":"brief change rationale"}. You may replace any artifact fields in '
-                           'every method. Use the current authoritative environment and all feedback to choose '
-                           'a repair. The evaluator, not self-reported success, decides completion. '
-                           'If current_leaf is present, prioritize that instruction and its dependencies; '
-                           'otherwise choose the next repair directly from the root task and feedback. '
-                           'Do not include root, plan, or grading changes. No external tools are available.'),
-                       "current_leaf": copy.deepcopy(leaf), "plan": copy.deepcopy(plan)}
+            payload = action_prompt("execute", task, solution, grades, plan, leaf, history)
             record = request_record(backend, "execute", payload, limits, request_started)
             charge(record, "execute", payload)
             try:
                 action = object_reply(record)
                 before = copy.deepcopy(solution)
+                before_grades = copy.deepcopy(grades)
                 solution = apply_patch(solution, action)
                 result["patch_actions"] += 1
                 grades = task.grade(solution)
+                ensure_root()
                 trace.add("patch", action=action, before_solution=before, after_solution=solution)
                 checkpoint()
                 history.append({"action": action, "public_feedback": grades})
-                need_replan = bool(leaf and not all(grades[g]["passed"] for g in leaf["checks"]))
+                need_replan = decide(before_grades, leaf)
             except InvalidAction as exc:
                 result["rejected_actions"] += 1
                 trace.add("rejected", role="execute", reason=str(exc))
                 history.append({"feedback": str(exc)})
                 need_replan = False
-            if result["input_tokens"] + result["output_tokens"] > limits["max_total_tokens"]:
-                raise BudgetExhausted("Measured logical token allowance exceeded on last response")
     except (InvalidAction, BudgetExhausted) as exc:
         result.update(status="FAIL", diagnostic=str(exc))
         trace.add("termination", status="FAIL", reason=type(exc).__name__,
-                  diagnostic=str(exc), wall_seconds=time.monotonic() - started)
+                  diagnostic=str(exc), wall_seconds=time.monotonic() - started,
+                  budget=exc.evidence if isinstance(exc, BudgetExhausted) else None)
     except TransportError as exc:
         result.update(status="UNCERTAIN", diagnostic=str(exc))
         transport_failure = True
@@ -457,6 +445,9 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
             result["known_actual_output_tokens"] = result["actual_output_tokens"]
             result["actual_input_tokens"] = result["actual_output_tokens"] = None
         trace.add("request_failed", **pending_request, diagnostic=result["diagnostic"])
+    if digest(task.root_contract) != root_hash:
+        result.update(invariant_ok=False, status="UNCERTAIN", diagnostic="Immutable root changed", protocol_ok=False)
+        transport_failure = True
     result["success"] = True if result["status"] == "PASS" else False if result["status"] == "FAIL" else None
     result["recovered"] = result["success"] if result["fault_delivered"] else None
     result["wall_seconds"] = time.monotonic() - started
@@ -484,7 +475,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
     try:
         result = json.loads(result_path.read_text(encoding="utf-8"))
         events = [json.loads(line) for line in result_path.with_name("trace.jsonl").read_text(encoding="utf-8").splitlines()]
-        task = make_task(trial["family"], trial["instance"], split=trial["split"], seed=manifest["task_seed"])
+        task = make_trial_task(trial, manifest["task_seed"])
         solution, plan, previous = task.initial_solution(), None, "0" * 64
         root_hash, final_pass, checkpoint_seen = digest(task.root_contract), False, False
         counts = {"calls": 0, "input_tokens": 0, "output_tokens": 0, "patch_actions": 0, "replans": 0,
@@ -493,8 +484,9 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
         final_seen, response_consumed, elapsed, termination = False, True, 0.0, None
         replan_attempts, rejected_actions, shared_plan_count = 0, 0, 0
         observed_models = []
+        history, decision_context, authorized_replan = [], None, None
         allowed_events = {"initial", "request_started", "response", "shared_plan", "patch", "checkpoint",
-                          "fault", "sham_checkpoint", "replan", "request_failed", "final_grade", "result", "rejected", "termination"}
+                          "fault", "sham_checkpoint", "replan", "replan_decision", "request_failed", "final_grade", "result", "rejected", "termination"}
         for index, event in enumerate(events):
             content = {k: v for k, v in event.items() if k != "event_sha256"}
             if (event["sequence"] != index or event["previous_sha256"] != previous or
@@ -504,16 +496,34 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
             kind = event["type"]
             if kind not in allowed_events or (final_seen and kind != "result"):
                 raise ValueError("Unexpected event after final grading")
+            if termination is not None and kind not in ("request_failed", "result"):
+                raise ValueError("Work continued after terminal stop")
             if index == 0 and kind != "initial":
                 raise ValueError("Missing initial evidence")
             if kind == "initial":
                 if index != 0 or event["trial"] != trial or event["protocol_id"] != manifest["protocol_id"] or event["root_contract"] != task.root_contract or event["solution"] != solution or event["public_spec"] != task.public_spec() or event["public_grades"] != task.grade(solution):
                     raise ValueError("Initial evidence mismatch")
             elif kind == "request_started":
+                if not response_consumed or decision_context is not None:
+                    raise ValueError("Earlier response or replan decision was not processed")
+                limits = manifest["limits"]
+                if (counts["calls"] >= limits["max_calls"]
+                        or counts["input_tokens"] is None or counts["output_tokens"] is None
+                        or counts["input_tokens"] + counts["output_tokens"] >= limits["max_total_tokens"]
+                        or elapsed >= limits["trial_timeout_seconds"]):
+                    raise ValueError("Request started after its measured allowance was exhausted")
+                if len(canonical(event["request"]).encode("utf-8")) > limits["max_prompt_bytes"]:
+                    raise ValueError("Request started above its prompt byte allowance")
                 if pending is not None or event["request"].get("root_contract") != task.root_contract or event["request"].get("task") != task.public_spec():
                     raise ValueError("Overlapping request or changed root")
                 if event["role"] not in ("plan", "execute", "replan"):
                     raise ValueError("Unexpected request role")
+                if event["role"] == "plan" and (trial["arm"] == "flat_retry" or counts["calls"] != 0 or shared_plan_count != 0):
+                    raise ValueError("Unexpected initial planning request")
+                expected_prompt = action_prompt(event["role"], task, solution, task.grade(solution), plan,
+                                                active_leaf(plan, task.grade(solution)), history)
+                if event["request"] != expected_prompt:
+                    raise ValueError("Responder context differs from the frozen prompt and observed history")
                 if event["role"] != "plan":
                     if trial["arm"] != "flat_retry" and (plan is None or shared_plan_count != 1):
                         raise ValueError("Hierarchical execution requires its shared validated plan")
@@ -523,6 +533,11 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                         raise ValueError("Responder received a different treatment plan")
                     if event["role"] == "replan" and (trial["arm"] != "hierarchy_adaptive" or event["request"].get("leaf") != active_leaf(plan, task.grade(solution))):
                         raise ValueError("Replanning the wrong or unauthorized leaf")
+                    if event["role"] == "replan" and (authorized_replan != event["request"]["leaf"]["id"] or replan_attempts >= manifest["limits"]["max_replans"]):
+                        raise ValueError("Replan is unnecessary or exceeds its allowance")
+                if event["role"] == "replan":
+                    replan_attempts += 1
+                authorized_replan = None
                 pending = {"role": event["role"], "request": event["request"]}
             elif kind == "response":
                 if event["request"].get("root_contract") != task.root_contract or event["request"].get("task") != task.public_spec():
@@ -537,8 +552,6 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 record = event["record"]
                 if record["model"] not in observed_models:
                     observed_models.append(record["model"])
-                if event["role"] == "replan":
-                    replan_attempts += 1
                 counts["calls"] += 1
                 for name in ("input_tokens", "output_tokens"):
                     if type(record[name]) is not int or record[name] < 0:
@@ -581,10 +594,15 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 response_consumed = True
                 if event["before_solution"] != solution:
                     raise ValueError("Stale artifact")
+                before_grades = task.grade(solution)
+                prior_leaf = copy.deepcopy(active_leaf(plan, before_grades))
                 solution = apply_patch(solution, event["action"])
                 if solution != event["after_solution"]:
                     raise ValueError("Patch replay mismatch")
                 counts["patch_actions"] += 1
+                history.append({"action": event["action"], "public_feedback": task.grade(solution)})
+                decision_context = {"source": "patch", "before_grades": before_grades,
+                                    "leaf": prior_leaf, "failure_introduced": False}
             elif kind == "checkpoint":
                 if (event["solution_sha256"] != digest(solution) or event["environment_sha256"] != digest(task.public_spec()) or
                     event["public_grades"] != task.grade(solution) or event["plan"] != plan or
@@ -598,11 +616,33 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 before_spec = task.public_spec()
                 if event["before_solution"] != solution or event["before_spec"] != before_spec or event["before_grades"] != task.grade(solution):
                     raise ValueError("Fault pre-state mismatch")
-                solution, fault = task.inject_fault(solution)
-                delivered = digest(before_spec) != digest(task.public_spec()) and not all(g["passed"] for g in task.grade(solution).values())
+                before_grades = task.grade(solution)
+                solution, fault, after_grades, delivered, introduced = inject_trial_fault(task, solution, trial)
                 if event["after_solution"] != solution or event["after_spec"] != task.public_spec() or event["fault"] != fault or event["delivered"] != delivered or event["after_grades"] != task.grade(solution):
                     raise ValueError("Fault replay mismatch")
+                if event["fault_kind"] != trial.get("fault_kind", "environment") or event["public_failure_introduced"] != introduced:
+                    raise ValueError("Fault kind or impact changed")
+                decision_context = {"source": "fault", "before_grades": before_grades,
+                                    "leaf": copy.deepcopy(active_leaf(plan, after_grades)), "failure_introduced": introduced}
                 fault_seen, checkpoint_seen = True, True
+            elif kind == "replan_decision":
+                if decision_context is None:
+                    raise ValueError("Replan decision has no fresh observation")
+                grades = task.grade(solution)
+                for key, value in decision_context.items():
+                    if event.get(key) != value:
+                        raise ValueError("Replan decision context mismatch")
+                choice = replan_decision(decision_context["before_grades"], grades,
+                                         decision_context["leaf"], fault_delivered=decision_context["failure_introduced"])
+                if (any(event.get(key) != value for key, value in choice.items()) or
+                    event["after_grades"] != grades or event["public_grades"] != grades or
+                    event["solution_sha256"] != digest(solution) or event["environment_sha256"] != digest(task.public_spec())):
+                    raise ValueError("Replan necessity was not derived from current evidence")
+                leaf = decision_context["leaf"]
+                if event["leaf_id"] != (leaf["id"] if leaf else None):
+                    raise ValueError("Replan decision identified a different leaf")
+                authorized_replan = leaf["id"] if choice["needed"] else None
+                decision_context = None
             elif kind == "sham_checkpoint":
                 if checkpoint_seen or trial["condition"] != "normal" or not all(g["passed"] for g in task.grade(solution).values()) or event["public_spec"] != task.public_spec() or event["public_grades"] != task.grade(solution):
                     raise ValueError("Invalid sham checkpoint")
@@ -610,22 +650,19 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
             elif kind == "replan":
                 if trial["arm"] != "hierarchy_adaptive" or event["before_plan"] != plan:
                     raise ValueError("Unauthorized plan change")
+                if (latest_reply is None or latest_reply["role"] != "replan" or
+                    event["leaf_id"] != latest_reply["request"]["leaf"]["id"] or
+                    event["leaf_id"] != active_leaf(plan, task.grade(solution))["id"]):
+                    raise ValueError("Replan changed a different leaf than the requested active goal")
                 leaf = plan["leaves"][event["leaf_id"]]
                 if all(task.grade(solution)[g]["passed"] for g in leaf["checks"]):
                     raise ValueError("Unnecessary replan lacks failure evidence")
-                expected = copy.deepcopy(plan)
-                revised = event["after_plan"]["leaves"][event["leaf_id"]]
                 if response_consumed or latest_reply is None or latest_reply["role"] != "replan":
                     raise ValueError("Replan does not match model output")
                 change = object_reply(latest_reply["record"])
-                if (set(change) != {"diagnosis", "revised_instruction"} or
-                    text_field(change["diagnosis"], "diagnosis") != event["diagnosis"] or
-                    text_field(change["revised_instruction"], "instruction") != revised["instruction"]):
-                    raise ValueError("Replan does not match model output")
+                expected, diagnosis = validate_replan(plan, leaf, task.grade(solution), change)
                 response_consumed = True
-                expected["leaves"][leaf["id"]]["instruction"] = text_field(revised["instruction"], "instruction")
-                expected["leaves"][leaf["id"]]["revision"] += 1
-                if expected != event["after_plan"] or revised["instruction"] == leaf["instruction"]:
+                if expected != event["after_plan"] or diagnosis != event["diagnosis"]:
                     raise ValueError("Replan changed unrelated goals or acceptance rules")
                 if event["solution_sha256"] != digest(solution) or event["environment_sha256"] != digest(task.public_spec()) or event["public_grades"] != task.grade(solution):
                     raise ValueError("Replan used stale evidence")
@@ -659,22 +696,39 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 if termination is not None:
                     raise ValueError("Multiple termination reasons")
                 termination = event
+                if event["reason"] == "BudgetExhausted":
+                    validate_budget_evidence(event, counts, manifest["limits"], task, solution, plan, history, elapsed)
+                elif event["reason"] == "InvalidAction":
+                    if shared_plan_count != 1 or plan is not None or shared["error"] is None or shared["error"].get("reason") != "InvalidAction":
+                        raise ValueError("Model failure has no invalid initial plan evidence")
             elif kind == "rejected":
                 if response_consumed or latest_reply is None or latest_reply["role"] != event["role"]:
                     raise ValueError("Rejection has no matching model reply")
+                try:
+                    reply = object_reply(latest_reply["record"])
+                    if event["role"] == "execute":
+                        apply_patch(solution, reply)
+                    elif event["role"] == "replan":
+                        validate_replan(plan, active_leaf(plan, task.grade(solution)), task.grade(solution), reply)
+                    else:
+                        raise ValueError("Unexpected rejection role")
+                except InvalidAction as exc:
+                    if event["reason"] != str(exc):
+                        raise ValueError("Rejection reason differs from actual validation")
+                else:
+                    raise ValueError("A valid response was incorrectly rejected")
                 response_consumed = True
                 rejected_actions += 1
-        if terminal is None or pending is not None or result != {**terminal, "trace_final_sha256": previous}:
+                history.append({"role": "replan", "feedback": event["reason"]} if event["role"] == "replan" else {"feedback": event["reason"]})
+        if terminal is None or pending is not None or decision_context is not None or result != {**terminal, "trace_final_sha256": previous}:
             raise ValueError("Missing or changed terminal result")
         if any(result[k] != v for k, v in counts.items()):
             raise ValueError("Accounting mismatch")
         if result["observed_models"] != observed_models or (manifest["backend"] == "openai" and len(observed_models) > 1):
             raise ValueError("Model changed within a trial")
-        # A response that exceeds its resource limit is not processed as an
-        # attempted replan. The terminal allowance event explains that one reply.
-        unused_replan = int(bool(termination and termination["reason"] == "BudgetExhausted" and
-                                 latest_reply and latest_reply["role"] == "replan" and not response_consumed))
-        if (result["replan_attempts"] != replan_attempts - unused_replan or
+        # Count issued requests even if transport fails or their response exceeds
+        # the remaining allowance; those attempts still consumed exposure.
+        if (result["replan_attempts"] != replan_attempts or
             result["rejected_actions"] != rejected_actions or
             result["replan_attempts"] > manifest["limits"]["max_replans"]):
             raise ValueError("Replan/rejection accounting mismatch")
@@ -698,6 +752,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
         if result["status"] == "PASS" and max(result["wall_seconds"], elapsed) > manifest["limits"]["trial_timeout_seconds"]:
             raise ValueError("PASS after the trial deadline")
         result["audit"] = "PASS"
+        result["mechanism_evidence"] = evidence_from_events(events, task)
         return result
     except (OSError, ValueError, KeyError, TypeError, RecursionError) as exc:
         return {"trial_id": trial["trial_id"], "status": "UNCERTAIN", "success": None,
@@ -800,7 +855,7 @@ def run(directory: Path, *, execute=False, approve_paid_api=False, responder=Non
             if time.monotonic() - start > manifest["limits"]["batch_timeout_seconds"]:
                 execution["stop_reason"] = "BATCH_TIME_ALLOWANCE"
                 break
-            task = make_task(trial["family"], trial["instance"], split=trial["split"], seed=manifest["task_seed"])
+            task = make_trial_task(trial, manifest["task_seed"])
             result = run_trial(task, trial, manifest, backend, directory)
             execution["completed"] += 1
             save(directory / "execution.json", execution)
@@ -818,7 +873,7 @@ def main():
     parser = argparse.ArgumentParser(description="Method study; defaults never call any API")
     parser.add_argument("command", choices=("prepare", "check", "run", "collect"), nargs="?", default="prepare")
     parser.add_argument("--output", type=Path, default=Path("runs/method-study"))
-    parser.add_argument("--profile", choices=("pilot", "study"), default="pilot")
+    parser.add_argument("--profile", choices=PROFILES, default="pilot")
     parser.add_argument("--model", default="gpt-6-luna")
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--approve-paid-api", action="store_true")
