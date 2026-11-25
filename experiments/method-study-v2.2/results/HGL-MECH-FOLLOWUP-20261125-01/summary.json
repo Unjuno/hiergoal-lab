@@ -1,0 +1,1374 @@
+{
+  "analysis_id": "HGL-MECH-FOLLOWUP-20261125-01",
+  "analysis_scope": "post_hoc_offline_record_audit_and_candidate_plan_validation_not_new_model_execution",
+  "source_archive": "method-study-run-mechanism-45566463441-1(1).zip",
+  "source_archive_sha256": "815fc42124a3e7561f19ad3cb39cc57c01e02ef26d916aa3607675692e3d5a85",
+  "profiles": {
+    "method-study": {
+      "protocol_id": "85520ccd4ca6920fc153897380718d05c4946dd737a09ef12bdd29893003d5f4",
+      "model": "gpt-6-luna",
+      "backend": "openai",
+      "limits": {
+        "max_calls": 24,
+        "max_replans": 4,
+        "max_output_tokens": 4096,
+        "max_total_tokens": 128000,
+        "max_prompt_bytes": 128000,
+        "request_timeout_seconds": 90,
+        "trial_timeout_seconds": 1800,
+        "batch_timeout_seconds": 18000
+      },
+      "source_sha256": {
+        "hiergoal/study_protocol.py": "a2efdd249bf593f71cb0b26256d8fbf10f74b8f8916b88ef7e82ee4266bbfb94",
+        "hiergoal/study_tasks.py": "298022f469ac5e05d30a8f58a81406eaeaf93ae5590c36666e9fd55b0adb8e8b",
+        "hiergoal/study_api.py": "c430dd0e70dcb19afb72679f96831e539758c190d30ee38995862a1a9194171c",
+        "hiergoal/study.py": "74609024c2f573866a127c8167d4adbc93ea9c607d2d39cb8d6ee5c0e7371f8c",
+        "hiergoal/study_analysis.py": "1a25e0d7a96551899769186ed3afc7fef9a740401a876fc68e70dd72094dbf79",
+        "hiergoal/study_planning.py": "0adcac1a659e92b6f6e91a2fa5c5656fb5a6c4ed13bf5374a3f0e1917604497d",
+        "hiergoal/study_scale.py": "a5ba2ef203dc1dd42bc7d04d5c9d694a5e4fa8c4813b03acc1dac8fcd7f62714",
+        "hiergoal/study_mechanisms.py": "c49fb65c2334f2041fd2afe31f934aad35fc00748a470c630bf91701c96b0558",
+        "docs/method_study_ja.md": "58ac01db0db509f75fc85c1b93b6af8141405d15e2d40162b32a82505ce8e247",
+        "docs/method_requirements_audit_ja.md": "353060c6a3534d92cd17d9416f5eb67ed792336d49ac71749d39be64f15cab11",
+        ".github/workflows/method-study.yml": "9f1c143b22a44a167677bd48805fe8b93128f07336311678f409fff62caa6275"
+      },
+      "host": {
+        "timestamp_utc": "2026-11-25T07:14:18.806497+00:00",
+        "git_commit": "53b27de055d2796b2ea89c759d4118b18b696a45",
+        "working_tree_dirty": false,
+        "python": "3.12.3",
+        "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39",
+        "cpu": "Intel(R) Xeon(R) 6975P-C",
+        "cpu_clock_mhz_observed_range": [
+          2700.0,
+          3919.622
+        ],
+        "logical_cpus": 4,
+        "memory_bytes": 16464306176,
+        "batch_size": 1,
+        "model_hardware": "Provider-managed; not observable"
+      },
+      "decision": "UNCERTAIN",
+      "feasibility": {
+        "decision": "PASS",
+        "invariant_failures": [],
+        "invariant_unknown": [],
+        "requires": "complete_consistent_observations_and_all_invariant_flags_true",
+        "scope": "recorded_engineering_invariants_separate_from_efficacy"
+      },
+      "criteria": [
+        {
+          "id": "R1",
+          "key": "forced_subgoal_recovery",
+          "title": "Forced failed subgoal and verified recovery",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Public-pass to forced domain-fail to an accepted revision of that failed target to independent final-pass, in at least one adaptive trace per family.",
+          "evidence": {
+            "assigned_adaptive_forced_trials": 18,
+            "measured_adaptive_forced_trials": 15,
+            "adaptive_forced_delivered": 15,
+            "adaptive_forced_recovered": 13,
+            "adaptive_forced_domain_delivered": 15,
+            "adaptive_forced_domain_recovered": 13,
+            "adaptive_forced_modified_domain_recovered": 13,
+            "post_fault_target_replans": 15,
+            "families_with_delivery": [
+              "code_repair",
+              "data_transform",
+              "scheduling"
+            ],
+            "families_with_recovery": [
+              "code_repair",
+              "data_transform",
+              "scheduling"
+            ],
+            "domain_failures_delivered": 48,
+            "fault_accounting": [
+              {
+                "arm": "flat_retry",
+                "assigned": 18,
+                "delivered": 18,
+                "triggered": 18,
+                "trigger_unknown": 0,
+                "untriggered": 0,
+                "triggered_no_impact": 0,
+                "not_delivered": 0,
+                "delivery_unknown": 0,
+                "recovered": 18,
+                "recovery_observed": 18,
+                "recovery_missing": 0,
+                "observed_recovery_rate": 1.0,
+                "recovery_rate_bounds": {
+                  "lower": 1.0,
+                  "upper": 1.0
+                }
+              },
+              {
+                "arm": "hierarchy_adaptive",
+                "assigned": 18,
+                "delivered": 15,
+                "triggered": 15,
+                "trigger_unknown": 0,
+                "untriggered": 3,
+                "triggered_no_impact": 0,
+                "not_delivered": 3,
+                "delivery_unknown": 0,
+                "recovered": 13,
+                "recovery_observed": 15,
+                "recovery_missing": 0,
+                "observed_recovery_rate": 0.8666666666666667,
+                "recovery_rate_bounds": {
+                  "lower": 0.8666666666666667,
+                  "upper": 0.8666666666666667
+                }
+              },
+              {
+                "arm": "hierarchy_fixed",
+                "assigned": 18,
+                "delivered": 15,
+                "triggered": 15,
+                "trigger_unknown": 0,
+                "untriggered": 3,
+                "triggered_no_impact": 0,
+                "not_delivered": 3,
+                "delivery_unknown": 0,
+                "recovered": 15,
+                "recovery_observed": 15,
+                "recovery_missing": 0,
+                "observed_recovery_rate": 1.0,
+                "recovery_rate_bounds": {
+                  "lower": 1.0,
+                  "upper": 1.0
+                }
+              }
+            ]
+          },
+          "limitations": [
+            "Forced certification invalidation and a domain failure are reported separately; one does not imply the other.",
+            "Pre-fault success is checked with public gates only; hidden final grading is deliberately not queried before the fault or fed back for repair.",
+            "Observed recovery demonstrates a finite trace; it does not establish comparative efficacy or uniform reliability."
+          ]
+        },
+        {
+          "id": "R2",
+          "key": "traceable_hierarchy",
+          "title": "Hierarchy, state transitions, and before/after replans",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Successfully replayed hierarchical checkpoints plus an exercised, failure-evidenced accepted replan.",
+          "evidence": {
+            "scheduled_hierarchical_trials": 72,
+            "replayed_hierarchical_trials": 60,
+            "checkpoint_events": 570,
+            "leaf_state_transitions": 712,
+            "milestone_state_transitions": 178,
+            "accepted_replans": 23,
+            "accepted_replans_with_failure_evidence": 23,
+            "post_fault_target_replans": 15,
+            "host_failure_causes_recorded": 30,
+            "model_diagnoses_recorded": 23
+          },
+          "limitations": [
+            "Replay checks the recorded state and diagnosis provenance; it does not certify the semantic truth of model-written causal explanations.",
+            "Hash chains detect checked inconsistencies, not wholesale forgery by a writer able to regenerate the entire record."
+          ]
+        },
+        {
+          "id": "R3",
+          "key": "immutable_root",
+          "title": "Immutable root contract",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "PASS",
+          "scope": "Every scheduled trace was replayed and the root contract stayed identical in root-bearing state and request snapshots.",
+          "evidence": {
+            "scheduled_trials": 108,
+            "root_checked_trials": 108,
+            "root_preservation_failures": 0,
+            "verification_issue_trials": 0,
+            "explicit_edit_requests": 0,
+            "rejected_edit_requests": 0,
+            "actual_root_changes": 0
+          },
+          "limitations": [
+            "Zero explicit edit requests does not exercise rejection of a root edit; mutation rejection is a separate adversarial software test.",
+            "Syntactic edit-request counts do not infer a model's intent."
+          ]
+        },
+        {
+          "id": "R4",
+          "key": "diverse_tasks",
+          "title": "Observed coverage across different task families",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "PASS",
+          "scope": "Complete replayed outcomes across all three declared synthetic task families; failures remain in coverage.",
+          "evidence": {
+            "scheduled_families": [
+              "code_repair",
+              "data_transform",
+              "scheduling"
+            ],
+            "observed_families": [
+              "code_repair",
+              "data_transform",
+              "scheduling"
+            ],
+            "task_clusters": 6,
+            "observed_trials": 108,
+            "clusters_per_family": {
+              "code_repair": 2,
+              "data_transform": 2,
+              "scheduling": 2
+            }
+          },
+          "limitations": [
+            "Coverage includes unsuccessful trials and is not a success claim.",
+            "Three selected synthetic families do not establish broad real-world task generalization."
+          ]
+        },
+        {
+          "id": "R5",
+          "key": "locality",
+          "title": "Unrelated goals and artifact fields preserved",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Plan comparisons cover accepted adaptive revisions; artifact comparisons cover audited adaptive fault paths independently of whether a revision was accepted. Both comparison sets must be nonempty.",
+          "evidence": {
+            "plan_locality_status": "PASS",
+            "artifact_locality_status": "UNCERTAIN",
+            "adaptive_plan_eligibility_known_trials": 36,
+            "adaptive_trials_with_accepted_replans": 17,
+            "nonvacuous_plan_locality_trials": 17,
+            "assigned_adaptive_fault_trials": 18,
+            "audited_adaptive_fault_trials": 18,
+            "fault_delivery_known_trials": 18,
+            "delivered_adaptive_fault_trials": 15,
+            "nonvacuous_artifact_locality_trials": 14,
+            "nonvacuous_locality_trials": 14,
+            "trials_with_plan_locality_violation": 0,
+            "trials_with_artifact_locality_violation": 0,
+            "trials_with_locality_violation": 0,
+            "unrelated_goals_checked": 92,
+            "unrelated_goals_unchanged": 92,
+            "unrelated_artifact_fields_checked": 48,
+            "unrelated_artifact_fields_unchanged": 48,
+            "artifact_locality_violations": 0,
+            "nonvacuous_artifact_events": 15,
+            "dependency_invalidation_events": 15,
+            "invalidated_goals": 45,
+            "reverified_goals": 39
+          },
+          "limitations": [
+            "Zero unrelated comparisons is UNCERTAIN, never a vacuous locality PASS.",
+            "Locality is defined by the declared task dependencies and artifact ownership, not inferred semantic independence."
+          ]
+        },
+        {
+          "id": "R6",
+          "key": "necessary_bounded_replanning",
+          "title": "Failure-evidenced and bounded replanning",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "PASS",
+          "scope": "A replan request must have current failed-leaf evidence and authorization; attempted requests stay within the declared cap.",
+          "evidence": {
+            "scheduled_adaptive_trials": 36,
+            "measured_adaptive_trials": 36,
+            "attempted_requests": 25,
+            "accepted": 23,
+            "rejected": 0,
+            "unnecessary_requests": 0,
+            "declared_request_cap": 4,
+            "trials_exceeding_request_cap": 0,
+            "decision_events": 232,
+            "needed_decisions": 25,
+            "deferred_progress_decisions": 164,
+            "normal_condition_attempts": 2
+          },
+          "limitations": [
+            "Operational necessity means satisfying the declared failure/progress predicate; it does not prove each replan improves outcomes or is globally optimal.",
+            "Attempts count issued replan requests, including failed or over-budget requests, and may exceed accepted plus rejected replies."
+          ]
+        },
+        {
+          "id": "R7",
+          "key": "independent_evaluation",
+          "title": "Independent final grading and replay",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "PASS",
+          "scope": "Audited final grades must match terminal claims; noncandidate budget failures need not call the hidden grader.",
+          "evidence": {
+            "scheduled_trials": 108,
+            "grade_disposition_known": 108,
+            "final_grader_called": 94,
+            "final_grader_passed": 94,
+            "final_grader_failed": 0,
+            "no_final_grade": 14,
+            "audit_failures": 0,
+            "grade_claim_conflicts": 0
+          },
+          "limitations": [
+            "Replay and hidden grading establish agreement with the implemented evaluator, not absence of evaluator bugs.",
+            "Self-reported success and changed tests cannot substitute for this evidence."
+          ]
+        },
+        {
+          "id": "R8",
+          "key": "scale_coverage",
+          "title": "Scale coverage and finite resilience",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Engineering covers the varied observed trees; the separate finite live-data rule tests frozen per-setting success, paired stress drop, and observed locality thresholds.",
+          "evidence": {
+            "profile": "mechanism",
+            "scheduled_settings": 1,
+            "scheduled_levels": {
+              "size": [
+                "small"
+              ],
+              "requested_depth_levels": [
+                3
+              ],
+              "density": [
+                "sparse"
+              ]
+            },
+            "observed_tree_values": {
+              "goal_count": [
+                1,
+                11
+              ],
+              "max_depth_edges": [
+                0,
+                2
+              ],
+              "dependency_density": [
+                0.0,
+                0.21428571428571427,
+                0.2857142857142857
+              ]
+            },
+            "task_clusters": 6,
+            "measured_hierarchical_trials": 72,
+            "scaling_law_status": "UNCERTAIN",
+            "finite_decision": "UNCERTAIN",
+            "finite_criteria": {
+              "every_setting_meets_success_threshold": null,
+              "paired_drop_within_margin": null,
+              "zero_root_protocol_violations": true,
+              "zero_observed_locality_violations": true
+            },
+            "finite_blockers": [
+              "incomplete_six_baseline_stress_pairs",
+              "missing_or_duplicate_baseline_stress_pair",
+              "requires_scale_profile",
+              "requires_seven_scale_cells_three_families_two_repeats"
+            ]
+          },
+          "limitations": [
+            "Requested depth counts levels including the root; measured max_depth_edges counts edges from root zero.",
+            "Deeper scale fixtures add executable certification leaves. Depth is not varied at fixed leaf count or fixed work.",
+            "The selected scale settings are not a full factorial design; marginal and interaction effects are not identified generally.",
+            "Distinct scale settings generated from shared source instances need not be independent task draws. No scale CI or significance test is reported.",
+            "Thresholds are frozen design choices, not estimates from these outcomes. With six assigned adaptive fault trials per setting, a 0.80 threshold requires at least five successes.",
+            "The stress contrast jointly changes size, depth, and direct dependency burden; fault targets may also differ across paired settings. It is not an isolated causal scale effect.",
+            "The six pairs reuse three source tasks across two repeats; no independent-Bernoulli or population reliability claim is made.",
+            "A failed path without a repair remains a failure in the success denominator and supplies no positive artifact-locality evidence."
+          ]
+        },
+        {
+          "id": "R9",
+          "key": "repeat_stability",
+          "title": "Finite repeatability and scientific stability uncertainty",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Engineering covers repeated outcome reporting; the separate live reliability rule requires every adaptive task/condition cell to meet frozen success and integrity thresholds.",
+          "evidence": {
+            "minimum_scheduled_repeats": 3,
+            "maximum_scheduled_repeats": 3,
+            "by_arm_condition": [
+              {
+                "arm": "flat_retry",
+                "condition": "normal",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 0,
+                "clusters_with_mixed_complete_outcomes": 0,
+                "clusters_all_repeats_passed": 6,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 1.0,
+                  "min": 1.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "arm": "flat_retry",
+                "condition": "fault",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 0,
+                "clusters_with_mixed_complete_outcomes": 0,
+                "clusters_all_repeats_passed": 6,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 1.0,
+                  "min": 1.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "arm": "hierarchy_fixed",
+                "condition": "normal",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 2,
+                "clusters_with_mixed_complete_outcomes": 2,
+                "clusters_all_repeats_passed": 4,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 1.0,
+                  "min": 0.3333333333333333,
+                  "max": 1.0
+                }
+              },
+              {
+                "arm": "hierarchy_fixed",
+                "condition": "fault",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 2,
+                "clusters_with_mixed_complete_outcomes": 2,
+                "clusters_all_repeats_passed": 4,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 1.0,
+                  "min": 0.3333333333333333,
+                  "max": 1.0
+                }
+              },
+              {
+                "arm": "hierarchy_adaptive",
+                "condition": "normal",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 2,
+                "clusters_with_mixed_complete_outcomes": 2,
+                "clusters_all_repeats_passed": 4,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 1.0,
+                  "min": 0.3333333333333333,
+                  "max": 1.0
+                }
+              },
+              {
+                "arm": "hierarchy_adaptive",
+                "condition": "fault",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 4,
+                "clusters_with_mixed_complete_outcomes": 4,
+                "clusters_all_repeats_passed": 2,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 0.6666666666666666,
+                  "min": 0.3333333333333333,
+                  "max": 1.0
+                }
+              }
+            ],
+            "sufficiency_status": "UNCERTAIN",
+            "finite_decision": "UNCERTAIN",
+            "finite_criteria": {
+              "every_task_condition_meets_success_threshold": null,
+              "zero_root_protocol_violations": true
+            },
+            "finite_blockers": [
+              "requires_reliability_profile",
+              "requires_twelve_tasks_both_conditions_and_declared_repeat_count"
+            ]
+          },
+          "limitations": [
+            "No population power, precision, or future-stability guarantee establishes that the repeat count is scientifically sufficient; a finite acceptance threshold is a separate claim.",
+            "Repeated calls of one task are dependent observations within the same task cluster.",
+            "Deterministic oracle repetitions do not estimate model stochasticity or empirical stability."
+          ]
+        }
+      ]
+    },
+    "method-check": {
+      "protocol_id": "1bd1021ae0c8c70ff1b1486c129883c6dfea65ab249572d20d99e7563cc04f37",
+      "model": "OFFLINE_ORACLE",
+      "backend": "oracle",
+      "limits": {
+        "max_calls": 24,
+        "max_replans": 4,
+        "max_output_tokens": 4096,
+        "max_total_tokens": 128000,
+        "max_prompt_bytes": 128000,
+        "request_timeout_seconds": 90,
+        "trial_timeout_seconds": 1800,
+        "batch_timeout_seconds": 18000
+      },
+      "source_sha256": {
+        "hiergoal/study_protocol.py": "a2efdd249bf593f71cb0b26256d8fbf10f74b8f8916b88ef7e82ee4266bbfb94",
+        "hiergoal/study_tasks.py": "298022f469ac5e05d30a8f58a81406eaeaf93ae5590c36666e9fd55b0adb8e8b",
+        "hiergoal/study_api.py": "c430dd0e70dcb19afb72679f96831e539758c190d30ee38995862a1a9194171c",
+        "hiergoal/study.py": "74609024c2f573866a127c8167d4adbc93ea9c607d2d39cb8d6ee5c0e7371f8c",
+        "hiergoal/study_analysis.py": "1a25e0d7a96551899769186ed3afc7fef9a740401a876fc68e70dd72094dbf79",
+        "hiergoal/study_planning.py": "0adcac1a659e92b6f6e91a2fa5c5656fb5a6c4ed13bf5374a3f0e1917604497d",
+        "hiergoal/study_scale.py": "a5ba2ef203dc1dd42bc7d04d5c9d694a5e4fa8c4813b03acc1dac8fcd7f62714",
+        "hiergoal/study_mechanisms.py": "c49fb65c2334f2041fd2afe31f934aad35fc00748a470c630bf91701c96b0558",
+        "docs/method_study_ja.md": "58ac01db0db509f75fc85c1b93b6af8141405d15e2d40162b32a82505ce8e247",
+        "docs/method_requirements_audit_ja.md": "353060c6a3534d92cd17d9416f5eb67ed792336d49ac71749d39be64f15cab11",
+        ".github/workflows/method-study.yml": "9f1c143b22a44a167677bd48805fe8b93128f07336311678f409fff62caa6275"
+      },
+      "host": {
+        "timestamp_utc": "2026-11-25T07:14:13.968631+00:00",
+        "git_commit": "53b27de055d2796b2ea89c759d4118b18b696a45",
+        "working_tree_dirty": false,
+        "python": "3.12.3",
+        "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39",
+        "cpu": "Intel(R) Xeon(R) 6975P-C",
+        "cpu_clock_mhz_observed_range": [
+          2700.0,
+          3900.272
+        ],
+        "logical_cpus": 4,
+        "memory_bytes": 16464306176,
+        "batch_size": 1,
+        "model_hardware": "Provider-managed; not observable"
+      },
+      "decision": "UNCERTAIN",
+      "feasibility": {
+        "decision": "PASS",
+        "invariant_failures": [],
+        "invariant_unknown": [],
+        "requires": "complete_consistent_observations_and_all_invariant_flags_true",
+        "scope": "recorded_engineering_invariants_separate_from_efficacy"
+      },
+      "criteria": [
+        {
+          "id": "R1",
+          "key": "forced_subgoal_recovery",
+          "title": "Forced failed subgoal and verified recovery",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Public-pass to forced domain-fail to an accepted revision of that failed target to independent final-pass, in at least one adaptive trace per family.",
+          "evidence": {
+            "assigned_adaptive_forced_trials": 18,
+            "measured_adaptive_forced_trials": 18,
+            "adaptive_forced_delivered": 18,
+            "adaptive_forced_recovered": 18,
+            "adaptive_forced_domain_delivered": 18,
+            "adaptive_forced_domain_recovered": 18,
+            "adaptive_forced_modified_domain_recovered": 18,
+            "post_fault_target_replans": 18,
+            "families_with_delivery": [
+              "code_repair",
+              "data_transform",
+              "scheduling"
+            ],
+            "families_with_recovery": [
+              "code_repair",
+              "data_transform",
+              "scheduling"
+            ],
+            "domain_failures_delivered": 54,
+            "fault_accounting": [
+              {
+                "arm": "flat_retry",
+                "assigned": 18,
+                "delivered": 18,
+                "triggered": 18,
+                "trigger_unknown": 0,
+                "untriggered": 0,
+                "triggered_no_impact": 0,
+                "not_delivered": 0,
+                "delivery_unknown": 0,
+                "recovered": 18,
+                "recovery_observed": 18,
+                "recovery_missing": 0,
+                "observed_recovery_rate": 1.0,
+                "recovery_rate_bounds": {
+                  "lower": 1.0,
+                  "upper": 1.0
+                }
+              },
+              {
+                "arm": "hierarchy_adaptive",
+                "assigned": 18,
+                "delivered": 18,
+                "triggered": 18,
+                "trigger_unknown": 0,
+                "untriggered": 0,
+                "triggered_no_impact": 0,
+                "not_delivered": 0,
+                "delivery_unknown": 0,
+                "recovered": 18,
+                "recovery_observed": 18,
+                "recovery_missing": 0,
+                "observed_recovery_rate": 1.0,
+                "recovery_rate_bounds": {
+                  "lower": 1.0,
+                  "upper": 1.0
+                }
+              },
+              {
+                "arm": "hierarchy_fixed",
+                "assigned": 18,
+                "delivered": 18,
+                "triggered": 18,
+                "trigger_unknown": 0,
+                "untriggered": 0,
+                "triggered_no_impact": 0,
+                "not_delivered": 0,
+                "delivery_unknown": 0,
+                "recovered": 18,
+                "recovery_observed": 18,
+                "recovery_missing": 0,
+                "observed_recovery_rate": 1.0,
+                "recovery_rate_bounds": {
+                  "lower": 1.0,
+                  "upper": 1.0
+                }
+              }
+            ]
+          },
+          "limitations": [
+            "Forced certification invalidation and a domain failure are reported separately; one does not imply the other.",
+            "Pre-fault success is checked with public gates only; hidden final grading is deliberately not queried before the fault or fed back for repair.",
+            "Observed recovery demonstrates a finite trace; it does not establish comparative efficacy or uniform reliability."
+          ]
+        },
+        {
+          "id": "R2",
+          "key": "traceable_hierarchy",
+          "title": "Hierarchy, state transitions, and before/after replans",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Successfully replayed hierarchical checkpoints plus an exercised, failure-evidenced accepted replan.",
+          "evidence": {
+            "scheduled_hierarchical_trials": 72,
+            "replayed_hierarchical_trials": 72,
+            "checkpoint_events": 270,
+            "leaf_state_transitions": 864,
+            "milestone_state_transitions": 216,
+            "accepted_replans": 18,
+            "accepted_replans_with_failure_evidence": 18,
+            "post_fault_target_replans": 18,
+            "host_failure_causes_recorded": 36,
+            "model_diagnoses_recorded": 18
+          },
+          "limitations": [
+            "Replay checks the recorded state and diagnosis provenance; it does not certify the semantic truth of model-written causal explanations.",
+            "Hash chains detect checked inconsistencies, not wholesale forgery by a writer able to regenerate the entire record."
+          ]
+        },
+        {
+          "id": "R3",
+          "key": "immutable_root",
+          "title": "Immutable root contract",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Every scheduled trace was replayed and the root contract stayed identical in root-bearing state and request snapshots.",
+          "evidence": {
+            "scheduled_trials": 108,
+            "root_checked_trials": 108,
+            "root_preservation_failures": 0,
+            "verification_issue_trials": 0,
+            "explicit_edit_requests": 0,
+            "rejected_edit_requests": 0,
+            "actual_root_changes": 0
+          },
+          "limitations": [
+            "Zero explicit edit requests does not exercise rejection of a root edit; mutation rejection is a separate adversarial software test.",
+            "Syntactic edit-request counts do not infer a model's intent."
+          ]
+        },
+        {
+          "id": "R4",
+          "key": "diverse_tasks",
+          "title": "Observed coverage across different task families",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Complete replayed outcomes across all three declared synthetic task families; failures remain in coverage.",
+          "evidence": {
+            "scheduled_families": [
+              "code_repair",
+              "data_transform",
+              "scheduling"
+            ],
+            "observed_families": [
+              "code_repair",
+              "data_transform",
+              "scheduling"
+            ],
+            "task_clusters": 6,
+            "observed_trials": 108,
+            "clusters_per_family": {
+              "code_repair": 2,
+              "data_transform": 2,
+              "scheduling": 2
+            }
+          },
+          "limitations": [
+            "Coverage includes unsuccessful trials and is not a success claim.",
+            "Three selected synthetic families do not establish broad real-world task generalization."
+          ]
+        },
+        {
+          "id": "R5",
+          "key": "locality",
+          "title": "Unrelated goals and artifact fields preserved",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Plan comparisons cover accepted adaptive revisions; artifact comparisons cover audited adaptive fault paths independently of whether a revision was accepted. Both comparison sets must be nonempty.",
+          "evidence": {
+            "plan_locality_status": "PASS",
+            "artifact_locality_status": "PASS",
+            "adaptive_plan_eligibility_known_trials": 36,
+            "adaptive_trials_with_accepted_replans": 18,
+            "nonvacuous_plan_locality_trials": 18,
+            "assigned_adaptive_fault_trials": 18,
+            "audited_adaptive_fault_trials": 18,
+            "fault_delivery_known_trials": 18,
+            "delivered_adaptive_fault_trials": 18,
+            "nonvacuous_artifact_locality_trials": 18,
+            "nonvacuous_locality_trials": 18,
+            "trials_with_plan_locality_violation": 0,
+            "trials_with_artifact_locality_violation": 0,
+            "trials_with_locality_violation": 0,
+            "unrelated_goals_checked": 72,
+            "unrelated_goals_unchanged": 72,
+            "unrelated_artifact_fields_checked": 60,
+            "unrelated_artifact_fields_unchanged": 60,
+            "artifact_locality_violations": 0,
+            "nonvacuous_artifact_events": 18,
+            "dependency_invalidation_events": 18,
+            "invalidated_goals": 54,
+            "reverified_goals": 54
+          },
+          "limitations": [
+            "Zero unrelated comparisons is UNCERTAIN, never a vacuous locality PASS.",
+            "Locality is defined by the declared task dependencies and artifact ownership, not inferred semantic independence."
+          ]
+        },
+        {
+          "id": "R6",
+          "key": "necessary_bounded_replanning",
+          "title": "Failure-evidenced and bounded replanning",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN",
+          "scope": "A replan request must have current failed-leaf evidence and authorization; attempted requests stay within the declared cap.",
+          "evidence": {
+            "scheduled_adaptive_trials": 36,
+            "measured_adaptive_trials": 36,
+            "attempted_requests": 18,
+            "accepted": 18,
+            "rejected": 0,
+            "unnecessary_requests": 0,
+            "declared_request_cap": 4,
+            "trials_exceeding_request_cap": 0,
+            "decision_events": 72,
+            "needed_decisions": 18,
+            "deferred_progress_decisions": 0,
+            "normal_condition_attempts": 0
+          },
+          "limitations": [
+            "Operational necessity means satisfying the declared failure/progress predicate; it does not prove each replan improves outcomes or is globally optimal.",
+            "Attempts count issued replan requests, including failed or over-budget requests, and may exceed accepted plus rejected replies."
+          ]
+        },
+        {
+          "id": "R7",
+          "key": "independent_evaluation",
+          "title": "Independent final grading and replay",
+          "status": "PASS",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Audited final grades must match terminal claims; noncandidate budget failures need not call the hidden grader.",
+          "evidence": {
+            "scheduled_trials": 108,
+            "grade_disposition_known": 108,
+            "final_grader_called": 108,
+            "final_grader_passed": 108,
+            "final_grader_failed": 0,
+            "no_final_grade": 0,
+            "audit_failures": 0,
+            "grade_claim_conflicts": 0
+          },
+          "limitations": [
+            "Replay and hidden grading establish agreement with the implemented evaluator, not absence of evaluator bugs.",
+            "Self-reported success and changed tests cannot substitute for this evidence."
+          ]
+        },
+        {
+          "id": "R8",
+          "key": "scale_coverage",
+          "title": "Scale coverage and finite resilience",
+          "status": "UNCERTAIN",
+          "engineering_status": "UNCERTAIN",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Engineering covers the varied observed trees; the separate finite live-data rule tests frozen per-setting success, paired stress drop, and observed locality thresholds.",
+          "evidence": {
+            "profile": "mechanism",
+            "scheduled_settings": 1,
+            "scheduled_levels": {
+              "size": [
+                "small"
+              ],
+              "requested_depth_levels": [
+                3
+              ],
+              "density": [
+                "sparse"
+              ]
+            },
+            "observed_tree_values": {
+              "goal_count": [
+                11
+              ],
+              "max_depth_edges": [
+                2
+              ],
+              "dependency_density": [
+                0.21428571428571427,
+                0.2857142857142857
+              ]
+            },
+            "task_clusters": 6,
+            "measured_hierarchical_trials": 72,
+            "scaling_law_status": "UNCERTAIN",
+            "finite_decision": "UNCERTAIN",
+            "finite_criteria": {
+              "every_setting_meets_success_threshold": null,
+              "paired_drop_within_margin": null,
+              "zero_root_protocol_violations": true,
+              "zero_observed_locality_violations": true
+            },
+            "finite_blockers": [
+              "incomplete_six_baseline_stress_pairs",
+              "missing_or_duplicate_baseline_stress_pair",
+              "requires_scale_profile",
+              "requires_seven_scale_cells_three_families_two_repeats",
+              "simulated_backend_not_empirical_model_evidence"
+            ]
+          },
+          "limitations": [
+            "Requested depth counts levels including the root; measured max_depth_edges counts edges from root zero.",
+            "Deeper scale fixtures add executable certification leaves. Depth is not varied at fixed leaf count or fixed work.",
+            "The selected scale settings are not a full factorial design; marginal and interaction effects are not identified generally.",
+            "Distinct scale settings generated from shared source instances need not be independent task draws. No scale CI or significance test is reported.",
+            "Thresholds are frozen design choices, not estimates from these outcomes. With six assigned adaptive fault trials per setting, a 0.80 threshold requires at least five successes.",
+            "The stress contrast jointly changes size, depth, and direct dependency burden; fault targets may also differ across paired settings. It is not an isolated causal scale effect.",
+            "The six pairs reuse three source tasks across two repeats; no independent-Bernoulli or population reliability claim is made.",
+            "A failed path without a repair remains a failure in the success denominator and supplies no positive artifact-locality evidence."
+          ]
+        },
+        {
+          "id": "R9",
+          "key": "repeat_stability",
+          "title": "Finite repeatability and scientific stability uncertainty",
+          "status": "UNCERTAIN",
+          "engineering_status": "PASS",
+          "empirical_status": "UNCERTAIN",
+          "scope": "Engineering covers repeated outcome reporting; the separate live reliability rule requires every adaptive task/condition cell to meet frozen success and integrity thresholds.",
+          "evidence": {
+            "minimum_scheduled_repeats": 3,
+            "maximum_scheduled_repeats": 3,
+            "by_arm_condition": [
+              {
+                "arm": "flat_retry",
+                "condition": "normal",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 0,
+                "clusters_with_mixed_complete_outcomes": 0,
+                "clusters_all_repeats_passed": 6,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 1.0,
+                  "min": 1.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "arm": "flat_retry",
+                "condition": "fault",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 0,
+                "clusters_with_mixed_complete_outcomes": 0,
+                "clusters_all_repeats_passed": 6,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 1.0,
+                  "min": 1.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "arm": "hierarchy_fixed",
+                "condition": "normal",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 0,
+                "clusters_with_mixed_complete_outcomes": 0,
+                "clusters_all_repeats_passed": 6,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 1.0,
+                  "min": 1.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "arm": "hierarchy_fixed",
+                "condition": "fault",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 0,
+                "clusters_with_mixed_complete_outcomes": 0,
+                "clusters_all_repeats_passed": 6,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 1.0,
+                  "min": 1.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "arm": "hierarchy_adaptive",
+                "condition": "normal",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 0,
+                "clusters_with_mixed_complete_outcomes": 0,
+                "clusters_all_repeats_passed": 6,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 1.0,
+                  "min": 1.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "arm": "hierarchy_adaptive",
+                "condition": "fault",
+                "task_clusters": 6,
+                "complete_task_clusters": 6,
+                "clusters_with_mixed_observed_outcomes": 0,
+                "clusters_with_mixed_complete_outcomes": 0,
+                "clusters_all_repeats_passed": 6,
+                "clusters_all_repeats_failed": 0,
+                "scheduled_repeats": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 3.0,
+                  "min": 3,
+                  "max": 3
+                },
+                "within_task_success_rate": {
+                  "n_measured": 6,
+                  "n_missing": 0,
+                  "median": 1.0,
+                  "min": 1.0,
+                  "max": 1.0
+                }
+              }
+            ],
+            "sufficiency_status": "UNCERTAIN",
+            "finite_decision": "UNCERTAIN",
+            "finite_criteria": {
+              "every_task_condition_meets_success_threshold": null,
+              "zero_root_protocol_violations": true
+            },
+            "finite_blockers": [
+              "requires_reliability_profile",
+              "requires_twelve_tasks_both_conditions_and_declared_repeat_count",
+              "simulated_backend_not_empirical_model_evidence"
+            ]
+          },
+          "limitations": [
+            "No population power, precision, or future-stability guarantee establishes that the repeat count is scientifically sufficient; a finite acceptance threshold is a separate claim.",
+            "Repeated calls of one task are dependent observations within the same task cluster.",
+            "Deterministic oracle repetitions do not estimate model stochasticity or empirical stability."
+          ]
+        }
+      ]
+    }
+  },
+  "checks": [
+    {
+      "check": "manifest_result_coverage",
+      "passed": true,
+      "n": 216
+    },
+    {
+      "check": "plan_validator_reproduces_stored_plan_and_error",
+      "passed": true,
+      "n": 36
+    },
+    {
+      "check": "candidate_plan_validation",
+      "passed": true,
+      "n": 36
+    },
+    {
+      "check": "root_and_unaffected_instruction_preservation",
+      "passed": true,
+      "n": 36
+    },
+    {
+      "check": "event_hash_chains_and_terminal_hashes",
+      "passed": true,
+      "n": 216
+    },
+    {
+      "check": "logical_token_and_call_accounting",
+      "passed": true,
+      "n": 216
+    }
+  ],
+  "plan_counts": {
+    "method-study": {
+      "n": 18,
+      "recorded_pass": 15,
+      "candidate_pass": 18,
+      "changed": 3
+    },
+    "method-check": {
+      "n": 18,
+      "recorded_pass": 18,
+      "candidate_pass": 18,
+      "changed": 0
+    }
+  },
+  "failures_by_diagnostic": {
+    "instruction must contain 5..1200 characters": 12,
+    "Measured logical token allowance exceeded on last response": 2
+  },
+  "group_results": [
+    {
+      "dataset": "method-study",
+      "arm": "flat_retry",
+      "condition": "fault",
+      "n": 18,
+      "pass": 18,
+      "fail": 0,
+      "median_logical_tokens": 11578.0,
+      "min_logical_tokens": 11083,
+      "max_logical_tokens": 23417,
+      "median_calls": 2.0
+    },
+    {
+      "dataset": "method-study",
+      "arm": "flat_retry",
+      "condition": "normal",
+      "n": 18,
+      "pass": 18,
+      "fail": 0,
+      "median_logical_tokens": 5663.5,
+      "min_logical_tokens": 5522,
+      "max_logical_tokens": 17653,
+      "median_calls": 1.0
+    },
+    {
+      "dataset": "method-study",
+      "arm": "hierarchy_adaptive",
+      "condition": "fault",
+      "n": 18,
+      "pass": 13,
+      "fail": 5,
+      "median_logical_tokens": 64595.0,
+      "min_logical_tokens": 5305,
+      "max_logical_tokens": 131204,
+      "median_calls": 10.0
+    },
+    {
+      "dataset": "method-study",
+      "arm": "hierarchy_adaptive",
+      "condition": "normal",
+      "n": 18,
+      "pass": 15,
+      "fail": 3,
+      "median_logical_tokens": 51391.5,
+      "min_logical_tokens": 5305,
+      "max_logical_tokens": 90387,
+      "median_calls": 8.0
+    },
+    {
+      "dataset": "method-study",
+      "arm": "hierarchy_fixed",
+      "condition": "fault",
+      "n": 18,
+      "pass": 15,
+      "fail": 3,
+      "median_logical_tokens": 54827.0,
+      "min_logical_tokens": 5305,
+      "max_logical_tokens": 103436,
+      "median_calls": 8.5
+    },
+    {
+      "dataset": "method-study",
+      "arm": "hierarchy_fixed",
+      "condition": "normal",
+      "n": 18,
+      "pass": 15,
+      "fail": 3,
+      "median_logical_tokens": 48766.0,
+      "min_logical_tokens": 5305,
+      "max_logical_tokens": 75829,
+      "median_calls": 7.5
+    },
+    {
+      "dataset": "method-check",
+      "arm": "flat_retry",
+      "condition": "fault",
+      "n": 18,
+      "pass": 18,
+      "fail": 0,
+      "median_logical_tokens": 400.0,
+      "min_logical_tokens": 400,
+      "max_logical_tokens": 400,
+      "median_calls": 2.0
+    },
+    {
+      "dataset": "method-check",
+      "arm": "flat_retry",
+      "condition": "normal",
+      "n": 18,
+      "pass": 18,
+      "fail": 0,
+      "median_logical_tokens": 200.0,
+      "min_logical_tokens": 200,
+      "max_logical_tokens": 200,
+      "median_calls": 1.0
+    },
+    {
+      "dataset": "method-check",
+      "arm": "hierarchy_adaptive",
+      "condition": "fault",
+      "n": 18,
+      "pass": 18,
+      "fail": 0,
+      "median_logical_tokens": 800.0,
+      "min_logical_tokens": 800,
+      "max_logical_tokens": 800,
+      "median_calls": 4.0
+    },
+    {
+      "dataset": "method-check",
+      "arm": "hierarchy_adaptive",
+      "condition": "normal",
+      "n": 18,
+      "pass": 18,
+      "fail": 0,
+      "median_logical_tokens": 400.0,
+      "min_logical_tokens": 400,
+      "max_logical_tokens": 400,
+      "median_calls": 2.0
+    },
+    {
+      "dataset": "method-check",
+      "arm": "hierarchy_fixed",
+      "condition": "fault",
+      "n": 18,
+      "pass": 18,
+      "fail": 0,
+      "median_logical_tokens": 600.0,
+      "min_logical_tokens": 600,
+      "max_logical_tokens": 600,
+      "median_calls": 3.0
+    },
+    {
+      "dataset": "method-check",
+      "arm": "hierarchy_fixed",
+      "condition": "normal",
+      "n": 18,
+      "pass": 18,
+      "fail": 0,
+      "median_logical_tokens": 400.0,
+      "min_logical_tokens": 400,
+      "max_logical_tokens": 400,
+      "median_calls": 2.0
+    }
+  ],
+  "budget_failures": [
+    {
+      "dataset": "method-study",
+      "trial_id": "scale-data_transform-heldout-001-small-d3-sparse-96ee4cc2-fault-r3-hierarchy_adaptive",
+      "family": "data_transform",
+      "task_id": "scale-data_transform-heldout-001-small-d3-sparse-96ee4cc2",
+      "repeat": 3,
+      "condition": "fault",
+      "arm": "hierarchy_adaptive",
+      "status": "FAIL",
+      "success": false,
+      "diagnostic": "Measured logical token allowance exceeded on last response",
+      "calls": 16,
+      "input_tokens": 125720,
+      "output_tokens": 5484,
+      "total_tokens": 131204,
+      "actual_calls": 16,
+      "replans": 3,
+      "replan_attempts": 4,
+      "fault_delivered": true,
+      "recovered": false,
+      "logical_usage_matches": true,
+      "trace_hash_ok": true,
+      "termination_reason": "BudgetExhausted",
+      "token_limit": 128000,
+      "tokens_over_limit": 3204
+    },
+    {
+      "dataset": "method-study",
+      "trial_id": "scale-data_transform-heldout-000-small-d3-sparse-5a988b43-fault-r3-hierarchy_adaptive",
+      "family": "data_transform",
+      "task_id": "scale-data_transform-heldout-000-small-d3-sparse-5a988b43",
+      "repeat": 3,
+      "condition": "fault",
+      "arm": "hierarchy_adaptive",
+      "status": "FAIL",
+      "success": false,
+      "diagnostic": "Measured logical token allowance exceeded on last response",
+      "calls": 16,
+      "input_tokens": 125062,
+      "output_tokens": 4371,
+      "total_tokens": 129433,
+      "actual_calls": 16,
+      "replans": 3,
+      "replan_attempts": 4,
+      "fault_delivered": true,
+      "recovered": false,
+      "logical_usage_matches": true,
+      "trace_hash_ok": true,
+      "termination_reason": "BudgetExhausted",
+      "token_limit": 128000,
+      "tokens_over_limit": 1433
+    }
+  ],
+  "model_calls_new": 0,
+  "efficacy_decision": "UNCERTAIN",
+  "limitations": [
+    "No live model inference or official hidden-grader re-execution.",
+    "Candidate plan checks are not end-to-end success claims.",
+    "Plan repair was developed after observing failures; no confirmatory inference.",
+    "Existing results are immutable; all failure rows retained.",
+    "Six independent task clusters, not 108 independent observations."
+  ]
+}

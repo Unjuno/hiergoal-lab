@@ -1,0 +1,13 @@
+dataset,arm,condition,n,pass,fail,median_logical_tokens,min_logical_tokens,max_logical_tokens,median_calls
+method-study,flat_retry,fault,18,18,0,11578.0,11083,23417,2.0
+method-study,flat_retry,normal,18,18,0,5663.5,5522,17653,1.0
+method-study,hierarchy_adaptive,fault,18,13,5,64595.0,5305,131204,10.0
+method-study,hierarchy_adaptive,normal,18,15,3,51391.5,5305,90387,8.0
+method-study,hierarchy_fixed,fault,18,15,3,54827.0,5305,103436,8.5
+method-study,hierarchy_fixed,normal,18,15,3,48766.0,5305,75829,7.5
+method-check,flat_retry,fault,18,18,0,400.0,400,400,2.0
+method-check,flat_retry,normal,18,18,0,200.0,200,200,1.0
+method-check,hierarchy_adaptive,fault,18,18,0,800.0,800,800,4.0
+method-check,hierarchy_adaptive,normal,18,18,0,400.0,400,400,2.0
+method-check,hierarchy_fixed,fault,18,18,0,600.0,600,600,3.0
+method-check,hierarchy_fixed,normal,18,18,0,400.0,400,400,2.0
