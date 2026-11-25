@@ -38,7 +38,8 @@ do not become independent task samples.
 trajectories across all five profiles passed local verification and semantic
 replay. The no-key workflow repeats these checks. See the verification record
 below for conditions and evidence. Oracle results are software checks, not model-performance measurements.
-The first v2.1 live pilot revealed a replay inconsistency when an accepted patch invalidated an upstream leaf. v2.2 selects the post-patch executable leaf for both decision and replay; see [the pilot regression fix](docs/method_pilot_fix_v2_2_ja.md). The earlier offline counts above refer to v2.1. No new live trial is started by this fix.
+The first v2.1 live pilot revealed a replay inconsistency when an accepted patch invalidated an upstream leaf. v2.2 selects the post-patch executable leaf for both decision and replay; see [the pilot regression fix](docs/method_pilot_fix_v2_2_ja.md).
+The v2.3 mechanism follow-up adds strict initial-plan schemas and lossless input deduplication; see [the mechanism fix and offline evidence](docs/method_mechanism_fix_v2_3_ja.md). Live model performance remains unverified. The earlier offline counts above refer to v2.1. No new live trial is started by this fix.
 
 ```bash
 # No API calls or key required:

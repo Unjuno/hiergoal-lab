@@ -1,0 +1,59 @@
+{
+  "analysis_id": "HGL-WIRE-REGRESSION-20261125-01",
+  "source_run_id": 45566463441,
+  "source_protocol": "v2.2",
+  "target_protocol": "v2.3",
+  "source_archive_sha256": "815fc42124a3e7561f19ad3cb39cc57c01e02ef26d916aa3607675692e3d5a85",
+  "scope": "Offline counterfactual wire serialization of recorded logical responses; no new model calls",
+  "exact_roundtrips": 586,
+  "plans_checked": 18,
+  "historical_plans_with_wrong_type_excluded_by_schema": 3,
+  "groups": [
+    {
+      "role": "plan",
+      "responses": 72,
+      "original_input_json_bytes": 1541340,
+      "compact_input_json_bytes": 836496
+    },
+    {
+      "role": "execute",
+      "responses": 489,
+      "original_input_json_bytes": 14278845,
+      "compact_input_json_bytes": 9433287
+    },
+    {
+      "role": "replan",
+      "responses": 25,
+      "original_input_json_bytes": 661249,
+      "compact_input_json_bytes": 441888
+    }
+  ],
+  "total": {
+    "original_input_json_bytes": 16481434,
+    "compact_input_json_bytes": 10711671,
+    "relative_reduction": 0.35007651640021015
+  },
+  "budget_failure_cases": [
+    {
+      "trial_id": "scale-data_transform-heldout-000-small-d3-sparse-5a988b43-fault-r3-hierarchy_adaptive",
+      "responses": 16,
+      "original_input_json_bytes": 511155,
+      "compact_input_json_bytes": 349239
+    },
+    {
+      "trial_id": "scale-data_transform-heldout-001-small-d3-sparse-96ee4cc2-fault-r3-hierarchy_adaptive",
+      "responses": 16,
+      "original_input_json_bytes": 509166,
+      "compact_input_json_bytes": 347234
+    }
+  ],
+  "engineering_check": "PASS",
+  "live_api_schema_compatibility": "UNVERIFIED",
+  "live_token_reduction": "UNVERIFIED",
+  "efficacy": "UNCERTAIN",
+  "limitations": [
+    "Counts logical shared-plan response appearances; not unique billed calls.",
+    "Byte comparison excludes fixed system guidance, response schema, protocol framing and new plan-prompt wording.",
+    "Actual model behavior, token counts, costs and success rates are not estimated from bytes."
+  ]
+}

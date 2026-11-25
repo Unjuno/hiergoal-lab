@@ -135,7 +135,7 @@ def plan_prompt(task):
     )
     return {"root_contract": task.root_contract, "task": task.public_spec(), "gates": task.gates,
             "gate_dependencies": task.dependencies,
-            "instruction": instruction + " The environment may change; objectives refer to current authoritative state."}
+            "instruction": instruction + " Every instruction and milestone title must be a plain JSON string of 5..1200 characters after trimming, never an object or array. Express certification steps as plain-text executable instructions, not certificate artifact objects. The environment may change; objectives refer to current authoritative state."}
 
 
 def statuses(plan, grades):

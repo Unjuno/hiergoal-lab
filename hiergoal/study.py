@@ -16,6 +16,7 @@ import time
 from pathlib import Path
 
 from hiergoal.study_api import OpenAIResponder, TransportError
+from hiergoal.study_wire import wire_metadata
 from hiergoal.study_protocol import (
     ARMS, SCHEMA, PROFILES, build_manifest, canonical, digest, host_metadata, save, make_trial_task,
     validate_manifest,
@@ -562,6 +563,9 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 pending, latest_reply = None, event
                 response_consumed = False
                 record = event["record"]
+                if (manifest["backend"] == "openai" and manifest.get("protocol_revision") == "v2.3"
+                        and not same_json(record.get("wire_request"), wire_metadata(event["role"], event["request"]))):
+                    raise ValueError("Wire input or response format receipt mismatch")
                 if record["model"] not in observed_models:
                     observed_models.append(record["model"])
                 counts["calls"] += 1

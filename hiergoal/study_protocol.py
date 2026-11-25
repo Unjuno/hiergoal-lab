@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 SCHEMA = "hiergoal.study.v2"
-PROTOCOL_REVISION = "v2.2"
+PROTOCOL_REVISION = "v2.3"
 ARMS = ("flat_retry", "hierarchy_fixed", "hierarchy_adaptive")
 FAMILIES = ("code_repair", "data_transform", "scheduling")
 CONDITIONS = ("normal", "fault")
@@ -31,6 +31,7 @@ SCALE_SETTINGS = (
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_FILES = (
     "hiergoal/study_protocol.py", "hiergoal/study_tasks.py", "hiergoal/study_api.py",
+    "hiergoal/study_wire.py",
     "hiergoal/study.py", "hiergoal/study_analysis.py",
     "hiergoal/study_planning.py", "hiergoal/study_scale.py", "hiergoal/study_mechanisms.py",
     "docs/method_study_ja.md", "docs/method_requirements_audit_ja.md",
