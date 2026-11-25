@@ -1,0 +1,16 @@
+{
+  "timestamp_utc": "2026-11-25T16:53:13.060604+00:00",
+  "git_commit": "46df073625e33c12a63bf99bc8e975a351883628",
+  "working_tree_dirty": false,
+  "python": "3.12.3",
+  "platform": "Linux-7.0.0-1020-azure-x86_64-with-glibc2.39",
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "cpu_clock_mhz_observed_range": [
+    800.0,
+    3600.756
+  ],
+  "logical_cpus": 4,
+  "memory_bytes": 16759275520,
+  "batch_size": 1,
+  "model_hardware": "Provider-managed; not observable"
+}

@@ -1,0 +1,7 @@
+{
+  "status": "COMPLETED",
+  "protocol_id": "d9b261c1036a9a24af0cb091f5ad1933a227bd31a465dde2d03011ae5f9fca0b",
+  "backend": "openai",
+  "completed": 108,
+  "stop_reason": null
+}
