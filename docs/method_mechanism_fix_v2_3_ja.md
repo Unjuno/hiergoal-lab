@@ -36,3 +36,5 @@ python -m unittest discover -s tests -p 'test_study_wire.py' -v
 オフラインCI全件合格後、明示的に承認されたv2.3 live pilotで厳格スキーマの受理と監査通過を確認する。次にmechanism 108試行を新規実行し、無効計画と予算超過、実測トークン、3方式別成功率を記録する。v2.2との比較は探索的であり、事前登録済み本試験の成績には混合しない。
 
 現時点: オフライン過去入力の変換検証 PASS、実モデル互換性・トークン・手法有効性 UNCERTAIN。新規API要求なし。
+
+追記: 上記のオフラインCIは [45628804840](https://github.com/Unjuno/hiergoal-lab/actions/runs/45628804840) で全件success、準備は [45628804738](https://github.com/Unjuno/hiergoal-lab/actions/runs/45628804738) でsuccessを確認した。次のlive開始条件と永続保存経路は[実験開始ガイド](method_live_launch_ja.md)を参照。実APIの互換性と有効性は未確認。

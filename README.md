@@ -39,7 +39,8 @@ trajectories across all five profiles passed local verification and semantic
 replay. The no-key workflow repeats these checks. See the verification record
 below for conditions and evidence. Oracle results are software checks, not model-performance measurements.
 The first v2.1 live pilot revealed a replay inconsistency when an accepted patch invalidated an upstream leaf. v2.2 selects the post-patch executable leaf for both decision and replay; see [the pilot regression fix](docs/method_pilot_fix_v2_2_ja.md).
-The v2.3 mechanism follow-up adds strict initial-plan schemas and lossless input deduplication; see [the mechanism fix and offline evidence](docs/method_mechanism_fix_v2_3_ja.md). Live model performance remains unverified. The earlier offline counts above refer to v2.1. No new live trial is started by this fix.
+The v2.3 mechanism follow-up adds strict initial-plan schemas and lossless input deduplication; see [the mechanism fix and offline evidence](docs/method_mechanism_fix_v2_3_ja.md). Live model performance remains unverified.
+For the next live run and permanent Git result publication, follow [the live launch and archival guide](docs/method_live_launch_ja.md). The earlier offline counts above refer to v2.1. No new live trial is started by this fix.
 
 ```bash
 # No API calls or key required:
@@ -55,7 +56,9 @@ For later execution, use **Actions → Method validation study**. Its default
 explicit manual `mode=run` receives `OPENAI_API_KEY` and starts the chosen profile.
 Pushes never start live inference. The initial live profile should be `pilot`.
 Use the other profiles separately for mechanism, method comparison, scale, and
-repeatability. The report separates engineering coverage, finite observed
+repeatability. Explicit main-branch live runs now publish audited structured results to
+`experiments/method-study-live/<profile>/run-<run_id>-attempt-<attempt>/` in addition
+to the time-limited Actions artifacts; verify the publication job and its Git commit. The report separates engineering coverage, finite observed
 benchmark criteria, empirical evidence, and unresolved scientific uncertainty.
 
 See the [Japanese research protocol and commands](docs/method_study_ja.md),

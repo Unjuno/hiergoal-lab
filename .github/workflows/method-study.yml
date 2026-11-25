@@ -44,6 +44,13 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+      - name: Check explicit live launch prerequisites (no inference)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'run' }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          test "$GITHUB_REF" = refs/heads/main || { echo 'Run the live study on main.'; exit 1; }
+          test -n "$OPENAI_API_KEY" || { echo 'Configure repository Actions secret OPENAI_API_KEY.'; exit 1; }
       - name: Offline regression tests (no credential)
         run: python3 -m unittest discover -s tests -v
       - name: Exercise selected profile offline (no credential)
@@ -51,12 +58,14 @@ jobs:
       - name: Freeze manifest before any model request
         run: python3 -m hiergoal.study prepare --profile "$STUDY_PROFILE" --output runs/method-study
       - name: Execute only the explicitly selected live study
+        id: live
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'run' }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL: https://api.openai.com/v1
         run: python3 -m hiergoal.study run --output runs/method-study --execute --approve-paid-api
       - name: Recheck all retained evidence including incomplete runs
+        id: collect
         if: ${{ always() }}
         run: |
           if test -f runs/method-study/manifest.json; then
@@ -74,6 +83,25 @@ jobs:
           if-no-files-found: error
           retention-days: 30
           include-hidden-files: false
+      - name: Export public structured results and receipt (no credential)
+        if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.mode == 'run' && github.ref == 'refs/heads/main' }}
+        env:
+          LIVE_OUTCOME: ${{ steps.live.outcome || 'skipped' }}
+          COLLECTION_OUTCOME: ${{ steps.collect.outcome || 'skipped' }}
+        run: |
+          python3 -m hiergoal.study_archive export \
+            --source runs/method-study --destination "$RUNNER_TEMP/hiergoal-public" \
+            --profile "$STUDY_PROFILE" --run-id "$GITHUB_RUN_ID" \
+            --attempt "$GITHUB_RUN_ATTEMPT" --commit "$GITHUB_SHA" \
+            --live-outcome "$LIVE_OUTCOME" --collection-outcome "$COLLECTION_OUTCOME"
+      - name: Transfer only public results to publication job
+        if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.mode == 'run' && github.ref == 'refs/heads/main' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: method-public-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/hiergoal-public/
+          if-no-files-found: error
+          retention-days: 30
       - name: Require complete audited execution when live was requested
         if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.mode == 'run' }}
         run: |
@@ -91,3 +119,52 @@ jobs:
           print('Complete audited experiment:', complete)
           raise SystemExit(0 if complete else 1)
           PY
+
+  publish:
+    needs: study
+    if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.mode == 'run' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      STUDY_PROFILE: ${{ inputs.profile }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: method-public-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/hiergoal-public
+      - name: Verify identity, allowlist and checksums without executing artifact contents
+        run: |
+          python3 -m hiergoal.study_archive verify \
+            --destination "$RUNNER_TEMP/hiergoal-public" --profile "$STUDY_PROFILE" \
+            --run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT" --commit "$GITHUB_SHA"
+      - name: Commit permanent results to main (no API key)
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          public="$RUNNER_TEMP/hiergoal-public"
+          target="experiments/method-study-live/$STUDY_PROFILE/run-$GITHUB_RUN_ID-attempt-$GITHUB_RUN_ATTEMPT"
+          for retry in 1 2 3; do
+            git fetch --no-tags origin refs/heads/main
+            git checkout --detach FETCH_HEAD
+            if test -e "$target"; then
+              diff -qr "$public" "$target"
+              echo "Identical results already archived: $target" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            mkdir -p "$target"
+            cp -R "$public/." "$target/"
+            git add -- "$target"
+            git commit -m "Archive method study $STUDY_PROFILE run $GITHUB_RUN_ID attempt $GITHUB_RUN_ATTEMPT"
+            if git push origin HEAD:refs/heads/main; then
+              echo "Permanent results: $target" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+          done
+          echo 'Permanent publication failed; inspect the public-results artifact and branch permissions.'
+          exit 1
