@@ -6,6 +6,12 @@
 
 ## Method validation study — Hermes is optional
 
+**Current revision: v2.5.** The [scale restart fix](docs/method_resume_v2_5_ja.md)
+reconstructs the execution order of validated plans during replay, checks each trial
+before continuing, and retains an isolated HTTP 400 as an uncertain trial while
+advancing the schedule. The third affected trial stops the batch. Task budgets,
+grading, and model settings are unchanged; ordinary pushes never launch inference.
+
 The research target is **evidence-driven hierarchical goal control and local replanning**.
 The new method study compares `flat_retry`, `hierarchy_fixed`, and `hierarchy_adaptive`
 with the same model, public feedback, artifact tools, and resource ceilings. Fixed and
@@ -34,7 +40,7 @@ The scale profile reaches **73 total goals, 48 leaves, 5 hierarchy levels, and
 isolate depth while holding leaf count fixed. Repeated calls and scaled variants
 do not become independent task samples.
 
-**Current v2.4 verification:** 275 offline tests and all 1,314 simulated trajectories passed; the combined reviewer reports all nine engineering criteria PASS and all nine empirical criteria UNCERTAIN. See [the reproducible verification record](experiments/method-study-v2.4/offline-verification.json) and [the nine-requirement report](experiments/method-study-v2.4/requirements.md). No live model performance is implied.
+**Historical v2.4 verification:** 275 offline tests and all 1,314 simulated trajectories passed; the combined reviewer reported all nine engineering criteria PASS and all nine empirical criteria UNCERTAIN. See [the verification record](experiments/method-study-v2.4/offline-verification.json) and [the nine-requirement report](experiments/method-study-v2.4/requirements.md). The subsequent scale run exposed a plan-order replay bug on incremental repairs; v2.5 adds that missing regression path. No live model performance follows from the Oracle checks.
 
 **Historical v2.1 readiness:** all 242 offline regression tests and 1,314 oracle-driven
 trajectories across all five profiles passed local verification and semantic

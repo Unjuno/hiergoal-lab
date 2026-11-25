@@ -102,11 +102,16 @@ def diagnostic_code(value):
         "Response did not complete within its output allowance": "INCOMPLETE_RESPONSE",
         "Response must be one JSON object": "INVALID_JSON",
         "BATCH_TIME_ALLOWANCE": "BATCH_TIME_ALLOWANCE",
+        "HTTP_400_TRIAL_ERROR_LIMIT": "HTTP_400_TRIAL_ERROR_LIMIT",
+        "AUDIT_FAILED": "AUDIT_FAILED",
         "Immutable root changed": "ROOT_INVARIANT",
         "OPENAI_TRANSPORT_OR_JSON_ERROR:TimeoutError": "API_TIMEOUT",
     }
     if value in fixed:
         return fixed[value]
+    if value in fixed.values() or value in {
+            "APPARATUS_ERROR", "API_TRANSPORT_ERROR", "OTHER_RECORDED_DIAGNOSTIC", "UNSPECIFIED"}:
+        return value
     if re.fullmatch(r"OPENAI_HTTP_[0-9]{3}", value):
         return value
     for prefix, code in (("EVIDENCE_AUDIT_FAILED:", "AUDIT_FAILED"),
@@ -115,6 +120,85 @@ def diagnostic_code(value):
         if value.startswith(prefix):
             return code
     return "OTHER_RECORDED_DIAGNOSTIC"
+
+
+def public_execution(execution, manifest, results):
+    """Project and cross-check batch continuation decisions against result rows.
+
+    COMPLETED means the scheduled prefix reached its end, including UNCERTAIN
+    trials. Scientific completion is derived separately from audited outcomes.
+    Continued IDs record permission to move on while later trials were planned;
+    a subsequent batch timeout can still prevent the next trial from starting.
+    """
+    require(isinstance(execution, dict) and execution.get("protocol_id") == manifest["protocol_id"]
+            and execution.get("backend") == "openai", "Execution provenance mismatch")
+    require(execution.get("status") in ("RUNNING", "STOPPED", "COMPLETED"), "Invalid execution state")
+    count = scalar(execution.get("completed"), "int")
+    require(count is not None and count <= len(results)
+            and (execution["status"] != "COMPLETED" or count == len(results)),
+            "Invalid execution count")
+    projected = {
+        "status": execution["status"], "protocol_id": manifest["protocol_id"],
+        "backend": "openai", "completed": count,
+        "stop_reason": diagnostic_code(execution["stop_reason"]) if execution.get("stop_reason") else None,
+    }
+    policy = manifest.get("execution_policy")
+    if policy is None:
+        require(manifest.get("protocol_revision") != "v2.5", "Missing frozen execution policy")
+        return projected
+    require(canonical(policy) == canonical({
+        "continue_diagnostics": ["OPENAI_HTTP_400"], "max_http_400_trial_errors": 3,
+        "retry_failed_requests": False, "audit_each_trial": True,
+    }), "Unsupported execution continuation policy")
+    trials = manifest["trials"]
+    require(len(results) == len(trials)
+            and all(record.get("trial_id") == trial["trial_id"] for record, trial in zip(results, trials)),
+            "Execution result assignment mismatch")
+    visited = results[:count]
+    require(all(record.get("status") in ("PASS", "FAIL", "UNCERTAIN")
+                and record.get("audit") in ("PASS", "FAIL") for record in visited),
+            "Execution count includes uncompleted trial")
+    # A killed process can leave the next trial incomplete. It cannot account
+    # for a completed later trial or a hole in the recorded schedule.
+    for offset, record in enumerate(results[count:]):
+        require(record.get("status") == "NOT_RUN" and record.get("audit") == "NOT_RUN"
+                or offset == 0 and record.get("status") == "UNCERTAIN" and record.get("audit") == "INCOMPLETE",
+                "Execution count disagrees with completed schedule prefix")
+    errors, continued = [], []
+    fatal_index, expected_stop = None, None
+    for index, record in enumerate(visited):
+        if record.get("audit") != "PASS":
+            fatal_index, expected_stop = index, "AUDIT_FAILED"
+            break
+        code = diagnostic_code(record.get("diagnostic"))
+        if code == "OPENAI_HTTP_400":
+            eligible = (record.get("status") == "UNCERTAIN"
+                        and record.get("protocol_ok") is True and record.get("invariant_ok") is True
+                        and record.get("stop_batch") is True)
+            if not eligible:
+                fatal_index, expected_stop = index, code
+                break
+            errors.append(record["trial_id"])
+            if len(errors) >= policy["max_http_400_trial_errors"]:
+                fatal_index, expected_stop = index, "HTTP_400_TRIAL_ERROR_LIMIT"
+                break
+            if index < len(trials) - 1:
+                continued.append(record["trial_id"])
+        elif record.get("stop_batch") is True or record.get("status") == "UNCERTAIN":
+            fatal_index, expected_stop = index, code
+            break
+    if fatal_index is not None:
+        require(fatal_index == count - 1, "Batch continued after a fatal trial")
+        require(projected["stop_reason"] == expected_stop, "Execution stop reason contradicts trial evidence")
+    else:
+        require(projected["stop_reason"] not in ("HTTP_400_TRIAL_ERROR_LIMIT", "AUDIT_FAILED"),
+                "Execution claims an unsupported error stop")
+    for name, expected in (("api_error_trial_ids", errors), ("continued_api_error_trial_ids", continued)):
+        value = execution.get(name)
+        require(isinstance(value, list) and all(isinstance(item, str) for item in value)
+                and value == expected, "Execution continuation IDs contradict trial evidence")
+        projected[name] = list(value)
+    return projected
 
 
 def public_evidence(value):
@@ -201,6 +285,9 @@ def export_run(source, destination, *, profile, run_id, attempt, commit, live_ou
         trials = manifest["trials"]
         require(isinstance(raw, list) and len(raw) == len(trials), "Missing collected rows")
         results = [public_result(record, trial, manifest) for record, trial in zip(raw, trials)]
+        if manifest.get("execution_policy") is not None and any(
+                record["status"] != "NOT_RUN" or record["audit"] != "NOT_RUN" for record in results):
+            require((source / "execution.json").is_file(), "Missing execution continuation evidence")
         summary = analyze({**manifest, "execution_context": host}, results)
         # Redaction must not change the statistical analysis or discard any
         # counters used by the analysis. Fail closed if schemas drift.
@@ -215,16 +302,7 @@ def export_run(source, destination, *, profile, run_id, attempt, commit, live_ou
             stream.write(render_trials_csv(trials, results))
         if (source / "execution.json").is_file():
             execution = read_json(source / "execution.json")
-            require(execution.get("protocol_id") == manifest["protocol_id"]
-                    and execution.get("backend") == "openai", "Execution provenance mismatch")
-            require(execution.get("status") in ("RUNNING", "STOPPED", "COMPLETED"), "Invalid execution state")
-            count = scalar(execution.get("completed"), "int")
-            require(count is not None and count <= len(trials), "Invalid execution count")
-            save(destination / "execution.json", {
-                "status": execution["status"], "protocol_id": manifest["protocol_id"],
-                "backend": "openai", "completed": count,
-                "stop_reason": diagnostic_code(execution["stop_reason"]) if execution.get("stop_reason") else None,
-            })
+            save(destination / "execution.json", public_execution(execution, manifest, results))
         outcomes = Counter(record["status"] for record in results)
         receipt.update(state="COLLECTED", protocol_id=manifest["protocol_id"],
                        protocol_revision=manifest.get("protocol_revision"), scheduled_trials=len(trials),
@@ -301,15 +379,12 @@ def verify(destination, *, profile, run_id, attempt, commit):
         with (destination / "trials.csv").open(encoding="utf-8", newline="") as stream:
             require(stream.read() == render_trials_csv(manifest["trials"], results),
                     "Publication trial table mismatch")
+        if manifest.get("execution_policy") is not None and any(
+                record["status"] != "NOT_RUN" or record["audit"] != "NOT_RUN" for record in results):
+            require("execution.json" in files, "Missing execution continuation evidence")
         if "execution.json" in files:
             execution = read_json(destination / "execution.json")
-            require(isinstance(execution, dict) and execution.get("protocol_id") == manifest["protocol_id"]
-                    and execution.get("backend") == "openai", "Execution provenance mismatch")
-            require(execution.get("status") in ("RUNNING", "STOPPED", "COMPLETED"), "Invalid execution state")
-            count = scalar(execution.get("completed"), "int")
-            require(count is not None and count <= len(results)
-                    and (execution["status"] != "COMPLETED" or count == len(results)),
-                    "Invalid execution count")
+            public_execution(execution, manifest, results)
     else:
         require(receipt.get("state") == "NO_COLLECTED_RESULTS" and not files
                 and receipt["complete_audited_execution"] is False

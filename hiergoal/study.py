@@ -157,6 +157,8 @@ def prepare_plan(task, trial, manifest, backend, directory, on_start=None):
         value["error"] = {"status": "FAIL", "diagnostic": str(exc), "reason": "InvalidAction"}
     except TransportError as exc:
         value["error"] = {"status": "UNCERTAIN", "diagnostic": str(exc)}
+        if exc.evidence is not None:
+            value["error"]["transport_evidence"] = copy.deepcopy(exc.evidence)
     except BudgetExhausted as exc:
         value["error"] = {"status": "FAIL", "diagnostic": str(exc), "reason": "BudgetExhausted", "budget": exc.evidence}
     save(path, value)  # Also persist a failed plan: no selective reroll.
@@ -338,7 +340,8 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
                 if transport_failure and reused:
                     pending_request.update(role="plan", request=shared["request"], reused=True)
                 if transport_failure:
-                    raise TransportError(shared["error"]["diagnostic"])
+                    raise TransportError(shared["error"]["diagnostic"],
+                                         evidence=shared["error"].get("transport_evidence"))
                 if shared["error"].get("reason") == "BudgetExhausted":
                     raise BudgetExhausted(shared["error"]["diagnostic"], evidence=shared["error"]["budget"])
                 raise InvalidAction(shared["error"]["diagnostic"])
@@ -428,7 +431,11 @@ def run_trial(task, trial, manifest, backend, directory: Path) -> dict:
     except TransportError as exc:
         result.update(status="UNCERTAIN", diagnostic=str(exc))
         transport_failure = True
-        trace.add("termination", status="UNCERTAIN", reason="TransportError", diagnostic=str(exc))
+        evidence = {}
+        if exc.evidence is not None:
+            result["transport_evidence"] = copy.deepcopy(exc.evidence)
+            evidence["transport_evidence"] = copy.deepcopy(exc.evidence)
+        trace.add("termination", status="UNCERTAIN", reason="TransportError", diagnostic=str(exc), **evidence)
     except Exception as exc:
         # An apparatus exception is NOT evidence of method failure. Do not log
         # arbitrary exception text (which could include transport credentials).
@@ -583,7 +590,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 pending, latest_reply = None, event
                 response_consumed = False
                 record = event["record"]
-                if (manifest["backend"] == "openai" and manifest.get("protocol_revision") in ("v2.3", "v2.4")
+                if (manifest["backend"] == "openai" and manifest.get("protocol_revision") in ("v2.3", "v2.4", "v2.5")
                         and not same_json(record.get("wire_request"), wire_metadata(event["role"], event["request"]))):
                     raise ValueError("Wire input or response format receipt mismatch")
                 if record["model"] not in observed_models:
@@ -625,6 +632,10 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 if plan is not None:
                     if latest_reply is None or latest_reply["role"] != "plan" or not same_json(plan, validate_plan(object_reply(latest_reply["record"]), task)):
                         raise ValueError("Initial plan does not match model output")
+                    # Canonical trace JSON sorts dictionary keys (S1,S10,...,S2).
+                    # Reconstruct the validated execution order from the original
+                    # response and frozen task instead of replaying that key order.
+                    plan = validate_plan(object_reply(latest_reply["record"]), task)
                     required_events = ["checkpoint"]
                 elif event["error"] and event["error"]["status"] == "FAIL" and shared["record"] is not None:
                     try:
@@ -761,6 +772,9 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                     raise ValueError("Unknown termination reason or unsupported terminal status")
                 if event["reason"] == "ApparatusError" and result["protocol_ok"] is not False:
                     raise ValueError("Apparatus failure must invalidate the execution protocol")
+                if event["reason"] == "TransportError" and not same_json(
+                        event.get("transport_evidence"), result.get("transport_evidence")):
+                    raise ValueError("Transport diagnostic receipt differs from terminal result")
                 termination = event
                 if event["reason"] == "BudgetExhausted":
                     validate_budget_evidence(event, counts, manifest["limits"], task, solution, plan, history, elapsed)
@@ -911,8 +925,10 @@ def run(directory: Path, *, execute=False, approve_paid_api=False, responder=Non
         backend = responder or OracleResponder()
         if backend.kind != manifest["backend"]:
             raise ValueError("Responder must match the prepared backend")
+    policy = manifest["execution_policy"]
     execution = {"status": "RUNNING", "protocol_id": manifest["protocol_id"],
-                 "backend": backend.kind, "completed": 0, "stop_reason": None}
+                 "backend": backend.kind, "completed": 0, "stop_reason": None,
+                 "api_error_trial_ids": [], "continued_api_error_trial_ids": []}
     # Atomic exclusive creation prevents two drivers from starting the same study.
     with (directory / "execution.json").open("x", encoding="utf-8") as stream:
         stream.write(canonical(execution) + "\n")
@@ -925,10 +941,32 @@ def run(directory: Path, *, execute=False, approve_paid_api=False, responder=Non
             task = make_trial_task(trial, manifest["task_seed"])
             result = run_trial(task, trial, manifest, backend, directory)
             execution["completed"] += 1
-            save(directory / "execution.json", execution)
-            if result["stop_batch"]:
-                execution["stop_reason"] = result["diagnostic"]
+            # Detect apparatus regressions before paying for another trial.
+            audited = audit_trial(directory, trial, manifest)
+            if audited.get("audit") != "PASS":
+                execution["stop_reason"] = "AUDIT_FAILED"
+                save(directory / "execution.json", execution)
                 break
+            if result["stop_batch"]:
+                isolated_http_400 = (
+                    result["status"] == "UNCERTAIN"
+                    and result["diagnostic"] in policy["continue_diagnostics"]
+                    and result["protocol_ok"] is True and result["invariant_ok"] is True)
+                if isolated_http_400:
+                    # Count affected trials, including reuse of a failed shared
+                    # initial plan. This is a total budget, never reset by PASS.
+                    execution["api_error_trial_ids"].append(trial["trial_id"])
+                    if len(execution["api_error_trial_ids"]) >= policy["max_http_400_trial_errors"]:
+                        execution["stop_reason"] = "HTTP_400_TRIAL_ERROR_LIMIT"
+                        save(directory / "execution.json", execution)
+                        break
+                    if execution["completed"] < len(manifest["trials"]):
+                        execution["continued_api_error_trial_ids"].append(trial["trial_id"])
+                else:
+                    execution["stop_reason"] = result["diagnostic"]
+                    save(directory / "execution.json", execution)
+                    break
+            save(directory / "execution.json", execution)
         execution["status"] = "COMPLETED" if execution["completed"] == len(manifest["trials"]) else "STOPPED"
     finally:
         save(directory / "execution.json", execution)

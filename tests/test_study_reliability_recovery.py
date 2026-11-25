@@ -43,7 +43,7 @@ class RecoveryReliabilityTests(unittest.TestCase):
     def test_v24_reliability_composes_all_twelve_tasks_with_matching_repair_budget(self):
         manifest = build_manifest("reliability", backend="oracle", model="OFFLINE_ORACLE")
         validate_manifest(manifest)
-        self.assertEqual(manifest["protocol_revision"], "v2.4")
+        self.assertEqual(manifest["protocol_revision"], "v2.5")
         self.assertEqual(len(manifest["tasks"]), 12)
         self.assertEqual(len(manifest["trials"]), 720)
         self.assertEqual(manifest["limits"], profile_limits("mechanism"))

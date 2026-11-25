@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 SCHEMA = "hiergoal.study.v2"
-PROTOCOL_REVISION = "v2.4"
+PROTOCOL_REVISION = "v2.5"
 ARMS = ("flat_retry", "hierarchy_fixed", "hierarchy_adaptive")
 FAMILIES = ("code_repair", "data_transform", "scheduling")
 CONDITIONS = ("normal", "fault")
@@ -37,6 +37,7 @@ SOURCE_FILES = (
     "hiergoal/study_planning.py", "hiergoal/study_scale.py", "hiergoal/study_mechanisms.py",
     "docs/method_study_ja.md", "docs/method_requirements_audit_ja.md",
     "docs/method_reaudit_v2_4_ja.md",
+    "docs/method_resume_v2_5_ja.md",
     ".github/workflows/method-study.yml",
 )
 LIMITS = {
@@ -139,6 +140,10 @@ def build_manifest(profile="pilot", backend="openai", model="gpt-6-luna",
         "schedule_seed": schedule_seed, "task_seed": 1729,
         "randomness_note": "Schedule/task seeds are not model sampling seeds.",
         "limits": profile_limits(profile), "tasks": list(tasks.values()), "trials": trials,
+        "execution_policy": {"continue_diagnostics": ["OPENAI_HTTP_400"],
+                             "max_http_400_trial_errors": 3,
+                             "retry_failed_requests": False,
+                             "audit_each_trial": True},
         "evidence_contract": "all-nine-v2",
         "analysis": {"minimum_effect": 0.10, "confidence": 0.95,
                      "bootstrap_samples": 5000, "seed": 20261125,
