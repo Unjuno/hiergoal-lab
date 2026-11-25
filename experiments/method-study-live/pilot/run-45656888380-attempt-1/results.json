@@ -1,0 +1,1730 @@
+[
+  {
+    "trial_id": "scheduling-dev-000-a0efc165-normal-r1-hierarchy_fixed",
+    "status": "FAIL",
+    "audit": "PASS",
+    "success": false,
+    "fault_assigned": false,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1105,
+    "output_tokens": 472,
+    "patch_actions": 0,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 1,
+    "actual_input_tokens": 1105,
+    "actual_output_tokens": 472,
+    "elapsed_seconds": 5.164242573000024,
+    "wall_seconds": 5.166773419000009,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "e0f4205898dad30e33ca6023358cbf82fc748b853562e32d7a4bdd743a84aad6",
+    "final_environment_sha256": "3644c83eb3769e6a0bd76f2d15faf1e0ea97d98d769b8b25ac673a21872d2ce8",
+    "trace_final_sha256": "dfc25513a2a8766b435d31e21b8e9d9e816c0cf6267ed867cae4c9e2256d471e",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": false,
+      "final_grade_passed": null,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 0,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 0
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 0,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "OTHER_RECORDED_DIAGNOSTIC"
+  },
+  {
+    "trial_id": "scheduling-dev-000-a0efc165-normal-r1-hierarchy_adaptive",
+    "status": "FAIL",
+    "audit": "PASS",
+    "success": false,
+    "fault_assigned": false,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1105,
+    "output_tokens": 472,
+    "patch_actions": 0,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 0,
+    "actual_input_tokens": 0,
+    "actual_output_tokens": 0,
+    "elapsed_seconds": 5.164242573000024,
+    "wall_seconds": 0.0008127719999890815,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "e0f4205898dad30e33ca6023358cbf82fc748b853562e32d7a4bdd743a84aad6",
+    "final_environment_sha256": "3644c83eb3769e6a0bd76f2d15faf1e0ea97d98d769b8b25ac673a21872d2ce8",
+    "trace_final_sha256": "db7aed8ac3fd3450e7c96181ad404bb1d7b26d05aeda408ea7693be8b5fb42ce",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": false,
+      "final_grade_passed": null,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 0,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 0
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 0,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "OTHER_RECORDED_DIAGNOSTIC"
+  },
+  {
+    "trial_id": "scheduling-dev-000-a0efc165-normal-r1-flat_retry",
+    "status": "PASS",
+    "audit": "PASS",
+    "success": true,
+    "fault_assigned": false,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1081,
+    "output_tokens": 291,
+    "patch_actions": 1,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 1,
+    "actual_input_tokens": 1081,
+    "actual_output_tokens": 291,
+    "elapsed_seconds": 3.9090211909999937,
+    "wall_seconds": 3.9119964980000077,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "0555d4d319b0beaca25a624c7242bfc8b8e3ac3cd720fa6f29f984415f1e47b8",
+    "final_environment_sha256": "3644c83eb3769e6a0bd76f2d15faf1e0ea97d98d769b8b25ac673a21872d2ce8",
+    "trace_final_sha256": "76d49b09d36e19b066319bdb90f9eb460727d3c76ecbf8ec49c7ac6fd21045c3",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": true,
+      "final_grade_passed": true,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 3,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 1
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 1,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "FINAL_GRADE_PASS"
+  },
+  {
+    "trial_id": "code_repair-dev-000-31c83a4f-fault-r1-hierarchy_adaptive",
+    "status": "FAIL",
+    "audit": "PASS",
+    "success": false,
+    "fault_assigned": true,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1196,
+    "output_tokens": 272,
+    "patch_actions": 0,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 1,
+    "actual_input_tokens": 1196,
+    "actual_output_tokens": 272,
+    "elapsed_seconds": 2.798777161000004,
+    "wall_seconds": 2.801747804999991,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "802003e36dc57e205d1f52b7fb9adb9d7421816190fe819d6a685bf3ccbe2e35",
+    "final_environment_sha256": "d3049e1cb239ea1696ea49b8b691f5e108df77060432753d2c517115912a4942",
+    "trace_final_sha256": "e3151f1dea1acec6192b3506dbf09eb5744f32bdf508c6bdc37019bc6f50b3bb",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": false,
+      "final_grade_passed": null,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 0,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 0
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 0,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "OTHER_RECORDED_DIAGNOSTIC"
+  },
+  {
+    "trial_id": "code_repair-dev-000-31c83a4f-fault-r1-hierarchy_fixed",
+    "status": "FAIL",
+    "audit": "PASS",
+    "success": false,
+    "fault_assigned": true,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1196,
+    "output_tokens": 272,
+    "patch_actions": 0,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 0,
+    "actual_input_tokens": 0,
+    "actual_output_tokens": 0,
+    "elapsed_seconds": 2.798777161000004,
+    "wall_seconds": 0.0010561919999929614,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "802003e36dc57e205d1f52b7fb9adb9d7421816190fe819d6a685bf3ccbe2e35",
+    "final_environment_sha256": "d3049e1cb239ea1696ea49b8b691f5e108df77060432753d2c517115912a4942",
+    "trace_final_sha256": "504eb72851c8b5b354bcfe9d75e959dc994ffa008a27f84ee02945428cea3f7d",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": false,
+      "final_grade_passed": null,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 0,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 0
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 0,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "OTHER_RECORDED_DIAGNOSTIC"
+  },
+  {
+    "trial_id": "code_repair-dev-000-31c83a4f-fault-r1-flat_retry",
+    "status": "PASS",
+    "audit": "PASS",
+    "success": true,
+    "fault_assigned": true,
+    "fault_triggered": true,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1112,
+    "output_tokens": 142,
+    "patch_actions": 1,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 1,
+    "actual_input_tokens": 1112,
+    "actual_output_tokens": 142,
+    "elapsed_seconds": 1.5910160230000088,
+    "wall_seconds": 1.5972208300000261,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "16b6f4a38113d6ff89a1017e57968a24c2fea8c7c2fc3826a42abb362e9ccd32",
+    "final_environment_sha256": "824a955996a7ecceab0318c3f2fa442ccbe51ce6f024e60654635dfb08e05549",
+    "trace_final_sha256": "05afc7dd15d1e654a7a26daf4449e0b3d22cca87623a6eae354e19ad9a08a437",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": true,
+      "final_grade_passed": true,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 3,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 1,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 1
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 2,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": true,
+        "delivered": false,
+        "no_impact": true,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "FINAL_GRADE_PASS"
+  },
+  {
+    "trial_id": "data_transform-dev-000-e27fb62a-normal-r1-flat_retry",
+    "status": "PASS",
+    "audit": "PASS",
+    "success": true,
+    "fault_assigned": false,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1331,
+    "output_tokens": 551,
+    "patch_actions": 1,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 1,
+    "actual_input_tokens": 1331,
+    "actual_output_tokens": 551,
+    "elapsed_seconds": 4.256592652000023,
+    "wall_seconds": 4.260232690999999,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "9a988feee231a1d9a945b0036642e3891c1f1d8974c5f0af400c00ba6fde359c",
+    "final_environment_sha256": "4b04340a6a39cbae186404626bcbe7432683e5c9454bcb09733518dd47d3a204",
+    "trace_final_sha256": "edd6076d1c751620b71f44c975897f908f24c40dbdfd20525789e90e93402504",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": true,
+      "final_grade_passed": true,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 3,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 1
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 1,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "FINAL_GRADE_PASS"
+  },
+  {
+    "trial_id": "data_transform-dev-000-e27fb62a-normal-r1-hierarchy_fixed",
+    "status": "PASS",
+    "audit": "PASS",
+    "success": true,
+    "fault_assigned": false,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 4,
+    "input_tokens": 7584,
+    "output_tokens": 988,
+    "patch_actions": 3,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 4,
+    "actual_input_tokens": 7584,
+    "actual_output_tokens": 988,
+    "elapsed_seconds": 10.945436317999992,
+    "wall_seconds": 10.957715321999984,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "9a988feee231a1d9a945b0036642e3891c1f1d8974c5f0af400c00ba6fde359c",
+    "final_environment_sha256": "4b04340a6a39cbae186404626bcbe7432683e5c9454bcb09733518dd47d3a204",
+    "trace_final_sha256": "100a43372fcade7cb367cab3a2f44acd7a360579789a51a7d08ac6814b24ab98",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": true,
+      "final_grade_passed": true,
+      "tree": {
+        "goal_count": 7,
+        "leaf_count": 3,
+        "max_depth_edges": 2,
+        "dependency_edges": 2,
+        "max_depth": 2,
+        "dependency_density": 0.6666666666666666
+      },
+      "trace": {
+        "checkpoint_events": 5,
+        "leaf_state_transitions": 3,
+        "milestone_state_transitions": 3,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 1
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 3,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 2
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "FINAL_GRADE_PASS"
+  },
+  {
+    "trial_id": "data_transform-dev-000-e27fb62a-normal-r1-hierarchy_adaptive",
+    "status": "PASS",
+    "audit": "PASS",
+    "success": true,
+    "fault_assigned": false,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 4,
+    "input_tokens": 7582,
+    "output_tokens": 1017,
+    "patch_actions": 3,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 3,
+    "actual_input_tokens": 6154,
+    "actual_output_tokens": 708,
+    "elapsed_seconds": 10.566019371999971,
+    "wall_seconds": 6.968203141999993,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "9a988feee231a1d9a945b0036642e3891c1f1d8974c5f0af400c00ba6fde359c",
+    "final_environment_sha256": "4b04340a6a39cbae186404626bcbe7432683e5c9454bcb09733518dd47d3a204",
+    "trace_final_sha256": "bbd8986b7f335600278cea955eb632dfced697ae86d36f1f5e32e81aee85afaf",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": true,
+      "final_grade_passed": true,
+      "tree": {
+        "goal_count": 7,
+        "leaf_count": 3,
+        "max_depth_edges": 2,
+        "dependency_edges": 2,
+        "max_depth": 2,
+        "dependency_density": 0.6666666666666666
+      },
+      "trace": {
+        "checkpoint_events": 5,
+        "leaf_state_transitions": 3,
+        "milestone_state_transitions": 3,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 1
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 3,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 2
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "FINAL_GRADE_PASS"
+  },
+  {
+    "trial_id": "data_transform-dev-000-e27fb62a-fault-r1-hierarchy_adaptive",
+    "status": "PASS",
+    "audit": "PASS",
+    "success": true,
+    "fault_assigned": true,
+    "fault_triggered": true,
+    "fault_delivered": true,
+    "recovered": true,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 6,
+    "input_tokens": 12306,
+    "output_tokens": 1757,
+    "patch_actions": 4,
+    "replans": 1,
+    "replan_attempts": 1,
+    "rejected_actions": 0,
+    "actual_calls": 5,
+    "actual_input_tokens": 10878,
+    "actual_output_tokens": 1448,
+    "elapsed_seconds": 17.280032240000025,
+    "wall_seconds": 13.68954866300001,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "0f3a9e8f870c99a7798b6cb55d3f4b5f81ae5c4893c6d19c6bebc669f6385490",
+    "final_environment_sha256": "4b7836c11c415890a7dd7c487cbd660990342946c720f8624ea4cb8430b208cc",
+    "trace_final_sha256": "2775317dc35d9017fff4b35ce35b694ba6e700ef7b59882b1f10f7e9a5629397",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": true,
+      "final_grade_passed": true,
+      "tree": {
+        "goal_count": 7,
+        "leaf_count": 3,
+        "max_depth_edges": 2,
+        "dependency_edges": 2,
+        "max_depth": 2,
+        "dependency_density": 0.6666666666666666
+      },
+      "trace": {
+        "checkpoint_events": 7,
+        "leaf_state_transitions": 9,
+        "milestone_state_transitions": 9,
+        "accepted_replans_with_failure_evidence": 1,
+        "post_fault_target_replans": 1,
+        "failure_causes_recorded": 1,
+        "model_diagnoses_recorded": 1,
+        "root_state_transitions": 3
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 1,
+        "accepted": 1,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 1,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 5,
+        "needed_decisions": 1,
+        "deferred_progress_decisions": 2
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 1,
+        "invalidated_goals": 2,
+        "reverified_goals": 2
+      },
+      "fault": {
+        "triggered": true,
+        "delivered": true,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": true
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "FINAL_GRADE_PASS"
+  },
+  {
+    "trial_id": "data_transform-dev-000-e27fb62a-fault-r1-flat_retry",
+    "status": "PASS",
+    "audit": "PASS",
+    "success": true,
+    "fault_assigned": true,
+    "fault_triggered": true,
+    "fault_delivered": true,
+    "recovered": true,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 2,
+    "input_tokens": 3356,
+    "output_tokens": 975,
+    "patch_actions": 2,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 2,
+    "actual_input_tokens": 3356,
+    "actual_output_tokens": 975,
+    "elapsed_seconds": 7.011504280999986,
+    "wall_seconds": 7.018917413999986,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "0f3a9e8f870c99a7798b6cb55d3f4b5f81ae5c4893c6d19c6bebc669f6385490",
+    "final_environment_sha256": "4b7836c11c415890a7dd7c487cbd660990342946c720f8624ea4cb8430b208cc",
+    "trace_final_sha256": "c31f85f7003f426e3ccda72fc26a048f824897944faf8fe638aebda67ed9186c",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": true,
+      "final_grade_passed": true,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 4,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 1,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 3
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 3,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": true,
+        "delivered": true,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": true
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "FINAL_GRADE_PASS"
+  },
+  {
+    "trial_id": "data_transform-dev-000-e27fb62a-fault-r1-hierarchy_fixed",
+    "status": "PASS",
+    "audit": "PASS",
+    "success": true,
+    "fault_assigned": true,
+    "fault_triggered": true,
+    "fault_delivered": true,
+    "recovered": true,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 7,
+    "input_tokens": 15517,
+    "output_tokens": 1618,
+    "patch_actions": 6,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 6,
+    "actual_input_tokens": 14089,
+    "actual_output_tokens": 1309,
+    "elapsed_seconds": 17.56378655300003,
+    "wall_seconds": 13.977662928,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "0f3a9e8f870c99a7798b6cb55d3f4b5f81ae5c4893c6d19c6bebc669f6385490",
+    "final_environment_sha256": "4b7836c11c415890a7dd7c487cbd660990342946c720f8624ea4cb8430b208cc",
+    "trace_final_sha256": "d940c4bc4c1d37de7c90e780b78ae4ddb15de487080a23c4a8145f4f57b4cdd1",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": true,
+      "final_grade_passed": true,
+      "tree": {
+        "goal_count": 7,
+        "leaf_count": 3,
+        "max_depth_edges": 2,
+        "dependency_edges": 2,
+        "max_depth": 2,
+        "dependency_density": 0.6666666666666666
+      },
+      "trace": {
+        "checkpoint_events": 8,
+        "leaf_state_transitions": 9,
+        "milestone_state_transitions": 9,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 1,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 3
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 7,
+        "needed_decisions": 1,
+        "deferred_progress_decisions": 4
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 1,
+        "invalidated_goals": 2,
+        "reverified_goals": 2
+      },
+      "fault": {
+        "triggered": true,
+        "delivered": true,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": true
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "FINAL_GRADE_PASS"
+  },
+  {
+    "trial_id": "code_repair-dev-000-31c83a4f-normal-r1-hierarchy_adaptive",
+    "status": "FAIL",
+    "audit": "PASS",
+    "success": false,
+    "fault_assigned": false,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1196,
+    "output_tokens": 272,
+    "patch_actions": 0,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 0,
+    "actual_input_tokens": 0,
+    "actual_output_tokens": 0,
+    "elapsed_seconds": 2.798777161000004,
+    "wall_seconds": 0.0010818760000006478,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "802003e36dc57e205d1f52b7fb9adb9d7421816190fe819d6a685bf3ccbe2e35",
+    "final_environment_sha256": "d3049e1cb239ea1696ea49b8b691f5e108df77060432753d2c517115912a4942",
+    "trace_final_sha256": "4ab651e43f4537ec9755623d95f152c48d7e6eeeb1449b4811b0cd5f1d35bcc7",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": false,
+      "final_grade_passed": null,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 0,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 0
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 0,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "OTHER_RECORDED_DIAGNOSTIC"
+  },
+  {
+    "trial_id": "code_repair-dev-000-31c83a4f-normal-r1-hierarchy_fixed",
+    "status": "FAIL",
+    "audit": "PASS",
+    "success": false,
+    "fault_assigned": false,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1196,
+    "output_tokens": 272,
+    "patch_actions": 0,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 0,
+    "actual_input_tokens": 0,
+    "actual_output_tokens": 0,
+    "elapsed_seconds": 2.798777161000004,
+    "wall_seconds": 0.0009551910000027419,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "802003e36dc57e205d1f52b7fb9adb9d7421816190fe819d6a685bf3ccbe2e35",
+    "final_environment_sha256": "d3049e1cb239ea1696ea49b8b691f5e108df77060432753d2c517115912a4942",
+    "trace_final_sha256": "ef7c15bc31f658a416b6f424dedf82211c9ef6a6a8c0691302601a0eda9608f4",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": false,
+      "final_grade_passed": null,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 0,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 0
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 0,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "OTHER_RECORDED_DIAGNOSTIC"
+  },
+  {
+    "trial_id": "code_repair-dev-000-31c83a4f-normal-r1-flat_retry",
+    "status": "PASS",
+    "audit": "PASS",
+    "success": true,
+    "fault_assigned": false,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1112,
+    "output_tokens": 137,
+    "patch_actions": 1,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 1,
+    "actual_input_tokens": 1112,
+    "actual_output_tokens": 137,
+    "elapsed_seconds": 1.5816677219999917,
+    "wall_seconds": 1.585870172,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "65ce8859b3e84272f4977f085c7ac488e9b766e68a2e77280345ef3c39ec8b75",
+    "final_environment_sha256": "d3049e1cb239ea1696ea49b8b691f5e108df77060432753d2c517115912a4942",
+    "trace_final_sha256": "cbc7e3c4b798274fb3b3f4b0fd24761b20623dcaf2d1596788923ffb3f6ba75a",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": true,
+      "final_grade_passed": true,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 3,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 1
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 1,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "FINAL_GRADE_PASS"
+  },
+  {
+    "trial_id": "scheduling-dev-000-a0efc165-fault-r1-hierarchy_adaptive",
+    "status": "FAIL",
+    "audit": "PASS",
+    "success": false,
+    "fault_assigned": true,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1105,
+    "output_tokens": 472,
+    "patch_actions": 0,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 0,
+    "actual_input_tokens": 0,
+    "actual_output_tokens": 0,
+    "elapsed_seconds": 5.164242573000024,
+    "wall_seconds": 0.0008611629999961679,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "e0f4205898dad30e33ca6023358cbf82fc748b853562e32d7a4bdd743a84aad6",
+    "final_environment_sha256": "3644c83eb3769e6a0bd76f2d15faf1e0ea97d98d769b8b25ac673a21872d2ce8",
+    "trace_final_sha256": "9a1da59294c7ed7673fe3088d3cfd9f91838cf0dabeee5b3e1d8d321a5f2da44",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": false,
+      "final_grade_passed": null,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 0,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 0
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 0,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "OTHER_RECORDED_DIAGNOSTIC"
+  },
+  {
+    "trial_id": "scheduling-dev-000-a0efc165-fault-r1-hierarchy_fixed",
+    "status": "FAIL",
+    "audit": "PASS",
+    "success": false,
+    "fault_assigned": true,
+    "fault_triggered": false,
+    "fault_delivered": false,
+    "recovered": null,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 1,
+    "input_tokens": 1105,
+    "output_tokens": 472,
+    "patch_actions": 0,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 0,
+    "actual_input_tokens": 0,
+    "actual_output_tokens": 0,
+    "elapsed_seconds": 5.164242573000024,
+    "wall_seconds": 0.0007967029999917941,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "e0f4205898dad30e33ca6023358cbf82fc748b853562e32d7a4bdd743a84aad6",
+    "final_environment_sha256": "3644c83eb3769e6a0bd76f2d15faf1e0ea97d98d769b8b25ac673a21872d2ce8",
+    "trace_final_sha256": "1105812b9099c1b7bdff13f254af83e6721adf6c9e299a974895c86222b85d39",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": false,
+      "final_grade_passed": null,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 0,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 0,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 0
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 0,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": false,
+        "delivered": false,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": false
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "OTHER_RECORDED_DIAGNOSTIC"
+  },
+  {
+    "trial_id": "scheduling-dev-000-a0efc165-fault-r1-flat_retry",
+    "status": "PASS",
+    "audit": "PASS",
+    "success": true,
+    "fault_assigned": true,
+    "fault_triggered": true,
+    "fault_delivered": true,
+    "recovered": true,
+    "invariant_ok": true,
+    "protocol_ok": true,
+    "simulated": false,
+    "stop_batch": false,
+    "calls": 3,
+    "input_tokens": 3724,
+    "output_tokens": 927,
+    "patch_actions": 3,
+    "replans": 0,
+    "replan_attempts": 0,
+    "rejected_actions": 0,
+    "actual_calls": 3,
+    "actual_input_tokens": 3724,
+    "actual_output_tokens": 927,
+    "elapsed_seconds": 7.654093198000027,
+    "wall_seconds": 7.6622059530000115,
+    "backend": "openai",
+    "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+    "fault_kind": "environment",
+    "final_artifact_sha256": "57793a104adc55a4a82244125bc82ea6e9036c547ddd882f30cbdeba89bf8f33",
+    "final_environment_sha256": "5b482249624bf0770d1d1530cfe0ec0e6e29cd2159d57fbb30b58564ddb00708",
+    "trace_final_sha256": "27a8c6be0ea1d53e93523b105fa5ff22508c284818f3048db378eacf7b062d09",
+    "mechanism_evidence": {
+      "trace_replayed": true,
+      "root_preserved": true,
+      "final_grade_called": true,
+      "final_grade_passed": true,
+      "tree": {
+        "goal_count": 1,
+        "leaf_count": 0,
+        "max_depth_edges": 0,
+        "dependency_edges": 0,
+        "max_depth": 0,
+        "dependency_density": 0.0
+      },
+      "trace": {
+        "checkpoint_events": 5,
+        "leaf_state_transitions": 0,
+        "milestone_state_transitions": 0,
+        "accepted_replans_with_failure_evidence": 0,
+        "post_fault_target_replans": 0,
+        "failure_causes_recorded": 1,
+        "model_diagnoses_recorded": 0,
+        "root_state_transitions": 3
+      },
+      "root_changes": {
+        "explicit_edit_requests": 0,
+        "rejected_edit_requests": 0,
+        "actual_changes": 0
+      },
+      "replanning": {
+        "attempted": 0,
+        "accepted": 0,
+        "rejected": 0,
+        "unnecessary": 0,
+        "parent_preserved_events": 0,
+        "unrelated_goals_checked": 0,
+        "unrelated_goals_unchanged": 0,
+        "decision_events": 4,
+        "needed_decisions": 0,
+        "deferred_progress_decisions": 0
+      },
+      "execution_locality": {
+        "unrelated_artifact_fields_checked": 0,
+        "unrelated_artifact_fields_unchanged": 0,
+        "violations": 0,
+        "nonvacuous_events": 0
+      },
+      "dependencies": {
+        "invalidation_events": 0,
+        "invalidated_goals": 0,
+        "reverified_goals": 0
+      },
+      "fault": {
+        "triggered": true,
+        "delivered": true,
+        "no_impact": false,
+        "forced": false,
+        "domain_delivered": true
+      }
+    },
+    "observed_models": [
+      "gpt-6-luna"
+    ],
+    "omitted_model_identifiers": 0,
+    "diagnostic": "FINAL_GRADE_PASS"
+  }
+]
