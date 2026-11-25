@@ -58,7 +58,7 @@ def expand_wire(value):
 
 def _object(properties):
     return {"type": "object", "properties": properties,
-            "required": list(properties), "additionalProperties": False}
+            "required": sorted(properties), "additionalProperties": False}
 
 
 def response_format(role, payload):
@@ -69,10 +69,10 @@ def response_format(role, payload):
     root = payload.get("root_contract", {})
     hierarchy = root.get("hierarchy") if isinstance(root, dict) else None
     if isinstance(hierarchy, dict) and "gate_parents" in hierarchy:
-        schema = _object({"instructions": _object({gate: string for gate in gates})})
+        schema = _object({"instructions": _object({gate: string for gate in sorted(gates)})})
     else:
         leaf = _object({"id": string, "instruction": string,
-                        "checks": {"type": "array", "items": {"type": "string", "enum": list(gates)}},
+                        "checks": {"type": "array", "items": {"type": "string", "enum": sorted(gates)}},
                         "depends_on": {"type": "array", "items": string}})
         milestone = _object({"id": string, "title": string,
                              "subgoals": {"type": "array", "items": leaf}})

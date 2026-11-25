@@ -71,7 +71,7 @@ class StudyProfileIntegration(unittest.TestCase):
                         self.assertEqual(task.task_id, entry["task_id"])
                         self.assertEqual(digest(task.root_contract), entry["root_sha256"])
                         self.assertEqual(digest(task.public_spec()), entry["initial_public_spec_sha256"])
-                        self.assertEqual(entry["fault_kind"], "forced_subgoal" if profile in ("mechanism", "scale")
+                        self.assertEqual(entry["fault_kind"], "forced_subgoal" if profile in ("mechanism", "scale", "reliability")
                                          else "environment")
                         if "planned_tree" in entry:
                             self.assertEqual(entry["planned_tree"], task.topology_stats())

@@ -1,5 +1,9 @@
 # 実API実験の開始条件と永続保存
 
+## 現行改訂 v2.4（2026-11-26 JST）
+
+[9要件の再監査](method_reaudit_v2_4_ja.md)で、状態記録の欠落、送信スキーマの順序、公開レシートの不整合を修正した。reliabilityは12複合課題への強制サブゴール故障を各10反復し、mechanismと同じ予算を使う。R4は課題族別の修復成績を新しい有限基準で判定する。旧結果を混合しない。実API側の成功はオフライン検査とは別に確認する。
+
 ## v2.3の開始前確認（2026-11-25）
 
 - [全オフラインCI](https://github.com/Unjuno/hiergoal-lab/actions/runs/45628804840): success。全5プロファイルの模擬検証を含む。
@@ -31,4 +35,12 @@
 
 ## 変更範囲
 
-研究のモデル、比較条件、試行数、資源上限、採点、効果判定を変更しない。workflowのソースハッシュが変わるためmanifestは新規生成する。自動保存経路には専用のオフラインテストを追加。liveの開始と自動保存の実環境での成功は別途確認する必要がある。
+前回のv2.3自動保存追加ではモデル、比較条件、試行数、資源上限、採点、効果判定を変更しなかった。今回のv2.4では上記の反復試験と有限判定を明示的に改訂する。新しいソースハッシュを持つmanifestを生成し、旧実行を新基準で再ラベル付けしない。公開verifyはhashだけでなく、結果行から再計算した完了状態とsummary/CSVの一致も検査する。liveの開始と自動保存の実環境での成功は別途確認する必要がある。
+
+mechanism・scale・reliabilityの完全なrunディレクトリを取得後、次の一括監査で9要件を照合できる。実API呼出しは発生しない。
+
+```bash
+python -m hiergoal.study_suite --mechanism runs/method-mechanism --scale runs/method-scale --reliability runs/method-reliability --output runs/method-requirements
+```
+
+工程検査と実証判定はrequirements.jsonのengineering_decisionとempirical_decisionに分ける。完全な再生には生トレース・共有計画が必要であり、公開集計だけでは不足する。

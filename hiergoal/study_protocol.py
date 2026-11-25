@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 SCHEMA = "hiergoal.study.v2"
-PROTOCOL_REVISION = "v2.3"
+PROTOCOL_REVISION = "v2.4"
 ARMS = ("flat_retry", "hierarchy_fixed", "hierarchy_adaptive")
 FAMILIES = ("code_repair", "data_transform", "scheduling")
 CONDITIONS = ("normal", "fault")
@@ -33,8 +33,10 @@ SOURCE_FILES = (
     "hiergoal/study_protocol.py", "hiergoal/study_tasks.py", "hiergoal/study_api.py",
     "hiergoal/study_wire.py",
     "hiergoal/study.py", "hiergoal/study_analysis.py",
+    "hiergoal/study_suite.py",
     "hiergoal/study_planning.py", "hiergoal/study_scale.py", "hiergoal/study_mechanisms.py",
     "docs/method_study_ja.md", "docs/method_requirements_audit_ja.md",
+    "docs/method_reaudit_v2_4_ja.md",
     ".github/workflows/method-study.yml",
 )
 LIMITS = {
@@ -58,7 +60,7 @@ def make_trial_task(trial, seed=1729):
 
 def profile_limits(profile):
     limits = copy.deepcopy(LIMITS)
-    if profile == "mechanism":
+    if profile in ("mechanism", "reliability"):
         limits.update(max_calls=24, max_replans=4, max_output_tokens=4096,
                       max_total_tokens=128000, max_prompt_bytes=128000, trial_timeout_seconds=1800)
     if profile == "scale":
@@ -104,8 +106,8 @@ def build_manifest(profile="pilot", backend="openai", model="gpt-6-luna",
     for family in FAMILIES:
         for instance in range(instances):
             specification = {"family": family, "instance": instance, "split": split,
-                             "fault_kind": "forced_subgoal" if profile in ("mechanism", "scale") else "environment"}
-            if profile in ("mechanism", "scale"):
+                             "fault_kind": "forced_subgoal" if profile in ("mechanism", "scale", "reliability") else "environment"}
+            if profile in ("mechanism", "scale", "reliability"):
                 specification.update(scale=copy.deepcopy(SCALE_SETTINGS[instance] if profile == "scale" else SCALE_SETTINGS[0]),
                                      source_instance=0 if profile == "scale" else instance)
             task = make_trial_task(specification)
@@ -144,7 +146,11 @@ def build_manifest(profile="pilot", backend="openai", model="gpt-6-luna",
                          "scale": {"minimum_setting_success": 0.80, "maximum_paired_drop": 0.10,
                                    "baseline": {"size": "small", "depth": 3, "density": "sparse"},
                                    "stress": {"size": "large", "depth": 5, "density": "dense"}},
-                         "reliability": {"required_repeats": 10, "minimum_task_condition_success": 0.90}}},
+                         "reliability": {"required_repeats": 10, "minimum_task_condition_success": 0.90,
+                                         "recovery_rule": "forced_domain_target_revision_v1"},
+                         "applicability": {"minimum_family_recovery": 0.80,
+                                           "minimum_assigned_fault_trials_per_family": 6,
+                                           "required_fault_kind": "forced_subgoal"}}},
         "planning": "Shared once per task/repeat, blinded to condition; logically charged to each hierarchical arm.",
         "source_file_sha256": source_hashes(),
     }

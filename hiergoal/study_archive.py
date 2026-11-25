@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import io
 import json
 import math
 import re
@@ -32,6 +33,19 @@ HASH_FIELDS = ("final_artifact_sha256", "final_environment_sha256", "trace_final
 HOST_FIELDS = ("timestamp_utc", "git_commit", "working_tree_dirty", "python",
                "platform", "cpu", "cpu_clock_mhz_observed_range", "logical_cpus",
                "memory_bytes", "batch_size", "model_hardware")
+CSV_COLUMNS = ("trial_id", "family", "instance", "condition", "repeat", "arm",
+               "status", "success", "audit", "diagnostic", "fault_triggered",
+               "fault_delivered", "recovered", *COUNTS, "elapsed_seconds",
+               "wall_seconds", "invariant_ok", "protocol_ok", *HASH_FIELDS)
+
+
+def render_trials_csv(trials, results):
+    stream = io.StringIO(newline="")
+    writer = csv.DictWriter(stream, fieldnames=CSV_COLUMNS, extrasaction="ignore")
+    writer.writeheader()
+    for trial, record in zip(trials, results):
+        writer.writerow({**trial, **record})
+    return stream.getvalue()
 
 
 def require(condition, message):
@@ -197,15 +211,8 @@ def export_run(source, destination, *, profile, run_id, attempt, commit, live_ou
         save(destination / "results.json", results)
         save(destination / "summary.json", summary)
         (destination / "summary.md").write_text(render_markdown(summary), encoding="utf-8")
-        columns = ["trial_id", "family", "instance", "condition", "repeat", "arm",
-                   "status", "success", "audit", "diagnostic", "fault_triggered",
-                   "fault_delivered", "recovered", *COUNTS, "elapsed_seconds",
-                   "wall_seconds", "invariant_ok", "protocol_ok", *HASH_FIELDS]
         with (destination / "trials.csv").open("w", encoding="utf-8", newline="") as stream:
-            writer = csv.DictWriter(stream, fieldnames=columns, extrasaction="ignore")
-            writer.writeheader()
-            for trial, record in zip(trials, results):
-                writer.writerow({**trial, **record})
+            stream.write(render_trials_csv(trials, results))
         if (source / "execution.json").is_file():
             execution = read_json(source / "execution.json")
             require(execution.get("protocol_id") == manifest["protocol_id"]
@@ -235,28 +242,80 @@ def ident_for_verify(ident):
 
 
 def verify(destination, *, profile, run_id, attempt, commit):
+    """Verify cross-file consistency; checksums alone do not authenticate evidence.
+
+    The trusted workflow must still run the trace replayer before export. This
+    second job checks the frozen source identity and recomputes all public
+    decisions, so a receipt or rendered summary cannot override its result rows.
+    """
     ident = identity(profile, run_id, attempt, commit)
     receipt = read_json(destination / RECEIPT)
-    require(receipt.get("schema") == "hiergoal.publication.v1"
+    require(isinstance(receipt, dict) and receipt.get("schema") == "hiergoal.publication.v1"
             and all(receipt.get(k) == v for k, v in ident.items()), "Publication identity mismatch")
+    require(receipt.get("live_step") in STEP_OUTCOMES
+            and receipt.get("collection_step") in STEP_OUTCOMES, "Invalid publication step outcome")
+    require(type(receipt.get("complete_audited_execution")) is bool, "Invalid completion flag")
     files = receipt.get("files")
     require(isinstance(files, dict) and set(files).issubset(DATA_FILES), "Unexpected publication file")
+    require(all(isinstance(sha, str) and re.fullmatch(r"[0-9a-f]{64}", sha)
+                for sha in files.values()), "Invalid publication checksum")
     paths = list(destination.iterdir())
     require({p.name for p in paths} == {RECEIPT, *files}
             and all(p.is_file() and not p.is_symlink() for p in paths), "Unexpected archive contents")
     require(all(file_hash(destination / name) == sha for name, sha in files.items()), "Publication checksum mismatch")
     if receipt.get("state") == "COLLECTED":
+        require(receipt["collection_step"] == "success", "Collected publication requires successful collection")
         require(DATA_FILES - {"execution.json"} <= set(files), "Missing public result files")
         manifest = read_json(destination / "manifest.json")
+        validate_manifest(manifest)
         results = read_json(destination / "results.json")
         require(manifest["profile"] == profile and manifest["backend"] == "openai"
-                and manifest["protocol_id"] == receipt["protocol_id"], "Publication manifest mismatch")
+                and manifest["protocol_id"] == receipt.get("protocol_id")
+                and manifest.get("protocol_revision") == receipt.get("protocol_revision"),
+                "Publication manifest mismatch")
+        host = read_json(destination / "host.json")
+        require(isinstance(host, dict) and set(host).issubset(HOST_FIELDS)
+                and host.get("git_commit") == commit and host.get("working_tree_dirty") is False,
+                "Publication source not clean or mismatched")
+        require(isinstance(results, list) and all(isinstance(record, dict) for record in results),
+                "Invalid public result rows")
+        require(type(receipt.get("scheduled_trials")) is int and receipt["scheduled_trials"] > 0,
+                "Invalid scheduled trial count")
         require(len(results) == len(manifest["trials"]) == receipt["scheduled_trials"], "Publication coverage mismatch")
-        require(all(r["trial_id"] == t["trial_id"] for r, t in zip(results, manifest["trials"])), "Publication assignment mismatch")
+        for record, trial in zip(results, manifest["trials"]):
+            # Validate result types, hashes and source/fault identity using the
+            # same projection boundary as export, without changing the rows.
+            public_result(record, trial, manifest)
         counts = Counter(r["status"] for r in results)
-        require(receipt["outcomes"] == {k: counts[k] for k in sorted(STATUS)}, "Publication outcome mismatch")
+        outcomes = receipt.get("outcomes")
+        require(isinstance(outcomes, dict) and set(outcomes) == STATUS
+                and all(type(value) is int and value >= 0 for value in outcomes.values())
+                and outcomes == {k: counts[k] for k in sorted(STATUS)}, "Publication outcome mismatch")
+        complete = all(r["status"] in ("PASS", "FAIL") and r["audit"] == "PASS" for r in results)
+        require(receipt["complete_audited_execution"] is complete, "Publication completion mismatch")
+        summary = analyze({**manifest, "execution_context": host}, results)
+        require(canonical(read_json(destination / "summary.json")) == canonical(summary),
+                "Publication analysis mismatch")
+        require((destination / "summary.md").read_text(encoding="utf-8") == render_markdown(summary),
+                "Publication rendered analysis mismatch")
+        with (destination / "trials.csv").open(encoding="utf-8", newline="") as stream:
+            require(stream.read() == render_trials_csv(manifest["trials"], results),
+                    "Publication trial table mismatch")
+        if "execution.json" in files:
+            execution = read_json(destination / "execution.json")
+            require(isinstance(execution, dict) and execution.get("protocol_id") == manifest["protocol_id"]
+                    and execution.get("backend") == "openai", "Execution provenance mismatch")
+            require(execution.get("status") in ("RUNNING", "STOPPED", "COMPLETED"), "Invalid execution state")
+            count = scalar(execution.get("completed"), "int")
+            require(count is not None and count <= len(results)
+                    and (execution["status"] != "COMPLETED" or count == len(results)),
+                    "Invalid execution count")
     else:
-        require(receipt.get("state") == "NO_COLLECTED_RESULTS" and not files, "Invalid receipt-only publication")
+        require(receipt.get("state") == "NO_COLLECTED_RESULTS" and not files
+                and receipt["complete_audited_execution"] is False
+                and receipt.get("scheduled_trials") is None and receipt.get("outcomes") is None
+                and receipt.get("protocol_id") is None and receipt.get("protocol_revision") is None,
+                "Invalid receipt-only publication")
     return receipt
 
 

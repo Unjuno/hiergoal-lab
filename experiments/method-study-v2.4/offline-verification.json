@@ -1,0 +1,342 @@
+{
+  "schema": "hiergoal.offline_verification.v2.4",
+  "recorded_at_utc": "2026-11-25T16:17:25.631258+00:00",
+  "baseline_commit": "2ef7b4f9f70d9f609f297eb65f205025ff9262b0",
+  "protocol_revision": "v2.4",
+  "source_file_sha256": {
+    "hiergoal/study_protocol.py": "cef08ba17a39037c3018e85f37c0aa3c64779a4cd3f9e52d6d04e1c590600ca6",
+    "hiergoal/study_tasks.py": "298022f469ac5e05d30a8f58a81406eaeaf93ae5590c36666e9fd55b0adb8e8b",
+    "hiergoal/study_api.py": "df1d3381d6239ad1d3db3737ba60e3680155de84edf2092291753dc3bc527110",
+    "hiergoal/study_wire.py": "da871b45f48b5372fe16e63bd2fe70bf35f9fb26a0a1ab418ee61e330aa88330",
+    "hiergoal/study.py": "694ccc598501b1bb4c3333222a4954173433a2236e83e1f20cad7cf002d40f2c",
+    "hiergoal/study_analysis.py": "7a8bda6a802b7010851b6f8db0a4269f5896d7c54e69650594121bfff3558eb9",
+    "hiergoal/study_suite.py": "7303af96b22d70f0326490b8c9d968cdd60cee87a3bfb39ce549e0bfee33852c",
+    "hiergoal/study_planning.py": "ff0ecf6e25a253561b814a23e27ece24b9d2490c2e72d2a96625b8c797bb8237",
+    "hiergoal/study_scale.py": "a5ba2ef203dc1dd42bc7d04d5c9d694a5e4fa8c4813b03acc1dac8fcd7f62714",
+    "hiergoal/study_mechanisms.py": "c49fb65c2334f2041fd2afe31f934aad35fc00748a470c630bf91701c96b0558",
+    "docs/method_study_ja.md": "2f32ddc01eee362bdf42864c637278878227924318265e0761ff5ad72fd1aa00",
+    "docs/method_requirements_audit_ja.md": "c17c7eaaa698fa9d4cdc224daf0d7688e5a5309311cb55fa187ab3dcd729877a",
+    "docs/method_reaudit_v2_4_ja.md": "2c469c077b3b7a64d542ffd965a8c5bdd5b9f65c5b05f0ef214942662de58c95",
+    ".github/workflows/method-study.yml": "e7a11039f4ddbe0d3f20c184b6862eacf3a9f44fb6a246c96591c4edc8189bd6"
+  },
+  "environment": {
+    "timestamp_utc": "2026-11-25T16:17:25.629458+00:00",
+    "git_commit": null,
+    "working_tree_dirty": null,
+    "python": "3.12.14",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpu_clock_mhz_observed_range": [
+      2300.0,
+      2300.0
+    ],
+    "logical_cpus": 9,
+    "memory_bytes": 10451423232,
+    "batch_size": 1,
+    "model_hardware": "Provider-managed; not observable",
+    "source_context": "API-materialized source snapshot based on 2ef7b4f9f70d9f609f297eb65f205025ff9262b0; exact source hashes below"
+  },
+  "unit_tests": {
+    "command": "python -m unittest discover -s tests -q",
+    "tests": 275,
+    "status": "PASS",
+    "output": "offline-unit-tests.txt"
+  },
+  "syntax_checks": {
+    "bash_scripts": "PASS",
+    "workflow_yaml": "PASS"
+  },
+  "profiles": {
+    "pilot": {
+      "protocol_id": "04a8569dbb0b70703079dcd2daa2a6d022846c29335bce2cc0caeb817fb9ed07",
+      "tasks": 3,
+      "scheduled": 18,
+      "outcomes": {
+        "PASS": 18,
+        "FAIL": 0,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "audit_pass": 18,
+      "actual_api_calls": 0,
+      "simulated": true,
+      "engineering": {
+        "R1": "UNCERTAIN",
+        "R2": "PASS",
+        "R3": "PASS",
+        "R4": "PASS",
+        "R5": "UNCERTAIN",
+        "R6": "PASS",
+        "R7": "PASS",
+        "R8": "UNCERTAIN",
+        "R9": "UNCERTAIN"
+      },
+      "empirical": {
+        "R1": "UNCERTAIN",
+        "R2": "UNCERTAIN",
+        "R3": "UNCERTAIN",
+        "R4": "UNCERTAIN",
+        "R5": "UNCERTAIN",
+        "R6": "UNCERTAIN",
+        "R7": "UNCERTAIN",
+        "R8": "UNCERTAIN",
+        "R9": "UNCERTAIN"
+      },
+      "summary_sha256": "7ddcbc9a5827f479599577e10880c6749939e5f490ed15aeff5405acc980c7b5",
+      "results_sha256": "917b7f13373471ba1fd3018f4c0282a10ecd351136931de53cb09cfc56c4e2a5"
+    },
+    "study": {
+      "protocol_id": "39fea964f1ce00225fdba06d61e8c593ec1b0fad995246bf363603c510d668d3",
+      "tasks": 12,
+      "scheduled": 216,
+      "outcomes": {
+        "PASS": 216,
+        "FAIL": 0,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "audit_pass": 216,
+      "actual_api_calls": 0,
+      "simulated": true,
+      "engineering": {
+        "R1": "UNCERTAIN",
+        "R2": "PASS",
+        "R3": "PASS",
+        "R4": "PASS",
+        "R5": "UNCERTAIN",
+        "R6": "PASS",
+        "R7": "PASS",
+        "R8": "UNCERTAIN",
+        "R9": "PASS"
+      },
+      "empirical": {
+        "R1": "UNCERTAIN",
+        "R2": "UNCERTAIN",
+        "R3": "UNCERTAIN",
+        "R4": "UNCERTAIN",
+        "R5": "UNCERTAIN",
+        "R6": "UNCERTAIN",
+        "R7": "UNCERTAIN",
+        "R8": "UNCERTAIN",
+        "R9": "UNCERTAIN"
+      },
+      "summary_sha256": "365edd0c543ff3ad9448fc2ec11c4a4ffc5166de3e931da1fb35f43b6f2a8619",
+      "results_sha256": "5774bec5d070fde2ba4ca4db888239f07a9090cdd8501dc954e84558777251ac"
+    },
+    "mechanism": {
+      "protocol_id": "c5aaca7840081e5e32a966e5cbfe45a86545af4fe61fe36dd9a0cebbc1c6d59c",
+      "tasks": 6,
+      "scheduled": 108,
+      "outcomes": {
+        "PASS": 108,
+        "FAIL": 0,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "audit_pass": 108,
+      "actual_api_calls": 0,
+      "simulated": true,
+      "engineering": {
+        "R1": "PASS",
+        "R2": "PASS",
+        "R3": "PASS",
+        "R4": "PASS",
+        "R5": "PASS",
+        "R6": "PASS",
+        "R7": "PASS",
+        "R8": "UNCERTAIN",
+        "R9": "PASS"
+      },
+      "empirical": {
+        "R1": "UNCERTAIN",
+        "R2": "UNCERTAIN",
+        "R3": "UNCERTAIN",
+        "R4": "UNCERTAIN",
+        "R5": "UNCERTAIN",
+        "R6": "UNCERTAIN",
+        "R7": "UNCERTAIN",
+        "R8": "UNCERTAIN",
+        "R9": "UNCERTAIN"
+      },
+      "summary_sha256": "6f69a38546cf78d0d371430fcea9097c23204fd81df3a60f09729719536fcd03",
+      "results_sha256": "ab302afb09933981b5421c99b326bfbda77fa449b276aa4ab41c25c7d045a23e"
+    },
+    "scale": {
+      "protocol_id": "1449bd391f610932a36fde49cb8d2218733655687f54ba430eb498be50761f8b",
+      "tasks": 21,
+      "scheduled": 252,
+      "outcomes": {
+        "PASS": 252,
+        "FAIL": 0,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "audit_pass": 252,
+      "actual_api_calls": 0,
+      "simulated": true,
+      "engineering": {
+        "R1": "PASS",
+        "R2": "PASS",
+        "R3": "PASS",
+        "R4": "PASS",
+        "R5": "PASS",
+        "R6": "PASS",
+        "R7": "PASS",
+        "R8": "PASS",
+        "R9": "UNCERTAIN"
+      },
+      "empirical": {
+        "R1": "UNCERTAIN",
+        "R2": "UNCERTAIN",
+        "R3": "UNCERTAIN",
+        "R4": "UNCERTAIN",
+        "R5": "UNCERTAIN",
+        "R6": "UNCERTAIN",
+        "R7": "UNCERTAIN",
+        "R8": "UNCERTAIN",
+        "R9": "UNCERTAIN"
+      },
+      "summary_sha256": "48e0502ec7070f47130d92224f9e3aacfedcfc203a18cc60e921d9183a9a0a88",
+      "results_sha256": "3af414f16f32b222d08f87190e9de9670906713837f3a976defbef94b6e57dd1"
+    },
+    "reliability": {
+      "protocol_id": "197d43c5569c6621fb4e700311f081a5eac57f82515d665c531b9347745de360",
+      "tasks": 12,
+      "scheduled": 720,
+      "outcomes": {
+        "PASS": 720,
+        "FAIL": 0,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "audit_pass": 720,
+      "actual_api_calls": 0,
+      "simulated": true,
+      "engineering": {
+        "R1": "PASS",
+        "R2": "PASS",
+        "R3": "PASS",
+        "R4": "PASS",
+        "R5": "PASS",
+        "R6": "PASS",
+        "R7": "PASS",
+        "R8": "UNCERTAIN",
+        "R9": "PASS"
+      },
+      "empirical": {
+        "R1": "UNCERTAIN",
+        "R2": "UNCERTAIN",
+        "R3": "UNCERTAIN",
+        "R4": "UNCERTAIN",
+        "R5": "UNCERTAIN",
+        "R6": "UNCERTAIN",
+        "R7": "UNCERTAIN",
+        "R8": "UNCERTAIN",
+        "R9": "UNCERTAIN"
+      },
+      "summary_sha256": "107418befcd3da69adc2c54803a035294cb55a46727b1bc278a6d916c9d21068",
+      "results_sha256": "7d0cfc625c114abdbe9d99f231efd390c2ecf08a1d6f2c598832427def817891"
+    }
+  },
+  "total_simulated_trials": 1314,
+  "actual_api_calls": 0,
+  "requirement_suite": {
+    "engineering_decision": "PASS",
+    "empirical_decision": "UNCERTAIN",
+    "criteria": [
+      {
+        "id": "R1",
+        "profiles": [
+          "mechanism",
+          "reliability"
+        ],
+        "engineering_status": "PASS",
+        "empirical_status": "UNCERTAIN"
+      },
+      {
+        "id": "R2",
+        "profiles": [
+          "mechanism",
+          "scale",
+          "reliability"
+        ],
+        "engineering_status": "PASS",
+        "empirical_status": "UNCERTAIN"
+      },
+      {
+        "id": "R3",
+        "profiles": [
+          "mechanism",
+          "scale",
+          "reliability"
+        ],
+        "engineering_status": "PASS",
+        "empirical_status": "UNCERTAIN"
+      },
+      {
+        "id": "R4",
+        "profiles": [
+          "mechanism",
+          "scale",
+          "reliability"
+        ],
+        "engineering_status": "PASS",
+        "empirical_status": "UNCERTAIN"
+      },
+      {
+        "id": "R5",
+        "profiles": [
+          "mechanism",
+          "scale",
+          "reliability"
+        ],
+        "engineering_status": "PASS",
+        "empirical_status": "UNCERTAIN"
+      },
+      {
+        "id": "R6",
+        "profiles": [
+          "mechanism",
+          "scale",
+          "reliability"
+        ],
+        "engineering_status": "PASS",
+        "empirical_status": "UNCERTAIN"
+      },
+      {
+        "id": "R7",
+        "profiles": [
+          "mechanism",
+          "scale",
+          "reliability"
+        ],
+        "engineering_status": "PASS",
+        "empirical_status": "UNCERTAIN"
+      },
+      {
+        "id": "R8",
+        "profiles": [
+          "scale"
+        ],
+        "engineering_status": "PASS",
+        "empirical_status": "UNCERTAIN"
+      },
+      {
+        "id": "R9",
+        "profiles": [
+          "reliability"
+        ],
+        "engineering_status": "PASS",
+        "empirical_status": "UNCERTAIN"
+      }
+    ],
+    "input_issues": [],
+    "report": "requirements.json"
+  },
+  "limitations": [
+    "Offline oracle and fake HTTP fixtures are apparatus tests, not empirical model evidence.",
+    "The local snapshot has no git working tree; source identity is the explicit baseline plus file hashes.",
+    "No live v2.4 inference or publication job was run by this verification.",
+    "R4 and R9 finite criteria and v2.4 reliability intervention differ explicitly from v2.3; historical records were untouched."
+  ]
+}

@@ -11,7 +11,7 @@ The new method study compares `flat_retry`, `hierarchy_fixed`, and `hierarchy_ad
 with the same model, public feedback, artifact tools, and resource ceilings. Fixed and
 adaptive hierarchies share their initial plan. Persistent environment updates and
 forced substantive subgoal faults test recovery; withheld final grading and
-semantic trace replay determine success. The v2.1 audit covers all nine requested
+semantic trace replay determine success. The v2.4 audit covers all nine requested
 requirements, including nonempty unrelated branches, bounded replanning, scaling,
 and repeated outcomes.
 
@@ -21,7 +21,7 @@ and repeated outcomes.
 | `study` | 12 heldout tasks, four per family | normal / fault | 3 | 3 | 216 |
 | `mechanism` | 6 composed tasks with independent branches | normal / forced subgoal fault | 3 | 3 | 108 |
 | `scale` | 3 families × 7 prescribed configurations | normal / forced subgoal fault | 3 | 2 | 252 |
-| `reliability` | The same 12 heldout tasks as `study` | normal / fault | 3 | 10 | 720 |
+| `reliability` | 12 composed tasks with independent branches | normal / forced subgoal fault | 3 | 10 | 720 |
 
 The task families are bounded code-expression repair, data transformation, and
 resource scheduling. These are controlled synthetic tasks, not a general autonomy
@@ -34,7 +34,9 @@ The scale profile reaches **73 total goals, 48 leaves, 5 hierarchy levels, and
 isolate depth while holding leaf count fixed. Repeated calls and scaled variants
 do not become independent task samples.
 
-**Readiness:** all 242 offline regression tests and 1,314 oracle-driven
+**Current v2.4 verification:** 275 offline tests and all 1,314 simulated trajectories passed; the combined reviewer reports all nine engineering criteria PASS and all nine empirical criteria UNCERTAIN. See [the reproducible verification record](experiments/method-study-v2.4/offline-verification.json) and [the nine-requirement report](experiments/method-study-v2.4/requirements.md). No live model performance is implied.
+
+**Historical v2.1 readiness:** all 242 offline regression tests and 1,314 oracle-driven
 trajectories across all five profiles passed local verification and semantic
 replay. The no-key workflow repeats these checks. See the verification record
 below for conditions and evidence. Oracle results are software checks, not model-performance measurements.
@@ -66,7 +68,10 @@ See the [Japanese research protocol and commands](docs/method_study_ja.md),
 [v2.1 follow-up audit and regression evidence](docs/method_reaudit_v2_1_ja.md),
 [completed readiness checks](docs/method_study_readiness_ja.md), and
 [frozen v2.1 study manifest](experiments/method-study-v2.1/study-manifest.json).
-The previous v1 and v2 manifests are historical and cannot be run against changed
+See the [v2.4 all-nine audit, repaired blockers, and finite criteria](docs/method_reaudit_v2_4_ja.md).
+The suite reviewer replays mechanism, scale, and reliability together; oracle outputs remain empirical UNCERTAIN.
+
+The previous v1 through v2.3 manifests are historical and cannot be run against changed
 newer sources; prepare a new output directory instead of reusing old traces.
 
 ## Earlier Hermes integration experiment

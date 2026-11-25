@@ -42,6 +42,7 @@ SCALE_FACTOR_CELLS = (
 )
 STATUSES = ("PASS", "FAIL", "UNCERTAIN", "NOT_RUN")
 COMPARATORS = ("hierarchy_fixed", "flat_retry")
+RECOVERY_RULE = "forced_domain_target_revision_v1"
 ASSIGNMENT_FIELDS = (
     "block_id", "task_id", "family", "split", "instance", "condition", "arm", "repeat",
     "scale", "source_instance", "fault_kind", "planned_tree",
@@ -151,6 +152,26 @@ def _finite_settings(value: Any) -> dict | None:
         raise AnalysisError("Finite scale baseline and stress settings must differ")
     output["reliability"]["required_repeats"] = _integer(value["reliability"].get("required_repeats"),
         "finite_diagnostics.reliability.required_repeats", minimum=2)
+    # The explicit rule is absent from historical v2.3 manifests. Their finite
+    # final-acceptance calculation must not be silently reinterpreted as repair.
+    if "recovery_rule" in value["reliability"]:
+        if value["reliability"]["recovery_rule"] != RECOVERY_RULE:
+            raise AnalysisError("Unknown finite reliability recovery_rule")
+        output["reliability"]["recovery_rule"] = RECOVERY_RULE
+    if "applicability" in value:
+        config = value["applicability"]
+        if not isinstance(config, dict) or config.get("required_fault_kind") != "forced_subgoal":
+            raise AnalysisError("Finite applicability requires forced_subgoal faults")
+        proportion = _number(config.get("minimum_family_recovery"), "minimum_family_recovery")
+        if proportion > 1:
+            raise AnalysisError("minimum_family_recovery must be <= 1")
+        output["applicability"] = {
+            "minimum_family_recovery": proportion,
+            "minimum_assigned_fault_trials_per_family": _integer(
+                config.get("minimum_assigned_fault_trials_per_family"),
+                "minimum_assigned_fault_trials_per_family", minimum=1),
+            "required_fault_kind": "forced_subgoal",
+        }
     return output
 
 
@@ -901,10 +922,87 @@ def _scale_resilience(manifest: dict, rows: list[dict], issues: list[dict], sett
     }
 
 
+def _forced_recovery_outcome(row: dict) -> int | None:
+    """Count the complete R1 chain; keep assigned early failures in its denominator.
+
+    A verified final failure cannot be a successful recovery, even if it never
+    reaches the fault. A final success needs a delivered forced domain failure
+    and an accepted revision of that target. Missing receipts are not failures.
+    """
+    if row["outcome"] is None or not _replayed(row):
+        return None
+    if row["outcome"] == 0:
+        return 0
+    if row.get("fault_kind") != "forced_subgoal":
+        return None
+    delivered = (row["fault_delivered"], _evidence_value(row, "fault", "forced"),
+                 _evidence_value(row, "fault", "domain_delivered"))
+    target_replans = _evidence_value(row, "trace", "post_fault_target_replans")
+    if any(value is not True for value in delivered) or target_replans is None:
+        return None
+    return int(row["recovered"] is True and target_replans > 0
+               and _independent_grade_receipt_valid(row))
+
+
+def _family_applicability(manifest: dict, rows: list[dict], issues: list[dict], settings: dict) -> dict | None:
+    """A new, explicitly frozen finite family rule; no retroactive v2.3 claim."""
+    config = (settings.get("finite_diagnostics") or {}).get("applicability")
+    if config is None:
+        return None
+    blockers = _finite_blockers(manifest, rows, issues, manifest["profile"], config)
+    selected = [row for row in rows if row["arm"] == "hierarchy_adaptive" and row["condition"] == "fault"]
+    if not selected or any(row.get("fault_kind") != config["required_fault_kind"] for row in selected):
+        blockers.append("requires_assigned_forced_subgoal_faults")
+    if {row["family"] for row in selected} != set(FAMILIES):
+        blockers.append("requires_three_declared_task_families")
+    table = []
+    for family in FAMILIES:
+        members = [row for row in selected if row["family"] == family]
+        outcomes = [_forced_recovery_outcome(row) for row in members]
+        observed = sum(value is not None for value in outcomes)
+        successes = sum(value == 1 for value in outcomes)
+        sufficient = len(members) >= config["minimum_assigned_fault_trials_per_family"]
+        complete = bool(members) and observed == len(members)
+        proportion = Fraction(successes, len(members)) if complete else None
+        if not sufficient:
+            blockers.append("insufficient_assigned_fault_trials_per_family")
+        if not complete:
+            blockers.append("missing_forced_domain_recovery_evidence")
+        table.append({
+            "family": family, "scheduled": len(members), "observed": observed,
+            "successful_recoveries": successes,
+            "final_acceptance_successes": sum(row["outcome"] == 1 for row in members),
+            "recovery_rate": float(proportion) if proportion is not None else None,
+            "meets_minimum": (proportion >= Fraction(str(config["minimum_family_recovery"]))
+                              if proportion is not None and sufficient else None),
+        })
+    violations = sum(_evidence_value(row, "root_preserved") is False or row["protocol_ok"] is False for row in rows)
+    criteria = {
+        "every_family_meets_recovery_threshold": (all(item["meets_minimum"] for item in table)
+            if all(item["meets_minimum"] is not None for item in table) else None),
+        "zero_root_protocol_violations": violations == 0,
+    }
+    blockers = sorted(set(blockers))
+    return {
+        "decision": _finite_decision(blockers, criteria), "eligible": not blockers,
+        "eligibility_blockers": blockers, "thresholds": config, "criteria": criteria,
+        "scope": "finite_three_family_forced_target_revision_recovery_not_generalization",
+        "recovery_rule": RECOVERY_RULE, "by_family": table,
+        "scientific_sufficiency_status": "UNCERTAIN",
+        "limitations": [
+            "Each named family must meet the frozen threshold; a pooled score cannot conceal a failed family.",
+            "Early failures remain in the assigned denominator. Final artifact success without a target revision is not successful mechanism recovery.",
+            "The proportion threshold and minimum assigned count are finite design choices, not power or population-generalization guarantees.",
+            "Source tasks can be shared across profiles; their results must not be pooled as independent replications.",
+        ],
+    }
+
+
 def _finite_repeatability(manifest: dict, rows: list[dict], issues: list[dict], settings: dict) -> dict:
     config = (settings.get("finite_diagnostics") or {}).get("reliability")
     blockers = _finite_blockers(manifest, rows, issues, "reliability", config)
     required = config["required_repeats"] if config is not None else None
+    recovery_rule = config.get("recovery_rule") if config is not None else None
     groups = defaultdict(list)
     for row in rows:
         if row["arm"] == "hierarchy_adaptive":
@@ -912,17 +1010,29 @@ def _finite_repeatability(manifest: dict, rows: list[dict], issues: list[dict], 
     family_tasks = {family: {key[1] for key in groups if key[0] == family} for family in FAMILIES}
     valid_shape = (required is not None and len(rows) == 12 * 2 * 3 * required and len(groups) == 24
                    and all(len(tasks) == 4 for tasks in family_tasks.values()))
+    if recovery_rule and any(row.get("fault_kind") != "forced_subgoal" for row in rows if row["condition"] == "fault"):
+        blockers.append("requires_assigned_forced_subgoal_faults")
     table = []
     for (family, task_id, condition), members in sorted(groups.items()):
         valid_shape = valid_shape and len(members) == required and {row["repeat"] for row in members} == set(range(1, required + 1))
-        observed = sum(row["outcome"] is not None for row in members)
-        successes = sum(row["outcome"] == 1 for row in members)
+        outcomes = [(_forced_recovery_outcome(row) if recovery_rule and condition == "fault" else row["outcome"])
+                    for row in members]
+        observed = sum(value is not None for value in outcomes)
+        successes = sum(value == 1 for value in outcomes)
+        if recovery_rule and condition == "fault" and any(
+                value is None and row["outcome"] is not None for value, row in zip(outcomes, members)):
+            blockers.append("missing_forced_domain_recovery_evidence")
         proportion = Fraction(successes, len(members)) if required is not None and len(members) == observed == required else None
         table.append({"family": family, "task_id": task_id, "condition": condition,
                       "scheduled": len(members), "observed": observed, "successes": successes,
                       "success_rate": float(proportion) if proportion is not None else None,
                       "meets_minimum": (proportion >= Fraction(str(config["minimum_task_condition_success"]))
                                         if proportion is not None and config else None)})
+        if recovery_rule:
+            table[-1].update(
+                outcome_metric="forced_domain_target_revision_recovery" if condition == "fault" else "final_acceptance",
+                final_acceptance_successes=sum(row["outcome"] == 1 for row in members),
+                final_outcomes_observed=sum(row["outcome"] is not None for row in members))
     if not valid_shape:
         blockers.append("requires_twelve_tasks_both_conditions_and_declared_repeat_count")
     violations = sum(_evidence_value(row, "root_preserved") is False or row["protocol_ok"] is False for row in rows)
@@ -932,7 +1042,7 @@ def _finite_repeatability(manifest: dict, rows: list[dict], issues: list[dict], 
         "zero_root_protocol_violations": violations == 0,
     }
     blockers = sorted(set(blockers))
-    return {
+    result = {
         "decision": _finite_decision(blockers, criteria), "eligible": not blockers, "eligibility_blockers": blockers,
         "scope": "prespecified_finite_adaptive_repeatability_benchmark_not_population_stability_or_power",
         "thresholds": config, "criteria": criteria, "by_task_condition": table,
@@ -945,10 +1055,19 @@ def _finite_repeatability(manifest: dict, rows: list[dict], issues: list[dict], 
             "No independence assumption, confidence interval, adequate-power claim, or general sample-sufficiency decision is introduced.",
         ],
     }
+    if recovery_rule:
+        result.update(
+            scope="prespecified_finite_adaptive_forced_recovery_repeatability_not_population_stability_or_power",
+            recovery_rule=recovery_rule)
+        result["limitations"].extend([
+            "Fault cells count final PASS only after a delivered forced domain failure and an accepted post-fault revision of that target. Normal cells count final acceptance.",
+            "Final artifact success with zero target revisions counts as zero mechanism recoveries. Missing or invalid delivery/revision receipts prevent a positive decision.",
+        ])
+    return result
 
 
 def _requirement_evidence(manifest: dict, rows: list[dict], issues: list[dict],
-                          repeats: dict, scale: dict) -> dict:
+                          repeats: dict, scale: dict, applicability: dict | None = None) -> dict:
     """Nine explicitly scoped evidence rules, never a replacement efficacy test.
 
     Positive mechanism claims require the replay receipt, not a self-reported
@@ -1009,7 +1128,8 @@ def _requirement_evidence(manifest: dict, rows: list[dict], issues: list[dict],
          "Observed recovery demonstrates a finite trace; it does not establish comparative efficacy or uniform reliability."],
         empirical_required=True)
 
-    trace_measured = [row for row in hierarchy if _replayed(row)
+    trace_measured = [row for row in hierarchy if _replayed(row) and row["protocol_ok"] is True
+                      and row["outcome"] is not None
                       and (_evidence_value(row, "tree", "goal_count") or 0) > 0
                       and (_evidence_value(row, "tree", "max_depth_edges") or 0) >= 2
                       and (_evidence_value(row, "trace", "checkpoint_events") or 0) > 0]
@@ -1047,14 +1167,24 @@ def _requirement_evidence(manifest: dict, rows: list[dict], issues: list[dict],
     complete = [row for row in replayed if row["outcome"] is not None]
     observed_families = {row["family"] for row in complete}
     diversity = _coverage_status(len(rows), len(complete), exercised=set(FAMILIES).issubset(observed_families))
+    diversity_evidence = {"scheduled_families": sorted({row["family"] for row in rows}), "observed_families": sorted(observed_families),
+        "task_clusters": len({row["task_id"] for row in rows}), "observed_trials": len(complete),
+        "clusters_per_family": {family: len({row["task_id"] for row in rows if row["family"] == family})
+                                for family in sorted({row["family"] for row in rows})}}
+    if applicability is not None:
+        diversity_evidence["finite_applicability"] = applicability
     add("R4", "diverse_tasks", "Observed coverage across different task families", diversity,
         "Complete replayed outcomes across all three declared synthetic task families; failures remain in coverage.",
-        {"scheduled_families": sorted({row["family"] for row in rows}), "observed_families": sorted(observed_families),
-         "task_clusters": len({row["task_id"] for row in rows}), "observed_trials": len(complete),
-         "clusters_per_family": {family: len({row["task_id"] for row in rows if row["family"] == family})
-                                 for family in sorted({row["family"] for row in rows})}},
+        diversity_evidence,
         ["Coverage includes unsuccessful trials and is not a success claim.",
-         "Three selected synthetic families do not establish broad real-world task generalization."], empirical_required=True)
+         "Three selected synthetic families do not establish broad real-world task generalization."],
+        empirical_required=True, finite=applicability)
+    if applicability is not None:
+        criteria[-1]["title"] = "Task-family coverage and finite recovery applicability"
+        criteria[-1]["scope"] = (
+            "Engineering status measures complete three-family coverage; the empirical rule requires each family's "
+            "assigned adaptive forced-fault recovery proportion to meet the frozen threshold.")
+        criteria[-1]["limitations"].extend(applicability["limitations"])
 
     plan_rows = [row for row in adaptive if _replayed(row) and (_evidence_value(row, "replanning", "accepted") or 0) > 0]
     fault_rows = [row for row in adaptive if row["condition"] == "fault"]
@@ -1180,6 +1310,12 @@ def _requirement_evidence(manifest: dict, rows: list[dict], issues: list[dict],
         [repeats["sufficiency_reason"], "Repeated calls of one task are dependent observations within the same task cluster.",
          "Deterministic oracle repetitions do not estimate model stochasticity or empirical stability."],
         empirical_required=True, finite=repeat_finite)
+    if repeat_finite.get("recovery_rule"):
+        criteria[-1]["scope"] = (
+            "The frozen live reliability rule requires final acceptance in every normal cell and repeated "
+            "forced domain failure, target revision, and final recovery in every fault cell.")
+        criteria[-1]["evidence"]["recovery_rule"] = repeat_finite["recovery_rule"]
+        criteria[-1]["limitations"].extend(repeat_finite["limitations"][-2:])
     return {
         "evidence_contract": manifest.get("evidence_contract"),
         "evidence_kind": "declared_model_execution_records" if manifest["backend"] == "openai" else "simulated_software_validation",
@@ -1238,7 +1374,8 @@ def analyze(manifest: dict, results: list[dict]) -> dict:
     scale = _scale_summary(manifest, rows, settings)
     scale["finite_resilience"] = _scale_resilience(manifest, rows, issues, settings)
     repeats["finite_repeatability"] = _finite_repeatability(manifest, rows, issues, settings)
-    requirements = _requirement_evidence(manifest, rows, issues, repeats, scale)
+    requirements = _requirement_evidence(manifest, rows, issues, repeats, scale,
+                                       _family_applicability(manifest, rows, issues, settings))
     simulated = manifest["backend"] != "openai"
     caveats = [
         "The manifest defines assignment; fault delivery and recovery never select the primary analysis set (intention to treat).",
@@ -1540,6 +1677,26 @@ def _render_scale(summary: dict, lines: list[str]) -> None:
 
 
 def _render_finite_benchmarks(summary: dict, lines: list[str]) -> None:
+    diversity = next(item for item in summary["requirement_evidence"]["criteria"] if item["id"] == "R4")
+    applicability = diversity["evidence"].get("finite_applicability")
+    if applicability is not None:
+        config = applicability["thresholds"]
+        lines.extend(["## Finite task-family recovery applicability", "",
+                      f"**Scoped decision: {applicability['decision']}.** Engineering coverage remains separate. "
+                      f"Each of the three families must reach recovery proportion {config['minimum_family_recovery']:.2f} "
+                      f"over at least {config['minimum_assigned_fault_trials_per_family']} assigned adaptive forced-fault trials. "
+                      "Recovery requires a delivered domain failure, an accepted revision of that target, and independent final acceptance. "
+                      "These are finite suite criteria, not a generalization or sample-adequacy guarantee.", "",
+                      "| Family | Successful recoveries/observed | Final acceptances | Assigned | Meets frozen minimum |",
+                      "| --- | ---: | ---: | ---: | --- |"])
+        for row in applicability["by_family"]:
+            status = "UNCERTAIN" if row["meets_minimum"] is None else "PASS" if row["meets_minimum"] else "FAIL"
+            lines.append(f"| {_md(row['family'])} | {row['successful_recoveries']}/{row['observed']} | "
+                         f"{row['final_acceptance_successes']} | {row['scheduled']} | {status} |")
+        lines.append("")
+        if applicability["eligibility_blockers"]:
+            lines.extend(["Family applicability blockers:", ""] +
+                         [f"- `{_md(item)}`" for item in applicability["eligibility_blockers"]] + [""])
     if summary["profile"] == "scale":
         diagnostic = summary["scale"]["finite_resilience"]
         config = diagnostic["thresholds"]
@@ -1571,6 +1728,10 @@ def _render_finite_benchmarks(summary: dict, lines: list[str]) -> None:
             lines.extend([f"Every adaptive task/condition cell must meet success proportion {config['minimum_task_condition_success']:.2f} "
                           f"across exactly {config['required_repeats']} scheduled repeats. All 12 task IDs and both conditions are retained; "
                           "complete valid live outcomes and zero root/protocol violations are required.", ""])
+        if diagnostic.get("recovery_rule"):
+            lines.extend(["Normal-condition successes mean independent final acceptance. Fault-condition successes "
+                          "mean the complete forced-domain-failure, accepted target-revision, final-recovery chain. "
+                          "Final artifact success alone does not count as mechanism recovery.", ""])
         lines.extend(["| Family | Task | Condition | Successes/observed | Scheduled | Meets frozen minimum |",
                       "| --- | --- | --- | ---: | ---: | --- |"])
         for row in diagnostic["by_task_condition"]:

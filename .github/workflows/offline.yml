@@ -34,6 +34,14 @@ jobs:
       - name: Freeze heldout method study without running it
         run: python -m hiergoal.study prepare --profile study --output runs/method-prepared
 
+      - name: Require all nine engineering criteria from replayed complementary profiles
+        run: >-
+          python -m hiergoal.study_suite
+          --mechanism runs/method-offline-mechanism
+          --scale runs/method-offline-scale
+          --reliability runs/method-offline-reliability
+          --output runs/method-requirements
+
       - name: Retain apparatus summaries and audited results
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -44,5 +52,6 @@ jobs:
             runs/method-offline-*/results.json
             runs/method-offline-*/host.json
             runs/method-offline-*/manifest.json
+            runs/method-requirements/requirements.*
           if-no-files-found: error
           retention-days: 30

@@ -488,6 +488,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
         replan_attempts, rejected_actions, shared_plan_count = 0, 0, 0
         observed_models = []
         history, decision_context, authorized_replan = [], None, None
+        required_events = []
         allowed_events = {"initial", "request_started", "response", "shared_plan", "patch", "checkpoint",
                           "fault", "sham_checkpoint", "replan", "replan_decision", "request_failed", "final_grade", "result", "rejected", "termination"}
         for index, event in enumerate(events):
@@ -497,6 +498,23 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 raise ValueError("Broken trace chain or root invariant")
             previous = event["event_sha256"]
             kind = event["type"]
+            # Checkpoints are part of the evidence contract, not optional
+            # snapshots. Match the runner's transition order before consuming
+            # the event so deletion, duplication, or reordering cannot erase
+            # state changes while retaining a successful replay receipt.
+            checkpoint_required = bool(required_events and required_events[0] == "checkpoint")
+            if required_events:
+                if kind == required_events[0]:
+                    required_events.pop(0)
+                elif kind == "termination" and event.get("reason") == "ApparatusError":
+                    # A failing apparatus may stop while constructing the next
+                    # snapshot. Its UNCERTAIN outcome must remain collectable.
+                    required_events.clear()
+                    decision_context = None
+                else:
+                    raise ValueError("Missing or reordered mandatory transition evidence")
+            if kind == "checkpoint" and not checkpoint_required:
+                raise ValueError("Unexpected or duplicated state checkpoint")
             if kind not in allowed_events or (final_seen and kind != "result"):
                 raise ValueError("Unexpected event after final grading")
             if termination is not None and kind not in ("request_failed", "result"):
@@ -510,6 +528,8 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                         or not same_json(event["public_spec"], task.public_spec())
                         or not same_json(event["public_grades"], task.grade(solution))):
                     raise ValueError("Initial evidence mismatch")
+                if trial["arm"] == "flat_retry":
+                    required_events = ["checkpoint"]
             elif kind == "request_started":
                 if not response_consumed or decision_context is not None:
                     raise ValueError("Earlier response or replan decision was not processed")
@@ -563,7 +583,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 pending, latest_reply = None, event
                 response_consumed = False
                 record = event["record"]
-                if (manifest["backend"] == "openai" and manifest.get("protocol_revision") == "v2.3"
+                if (manifest["backend"] == "openai" and manifest.get("protocol_revision") in ("v2.3", "v2.4")
                         and not same_json(record.get("wire_request"), wire_metadata(event["role"], event["request"]))):
                     raise ValueError("Wire input or response format receipt mismatch")
                 if record["model"] not in observed_models:
@@ -605,6 +625,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 if plan is not None:
                     if latest_reply is None or latest_reply["role"] != "plan" or not same_json(plan, validate_plan(object_reply(latest_reply["record"]), task)):
                         raise ValueError("Initial plan does not match model output")
+                    required_events = ["checkpoint"]
                 elif event["error"] and event["error"]["status"] == "FAIL" and shared["record"] is not None:
                     try:
                         validate_plan(object_reply(shared["record"]), task)
@@ -627,6 +648,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 history.append({"action": event["action"], "public_feedback": after_grades})
                 decision_context = {"source": "patch", "before_grades": before_grades,
                                     "leaf": copy.deepcopy(active_leaf(plan, after_grades)), "failure_introduced": False}
+                required_events = ["checkpoint", "replan_decision"]
             elif kind == "checkpoint":
                 if (event["solution_sha256"] != digest(solution) or event["environment_sha256"] != digest(task.public_spec()) or
                     not same_json(event["public_grades"], task.grade(solution)) or not same_json(event["plan"], plan) or
@@ -652,6 +674,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                 decision_context = {"source": "fault", "before_grades": before_grades,
                                     "leaf": copy.deepcopy(active_leaf(plan, after_grades)), "failure_introduced": introduced}
                 fault_seen, checkpoint_seen = True, True
+                required_events = ["replan_decision", "checkpoint"]
             elif kind == "replan_decision":
                 if decision_context is None:
                     raise ValueError("Replan decision has no fresh observation")
@@ -676,6 +699,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                         or not same_json(event["public_grades"], task.grade(solution))):
                     raise ValueError("Invalid sham checkpoint")
                 checkpoint_seen = True
+                required_events = ["checkpoint"]
             elif kind == "replan":
                 if trial["arm"] != "hierarchy_adaptive" or not same_json(event["before_plan"], plan):
                     raise ValueError("Unauthorized plan change")
@@ -698,6 +722,7 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                     raise ValueError("Replan used stale evidence")
                 plan = expected
                 counts["replans"] += 1
+                required_events = ["checkpoint"]
             elif kind == "request_failed":
                 if not event["reused"] and not same_json(pending, {"role": event["role"], "request": event["request"]}):
                     raise ValueError("Failed request lacks matching start")
@@ -710,6 +735,8 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
             elif kind == "final_grade":
                 if final_seen:
                     raise ValueError("Repeated hidden grading")
+                if not response_consumed or pending is not None or decision_context is not None:
+                    raise ValueError("Final grading preceded completion of the recorded action")
                 if trial["arm"] != "flat_retry" and (plan is None or shared_plan_count != 1):
                     raise ValueError("Hierarchical completion lacks its shared validated plan")
                 final_seen = True
@@ -732,6 +759,8 @@ def audit_trial(directory: Path, trial: dict, manifest: dict) -> dict:
                                    "TransportError": "UNCERTAIN", "ApparatusError": "UNCERTAIN"}.get(event["reason"])
                 if expected_status is None or event["status"] != expected_status:
                     raise ValueError("Unknown termination reason or unsupported terminal status")
+                if event["reason"] == "ApparatusError" and result["protocol_ok"] is not False:
+                    raise ValueError("Apparatus failure must invalidate the execution protocol")
                 termination = event
                 if event["reason"] == "BudgetExhausted":
                     validate_budget_evidence(event, counts, manifest["limits"], task, solution, plan, history, elapsed)
