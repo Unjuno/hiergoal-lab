@@ -1,0 +1,7 @@
+{
+  "status": "STOPPED",
+  "protocol_id": "25c3ee07783c209eb8bd1abf3f8cd6125d37703593b6643a9ef517c7c078593e",
+  "backend": "openai",
+  "completed": 231,
+  "stop_reason": "OPENAI_HTTP_400"
+}
