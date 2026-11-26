@@ -1,0 +1,2 @@
+index,case_id,repetition,status,hermes_invocations,tokens_input,tokens_output,tool_calls,replans,elapsed_hermes_seconds,estimated_visible_usd,verified_evidence
+1,legacy,1,PASS,3,278595,3911,41,0,80.695,0.029815,True

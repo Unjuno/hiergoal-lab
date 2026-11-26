@@ -1,9 +1,16 @@
+# Local credentials; only the template belongs in git.
 .env
 .env.*
 !.env.example
+
+# Disposable execution output. Preserved evidence belongs in experiments/.
 runs/
+experiment-results/
+
+# Local Python environment and caches.
 __pycache__/
 *.pyc
+*.pyo
 .venv/
 .pytest_cache/
 .DS_Store

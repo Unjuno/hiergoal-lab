@@ -1,0 +1,9 @@
+index,case_id,repetition,status,hermes_invocations,tokens_input,tokens_output,tool_calls,replans,elapsed_hermes_seconds,estimated_visible_usd,verified_evidence
+1,parser_ready,2,PASS,2,80960,1913,19,0,47.116,0.0090525,True
+2,refund_rounding,2,PASS,3,166558,2137,30,0,85.315,0.0177243,True
+3,summary_ready,1,PASS,2,84645,1761,17,0,41.885,0.009345,True
+4,parser_ready,1,PASS,2,126766,2171,17,0,45.398,0.0137621,True
+5,summary_ready,2,PASS,2,96886,2251,17,0,60.428,0.0108141,True
+6,legacy,2,PASS,5,302229,5309,51,1,143.3,0.0328774,True
+7,refund_rounding,1,PASS,3,172543,2636,33,0,84.825,0.0185723,True
+8,legacy,1,PASS,6,357536,5766,58,1,160.793,0.0386366,True

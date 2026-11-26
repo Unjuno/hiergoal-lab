@@ -7,8 +7,8 @@ on:
       mode:
         description: 'check: no API / smoke: API connection / pilot: 1 task / benchmark: 8 tasks'
         type: choice
-        options: [smoke, pilot, benchmark, check]
-        default: smoke
+        options: [check, smoke, pilot, benchmark]
+        default: check
         required: true
       soft_budget_usd:
         description: 'Nominal token-cost stop threshold, including smoke (not a billing cap; max 12 USD)'

@@ -1,0 +1,159 @@
+{
+  "schema_version": "1.0",
+  "study": "hierarchical Hermes goal execution, single-case observation",
+  "source": "local run records + SHA256 fingerprints; not a signed attestation",
+  "experiment": "hermes-hiergoal-v1",
+  "case_id": "parser_ready",
+  "provider": "openai-api",
+  "model": "gpt-6-luna",
+  "profile": "None",
+  "declared_outcome": "PASS",
+  "verified_report_outcome": "PASS",
+  "evidence_issues": [],
+  "milestone_count": 4,
+  "parent_acceptance_evidence_verified": true,
+  "leaf_acceptance_evidence_verified": true,
+  "acceptance_gate_coverage_verified": true,
+  "leaf_count_including_superseded": 6,
+  "terminal_leaves_completed": 6,
+  "replans": 0,
+  "hermes_calls_claimed": 2,
+  "hermes_calls_with_readable_streams": 2,
+  "observed_tool_calls": 17,
+  "elapsed_hermes_seconds": 45.398,
+  "token_usage_measured_on_all_calls": true,
+  "estimated_visible_usd": 0.0137621,
+  "provenance": {
+    "protocol_id": "369dbf64ac85959ce22dece838417fceefd565f433551d9522c38e4374c081ca",
+    "git_commit": "14ca1496e82ac34fc3fcbe8047f178002efd7fb7",
+    "timestamp_utc": "2026-11-24T18:06:13.410916+00:00",
+    "host_os": "Linux",
+    "host_architecture": "x86_64",
+    "python_version": "3.14.10"
+  },
+  "calls": [
+    {
+      "index": 1,
+      "role": "plan",
+      "terminal_result_seen": true,
+      "recorded_tool_calls": 0,
+      "hermes_exit_code": 0,
+      "elapsed_seconds": 10.438,
+      "token_usage_measured": true,
+      "nested_todo_observed": false
+    },
+    {
+      "index": 2,
+      "role": "execute-S3",
+      "terminal_result_seen": true,
+      "recorded_tool_calls": 17,
+      "hermes_exit_code": 0,
+      "elapsed_seconds": 34.96,
+      "token_usage_measured": true,
+      "nested_todo_observed": true
+    }
+  ],
+  "evidence_fingerprints": [
+    {
+      "name": "gate-S1-before.json",
+      "sha256": "17ab747e4acdab4446fae0f1e2159c6aa371457f501e7fc9f3bb075243b16226",
+      "size_bytes": 269
+    },
+    {
+      "name": "gate-S2-before.json",
+      "sha256": "93786b16996b5976e78574ae3c4fe6061e77ac0c88e5ce69a2adfc6f7328bc88",
+      "size_bytes": 281
+    },
+    {
+      "name": "gate-S3-after.json",
+      "sha256": "2b3cb3775f47445375a0cb6fd6aaa700509b40ebb5026a1bdef4ebe6a0ee7e77",
+      "size_bytes": 283
+    },
+    {
+      "name": "gate-S3-before.json",
+      "sha256": "031164cd4fd85deb2cd0cc0377bd9bdd544fd29847523fe453c803c45d030146",
+      "size_bytes": 1286
+    },
+    {
+      "name": "gate-S4-before.json",
+      "sha256": "6ed4bcbce454b4856ad0a3d5f5939e4a66f207c235b26fff9dbacf2266553092",
+      "size_bytes": 293
+    },
+    {
+      "name": "gate-S5-before.json",
+      "sha256": "7256f8806ad222ebee208427b6f524ee34aaafbc969207a0b95e51ac1e3c5bd8",
+      "size_bytes": 299
+    },
+    {
+      "name": "gate-S6-before.json",
+      "sha256": "aaeb87bf59669d4e6952e82f36faf19373a259414ab31cf442307c610f7294f2",
+      "size_bytes": 263
+    },
+    {
+      "name": "gate-final-independent.json",
+      "sha256": "36b146177061f1c7a0d6a81efb17eb023602797900099c5de95f79d10059c1dd",
+      "size_bytes": 689
+    },
+    {
+      "name": "gate-parent-M1.json",
+      "sha256": "ee03b9500131fbceb29d5a5c2e755beadaea3dab5682e0a17c8ee67497cddba8",
+      "size_bytes": 351
+    },
+    {
+      "name": "gate-parent-M2.json",
+      "sha256": "466f219a89b0c4f065fa697507d8d891c67b6502c0de0b47c80681f5f19ae162",
+      "size_bytes": 377
+    },
+    {
+      "name": "gate-parent-M3.json",
+      "sha256": "7256f8806ad222ebee208427b6f524ee34aaafbc969207a0b95e51ac1e3c5bd8",
+      "size_bytes": 299
+    },
+    {
+      "name": "gate-parent-M4.json",
+      "sha256": "aaeb87bf59669d4e6952e82f36faf19373a259414ab31cf442307c610f7294f2",
+      "size_bytes": 263
+    },
+    {
+      "name": "initial_grading.json",
+      "sha256": "4f127cb85bb39b6ee319ccb270dbcdbf6ac3d3325a10a088399fd4491cde786b",
+      "size_bytes": 6699
+    },
+    {
+      "name": "final-visible.json",
+      "sha256": "a0cde8932b17800037c5ad319f4a108d55ae2064f7818ed1774feb34992190d1",
+      "size_bytes": 392
+    },
+    {
+      "name": "state.json",
+      "sha256": "c762c1a31a1c256908de6c625bb7f5687a50f2875e76c5e4b724ad01aa62873b",
+      "size_bytes": 4636
+    },
+    {
+      "name": "records.json",
+      "sha256": "4215adbcceafe6597918cdd7f860038303a1b0d68f3b921e0ea38ab154e09df0",
+      "size_bytes": 4179
+    },
+    {
+      "name": "01-plan.stream.jsonl",
+      "sha256": "074bc5adc4775aefe91b4466de9954dda60b78033b4eafd7b8fa6231dc2066d1",
+      "size_bytes": 21687
+    },
+    {
+      "name": "02-execute-S3.stream.jsonl",
+      "sha256": "0c48b5adc167296b043b6b7ddde0945217d28061902918a8833935751db37c15",
+      "size_bytes": 28897
+    }
+  ],
+  "index": 4,
+  "repetition": 1,
+  "call_metrics": {
+    "model_calls": 2,
+    "token_usage_measured": true,
+    "tool_calls": 17,
+    "elapsed_hermes_seconds": 45.398,
+    "tokens_input": 126766,
+    "tokens_output": 2171,
+    "estimated_visible_usd": 0.0137621
+  }
+}

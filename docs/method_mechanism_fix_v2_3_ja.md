@@ -1,5 +1,7 @@
 # Mechanism実験の計画形式と重複入力の修正 — v2.3
 
+> **v2.3の修正記録（履歴）。** 以下は修正・オフライン再検証を行った時点の記録である。「実APIで未確認」「次の判定」「現時点」はその時点を指し、後続の実API実験結果で過去の本文を上書きしない。現在の実測と限界は[2026年11月26日の結果整理](results_20261126_ja.md)を参照。過去入力のバイト削減率を、実測トークンや手法有効性の改善率として扱わない。
+
 旧実験: [Actions run 45566463441](https://github.com/Unjuno/hiergoal-lab/actions/runs/45566463441)。
 [失敗分析・全216試行](../experiments/method-study-v2.2/results/HGL-MECH-FOLLOWUP-20261125-01/README_ja.md)。
 

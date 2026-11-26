@@ -1,5 +1,7 @@
 # Preliminary benchmark protocol — Hermes Issue #156054
 
+> **Historical protocol.** The body preserves the conditions and knowledge available when this preliminary benchmark was prepared. Its statements about live runs being unverified or CI using only fake Hermes are historical, not the current experiment status. Real Hermes pilot and benchmark reports were subsequently recorded. See [results and evidence boundaries as of 2026-11-26 JST](results_20261126_ja.md). The execution steps below are retained for provenance; this document does not schedule another run.
+
 ## Scope
 
 **Goal:** Observe whether a real Hermes Agent, driven by the external hierarchical goal controller, completes multiple versioned coding tasks and uses evidence-driven local replanning. This is a **single-method operational benchmark**, not a comparison with flat goals.

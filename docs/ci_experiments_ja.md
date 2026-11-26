@@ -1,18 +1,22 @@
-# GitHub Actions で実際の Hermes / OpenAI API 実験を実行する
+# Hermes / OpenAI API 実験ワークフローの操作資料
+
+> **現在の位置づけ（2026年11月26日 JST）。** 実Hermesのpilotとbenchmarkは実施済みで、現在は既存結果を整理し、追加実験の計画を検討する段階である。[結果と主張範囲](results_20261126_ja.md)を先に参照する。本書は既存ワークフローの操作仕様を説明するもので、追加実験の開始予定ではない。手動実行の既定modeは、API推論を行わない`check`である。
 
 通常の `offline.yml` は模擬 Hermes によるソフトウェア検証です。
 `live-experiment.yml` は固定版の **実際の Hermes Agent** をインストールし、
-手動実行時に OpenAI API への接続、課題の実行、証拠の集計を行います。
+手動で選んだmodeに応じて互換性確認、OpenAI APIへの接続、課題の実行、証拠の集計を行います。
 プッシュ時は実際の CLI の互換性確認だけを行い、API キーを渡しません。
 
-## 1. 最初の設定と実行
+## 1. 新しい実行を計画した場合の設定・操作
 
-1. このリポジトリの **Settings → Secrets and variables → Actions → New repository secret** で
-   `OPENAI_API_KEY` を登録します。値は既存の OpenAI API キーです。コード、Issue、チャットには貼りません。
+以下は新しい実行の対象・条件を決めた後に使う操作手順です。既存のpilotやbenchmarkを未実施扱いに戻して繰り返す手順ではありません。API実験を追加する場合は、その目的とプロトコルを別に固定します。
+
+1. APIを使うmodeでキーが未登録の場合は、このリポジトリの **Settings → Secrets and variables → Actions → New repository secret** で
+   `OPENAI_API_KEY` を登録します。登録済みのキーは再登録不要です。`check`にはAPIキーは不要です。コード、Issue、チャットにはキーを貼りません。
 2. **Actions → Hermes live experiment → Run workflow** を開きます。
-3. 最初は `mode: smoke`、`soft_budget_usd: 1` で実行します。
-4. Summary の **API connection: PASS** を確認します。
-5. `pilot` で 1 課題を実行して計測経路を確認し、その後 `benchmark` で 8 試行を行います。
+3. API推論を含めない互換性確認は、既定の `mode: check` を使います。
+4. API接続確認を新たに行う場合は `mode: smoke`、`soft_budget_usd: 1` を明示し、Summary の **API connection: PASS** を確認します。
+5. 課題実験を新たに行う場合だけ、計画した `pilot`（1課題）または `benchmark`（8試行）を明示します。初回の実験ではpilotで計測経路を確認してからbenchmarkへ進みました。
 
 `gpt-6-luna` がその API プロジェクトで利用できること、API 請求設定が有効であることが前提です。
 ChatGPT の契約だけで API 利用権や API 残高が確認できたとは扱いません。
@@ -78,6 +82,8 @@ Actions の実行ページに **接続・実験・基盤の別々の判定** と
 同じページの Artifacts から `hermes-<mode>-<run_id>-<attempt>` をダウンロードできます。
 保存期間は 14 日です。
 
+初期のpilot・benchmarkで公開されたレポートは、[Hermes実験記録](../experiments/hermes-live/README.md)にも出所と指紋付きで保存しています。この保存物にも元のraw streamや個別採点ファイルは含まれません。
+
 | ファイル | 内容 |
 |---|---|
 | `ci-result.json` | 実行条件、診断コード、API 接続判定、実験判定、全体の観測名目費用 |
@@ -96,10 +102,14 @@ Hermes 時間は各 CLI 起動と停止確認に要した時間の合計であ�
 失敗時も診断コードと利用可能な証拠を保存しますが、raw ログは runner 終了後に残りません。
 詳しいプロバイダー障害の調査には、新しい試行として手元の隔離環境で再現する必要があります。
 
-GitHub CLI を設定済みなら、画面操作の代わりに次のように実行できます。
+GitHub CLI を設定済みなら、計画した操作を画面の代わりに次の形式で指定できます。`smoke`はAPI要求を発行するため、接続確認を追加する場合だけ選びます。
 
 ```bash
-# API 接続だけを確認
+# API 推論なしの互換性確認（手動実行の既定mode）
+gh workflow run live-experiment.yml --repo Unjuno/hiergoal-lab \
+  -f mode=check
+
+# 新しい API 接続確認を計画した場合
 gh workflow run live-experiment.yml --repo Unjuno/hiergoal-lab \
   -f mode=smoke -f soft_budget_usd=1
 

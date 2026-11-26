@@ -1,0 +1,80 @@
+{
+  "schema_version": "hiergoal.curated-hermes-import.v1",
+  "imported_on": "2026-11-26",
+  "source_kind": "github_actions_curated_artifact",
+  "run_id": 45455153574,
+  "attempt": 1,
+  "artifact_id": 14950967065,
+  "workflow_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45455153574",
+  "source_commit": "14ca1496e82ac34fc3fcbe8047f178002efd7fb7",
+  "hermes_commit": "caafe5389ae585ef77387a962aee05b1bcf17029",
+  "source_archive_sha256": "2f38d0ac3ac7909ec3bf25c9449d8d0d727ada7d719fc559332005b2db968428",
+  "source_archive_bytes": 20387,
+  "files": [
+    {
+      "path": "attempts.csv",
+      "bytes": 665,
+      "sha256": "fe2d3a8d68b419454734d5e09163d47a6b187cb0a4e753a97c04fa9149cf06c2"
+    },
+    {
+      "path": "ci-result.json",
+      "bytes": 7465,
+      "sha256": "1d651c81c515616dee3ddae6ed1b13ec45c4c0dd9fc4b39623ed225b21444378"
+    },
+    {
+      "path": "report-task-01.json",
+      "bytes": 4893,
+      "sha256": "81ac081f6534a345b0eb5a8e8cd6d4120b640718e6866b1bdf5cfef5c67d9289"
+    },
+    {
+      "path": "report-task-02.json",
+      "bytes": 5324,
+      "sha256": "210b10024814d159083fca5fd3165af434af8a2761394580774fc8f676c5ff07"
+    },
+    {
+      "path": "report-task-03.json",
+      "bytes": 4732,
+      "sha256": "813aee8a81c4f8661abeba2b422a4f3815ff9ebf0d6d7077fd29b18a2067f83c"
+    },
+    {
+      "path": "report-task-04.json",
+      "bytes": 4893,
+      "sha256": "bbae2b040d034b42f1be850b93642c0769214311890a368d5202b61b023bb9f7"
+    },
+    {
+      "path": "report-task-05.json",
+      "bytes": 4735,
+      "sha256": "88af24b03742d0cff26203a84e15673e3d9686f931967f1a97b080a565a8a249"
+    },
+    {
+      "path": "report-task-06.json",
+      "bytes": 6330,
+      "sha256": "f7ada530a4d378fd9ba791de122d78b1ad994038d9cd40be61e192f9a052c7d1"
+    },
+    {
+      "path": "report-task-07.json",
+      "bytes": 5483,
+      "sha256": "54befdc7182b9ab7c074da29cd0d60382c762713a02bcfae7b450775778cfbea"
+    },
+    {
+      "path": "report-task-08.json",
+      "bytes": 7239,
+      "sha256": "531e93cfe52a1e050d5ea28a67ea4d01aa89eff5b57a6b5a97aa68235dbd2381"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 5376,
+      "sha256": "e2c6ff7d36ad6ff24026542d4fda2e40ac3a56334943e186d54f0a3cf5901d6f"
+    },
+    {
+      "path": "summary.md",
+      "bytes": 2213,
+      "sha256": "aad803bff34b080a6b57ebb6c95743f1828605415088f76dbcea6586196baecf"
+    }
+  ],
+  "limitations": [
+    "Existing curated reports copied byte-for-byte; this import is not a new experiment.",
+    "Raw model streams and grading artifacts are absent; historical verification claims cannot be independently replayed from this package.",
+    "No comparator was run in this Hermes experiment."
+  ]
+}

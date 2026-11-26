@@ -1,0 +1,45 @@
+{
+  "schema_version": "hiergoal.curated-hermes-import.v1",
+  "imported_on": "2026-11-26",
+  "source_kind": "github_actions_curated_artifact",
+  "run_id": 45452695213,
+  "attempt": 1,
+  "artifact_id": 14947224133,
+  "workflow_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45452695213",
+  "source_commit": "14ca1496e82ac34fc3fcbe8047f178002efd7fb7",
+  "hermes_commit": "caafe5389ae585ef77387a962aee05b1bcf17029",
+  "source_archive_sha256": "7e2c1cc82251a40be0ccb5c45adefc4236a90e581dd800009559cb6f39da7270",
+  "source_archive_bytes": 5624,
+  "files": [
+    {
+      "path": "attempts.csv",
+      "bytes": 218,
+      "sha256": "3a7f9e18b3e1f7141598e4e0f248ec6f436eea83cd54077c45abb9e345ee6efc"
+    },
+    {
+      "path": "ci-result.json",
+      "bytes": 3368,
+      "sha256": "3dbf128d6cf2ffb70c6d1d2d1f5abc091cbc38e9df756962808d245b9cbace60"
+    },
+    {
+      "path": "report-task-01.json",
+      "bytes": 5472,
+      "sha256": "1f2b5531def5ed446ef4f4fada024f9a45fa8eda4094637e65d4756c30c3327b"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 1564,
+      "sha256": "d7a30392045129469da77191a97f779e2df777e427d94fe9f77402dc6fcf5a97"
+    },
+    {
+      "path": "summary.md",
+      "bytes": 1702,
+      "sha256": "7feaa40ddd354aa1ec1a6d7a776de8d80d9a666f1f4c1930e8e8f2cbc6de3e2a"
+    }
+  ],
+  "limitations": [
+    "Existing curated reports copied byte-for-byte; this import is not a new experiment.",
+    "Raw model streams and grading artifacts are absent; historical verification claims cannot be independently replayed from this package.",
+    "No comparator was run in this Hermes experiment."
+  ]
+}

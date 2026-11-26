@@ -1,8 +1,10 @@
-# 実API実験の開始条件と永続保存
+# 実API実験の操作資料と公開保存
 
-## 現行改訂 v2.5（2026-11-26 JST）
+> **現在の位置づけ（2026年11月26日 JST）。** v2.5のscale・study・reliabilityの結果は保存済みで、現在は結果を整理し、追加実験の計画を検討する段階である。[結果と主張範囲](results_20261126_ja.md)を先に参照する。以下では過去の開始・再開条件と現在の保存仕様を区別する。ここに残す手順は、同じ実験を再実行する推奨ではない。
 
-[scale再開修正](method_resume_v2_5_ja.md)を適用し、次はmain / mode=run / profile=scaleで252試行を実行する。
+## v2.5のscale再開時に固定した条件（履歴）
+
+[scale再開修正](method_resume_v2_5_ja.md)では、main / mode=run / profile=scaleで新しい252試行を実行する方針を固定した。後続の実行結果は上記の結果整理に記載している。
 保存と再生で葉の順序が変わる不具合を修正し、各試行を直後に監査する。
 単発HTTP 400は当該試行をUNCERTAINとして残し、後続へ進む。3件目の影響試行で停止する。
 旧runの結果は保持し、新規v2.5の結果と混合しない。通常pushはAPI実行を起動しない。
@@ -17,7 +19,9 @@
 - [実験準備](https://github.com/Unjuno/hiergoal-lab/actions/runs/45628804738): success。API実行は含まない。
 - v2.3の厳格な出力スキーマを実モデルが受理するか、実トークン消費と成功率が改善するかは未確認。オフライン成功はその根拠にならない。
 
-## 実験開始
+## 初回の実験開始手順（履歴）
+
+以下は当時の開始順序を記録したもので、現在の追加実験計画ではない。新しい実験では目的・比較条件・ソースを別に固定し、対象profileを明示する。ワークフローの既定modeはAPIを呼ばない`prepare`である。
 
 1. リポジトリ Actions → [Method validation study](https://github.com/Unjuno/hiergoal-lab/actions/workflows/method-study.yml) → Run workflow。
 2. Branch: main / mode: run / profile: pilot。
@@ -42,9 +46,11 @@
 
 ## 変更範囲
 
-前回のv2.3自動保存追加ではモデル、比較条件、試行数、資源上限、採点、効果判定を変更しなかった。今回のv2.4では上記の反復試験と有限判定を明示的に改訂する。新しいソースハッシュを持つmanifestを生成し、旧実行を新基準で再ラベル付けしない。公開verifyはhashだけでなく、結果行から再計算した完了状態とsummary/CSVの一致も検査する。liveの開始と自動保存の実環境での成功は別途確認する必要がある。
+v2.3の自動保存追加ではモデル、比較条件、試行数、資源上限、採点、効果判定を変更しなかった。v2.4では上記の反復試験と有限判定を明示的に改訂した。新しいソースハッシュを持つmanifestを生成し、旧実行を新基準で再ラベル付けしない。公開verifyはhashだけでなく、結果行から再計算した完了状態とsummary/CSVの一致も検査する。当時のlive開始・自動保存の実環境での確認事項と、後続の保存済み結果は区別する。
 
 mechanism・scale・reliabilityの完全なrunディレクトリを取得後、次の一括監査で9要件を照合できる。実API呼出しは発生しない。
+
+この一括監査には、ソース指紋などの実験契約が一致するrunを使う。異なる改訂の結果を、そのまま全9要件の統一判定としてまとめない。既存manifestの指紋を変更して一致させず、各保存記録の実行ソースと条件を保持する。
 
 ```bash
 python -m hiergoal.study_suite --mechanism runs/method-mechanism --scale runs/method-scale --reliability runs/method-reliability --output runs/method-requirements

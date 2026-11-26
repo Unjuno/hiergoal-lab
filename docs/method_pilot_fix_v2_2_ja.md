@@ -1,5 +1,7 @@
 # 実API pilotの再計画対象の不整合修正 — v2.2
 
+> **v2.2の修正記録（履歴）。** 本文は旧pilotを分析して修正した時点の原因・検証・次の計画を保持する。「新規要求なし」「次の実API pilot」は当時の作業についての記述であり、現在の未実施状態や追加実験の開始指示を意味しない。後続の結果は[2026年11月26日の結果整理](results_20261126_ja.md)を参照。
+
 旧版 v2.1 の実行: https://github.com/Unjuno/hiergoal-lab/actions/runs/45490627099
 旧版成果物: https://github.com/Unjuno/hiergoal-lab/actions/runs/45490627099/artifacts/14966166679
 

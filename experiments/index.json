@@ -1,0 +1,635 @@
+{
+  "schema_version": "hiergoal.experiment_index.v1",
+  "as_of_date": "2026-11-26",
+  "timezone": "Asia/Tokyo",
+  "source_snapshot": "6ae9fee461fb75c9210c97002df9f2896cf108aa",
+  "current_protocol_revision": "v2.5",
+  "purpose": "Navigation and provenance for immutable saved evidence; this file does not rerun, relabel, or replace results.",
+  "path_base": "repository_root",
+  "lifecycle_definitions": {
+    "current": "Saved observations under the current v2.5 protocol revision; not efficacy approval or permission to rerun old manifests.",
+    "archive": "Historical execution or analysis retained as evidence; not merged into current protocol claims.",
+    "superseded": "An earlier design or scale run has a later applicable revision/rerun; original data and failures remain unchanged."
+  },
+  "claim_boundaries": [
+    "CI success, audit PASS, task PASS, finite requirement PASS, and comparative efficacy are distinct.",
+    "Different protocols, source signatures, budgets, task variants, or oracle/live backends cannot be pooled as independent replications.",
+    "The archived v2.4 mechanism and v2.5 scale/reliability results do not constitute a source-matched unified nine-requirement PASS.",
+    "Public method archives contain structured summaries and verification receipts, not raw prompts/responses/traces.",
+    "Any new authorized execution requires a new prepare step against its actual source; archived manifests are immutable reference records."
+  ],
+  "method_live_runs": [
+    {
+      "id": "method-pilot-45656888380-1",
+      "path": "experiments/method-study-live/pilot/run-45656888380-attempt-1",
+      "lifecycle": "archive",
+      "evidence_kind": "published_structured_live_model_records",
+      "profile": "pilot",
+      "protocol_revision": "v2.4",
+      "protocol_id": "df31920c82fd7e6207a034226575675961f00b3bd2537bf240415f6a1d94b26e",
+      "source_sha": "4bc260c0e643d66e90bb2fba7ccbf1dbad7b74eb",
+      "source_files_manifest": "experiments/method-study-live/pilot/run-45656888380-attempt-1/manifest.json",
+      "run_id": "45656888380",
+      "run_attempt": 1,
+      "workflow_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45656888380",
+      "backend": "openai",
+      "model": "gpt-6-luna",
+      "reasoning_effort": "low",
+      "scheduled_trials": 18,
+      "task_clusters": 3,
+      "outcome_counts": {
+        "PASS": 10,
+        "FAIL": 8,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "audit_counts": {
+        "PASS": 18
+      },
+      "diagnostic_counts": {
+        "OTHER_RECORDED_DIAGNOSTIC": 8,
+        "FINAL_GRADE_PASS": 10
+      },
+      "execution_status": "COMPLETED",
+      "completed_trials": 18,
+      "stop_reason": null,
+      "complete_audited_execution": true,
+      "study_efficacy_decision": "UNCERTAIN",
+      "analysis_scope": "prespecified_study_rule",
+      "finite_requirement_statuses": {
+        "R1": "UNCERTAIN",
+        "R2": "UNCERTAIN",
+        "R3": "PASS",
+        "R4": "UNCERTAIN",
+        "R5": "UNCERTAIN",
+        "R6": "PASS",
+        "R7": "PASS",
+        "R8": "UNCERTAIN",
+        "R9": "UNCERTAIN"
+      },
+      "limits": {
+        "max_calls": 12,
+        "max_replans": 3,
+        "max_output_tokens": 2048,
+        "max_total_tokens": 64000,
+        "max_prompt_bytes": 48000,
+        "request_timeout_seconds": 90,
+        "trial_timeout_seconds": 1200,
+        "batch_timeout_seconds": 18000
+      },
+      "host_record": "experiments/method-study-live/pilot/run-45656888380-attempt-1/host.json",
+      "summary": "experiments/method-study-live/pilot/run-45656888380-attempt-1/summary.md",
+      "trial_table": "experiments/method-study-live/pilot/run-45656888380-attempt-1/trials.csv",
+      "publication_receipt": "experiments/method-study-live/pilot/run-45656888380-attempt-1/publication.json",
+      "raw_traces_in_git_archive": false,
+      "superseded_by": null,
+      "limitations": [
+        "Development pilot only; no confirmatory efficacy claim.",
+        "Published diagnostics generalize eight failures as OTHER_RECORDED_DIAGNOSTIC."
+      ]
+    },
+    {
+      "id": "method-mechanism-45658610566-1",
+      "path": "experiments/method-study-live/mechanism/run-45658610566-attempt-1",
+      "lifecycle": "archive",
+      "evidence_kind": "published_structured_live_model_records",
+      "profile": "mechanism",
+      "protocol_revision": "v2.4",
+      "protocol_id": "d9b261c1036a9a24af0cb091f5ad1933a227bd31a465dde2d03011ae5f9fca0b",
+      "source_sha": "46df073625e33c12a63bf99bc8e975a351883628",
+      "source_files_manifest": "experiments/method-study-live/mechanism/run-45658610566-attempt-1/manifest.json",
+      "run_id": "45658610566",
+      "run_attempt": 1,
+      "workflow_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45658610566",
+      "backend": "openai",
+      "model": "gpt-6-luna",
+      "reasoning_effort": "low",
+      "scheduled_trials": 108,
+      "task_clusters": 6,
+      "outcome_counts": {
+        "PASS": 98,
+        "FAIL": 10,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "audit_counts": {
+        "PASS": 108
+      },
+      "diagnostic_counts": {
+        "FINAL_GRADE_PASS": 98,
+        "INVALID_PLAN_INSTRUCTION": 8,
+        "TOKEN_BUDGET_AFTER": 2
+      },
+      "execution_status": "COMPLETED",
+      "completed_trials": 108,
+      "stop_reason": null,
+      "complete_audited_execution": true,
+      "study_efficacy_decision": "UNCERTAIN",
+      "analysis_scope": "descriptive_only",
+      "finite_requirement_statuses": {
+        "R1": "UNCERTAIN",
+        "R2": "UNCERTAIN",
+        "R3": "PASS",
+        "R4": "FAIL",
+        "R5": "PASS",
+        "R6": "PASS",
+        "R7": "PASS",
+        "R8": "UNCERTAIN",
+        "R9": "UNCERTAIN"
+      },
+      "limits": {
+        "max_calls": 24,
+        "max_replans": 4,
+        "max_output_tokens": 4096,
+        "max_total_tokens": 128000,
+        "max_prompt_bytes": 128000,
+        "request_timeout_seconds": 90,
+        "trial_timeout_seconds": 1800,
+        "batch_timeout_seconds": 18000
+      },
+      "host_record": "experiments/method-study-live/mechanism/run-45658610566-attempt-1/host.json",
+      "summary": "experiments/method-study-live/mechanism/run-45658610566-attempt-1/summary.md",
+      "trial_table": "experiments/method-study-live/mechanism/run-45658610566-attempt-1/trials.csv",
+      "publication_receipt": "experiments/method-study-live/mechanism/run-45658610566-attempt-1/publication.json",
+      "raw_traces_in_git_archive": false,
+      "superseded_by": null,
+      "limitations": [
+        "Historical v2.4 mechanism execution; not source-compatible evidence for a unified v2.5 suite.",
+        "Eight invalid-plan-instruction failures and two token-budget failures remain in assigned outcomes."
+      ]
+    },
+    {
+      "id": "method-scale-45667519808-1",
+      "path": "experiments/method-study-live/scale/run-45667519808-attempt-1",
+      "lifecycle": "superseded",
+      "evidence_kind": "published_structured_live_model_records",
+      "profile": "scale",
+      "protocol_revision": "v2.4",
+      "protocol_id": "25c3ee07783c209eb8bd1abf3f8cd6125d37703593b6643a9ef517c7c078593e",
+      "source_sha": "8c45ba15293876d5ddb2a91bb7b60c333136219d",
+      "source_files_manifest": "experiments/method-study-live/scale/run-45667519808-attempt-1/manifest.json",
+      "run_id": "45667519808",
+      "run_attempt": 1,
+      "workflow_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45667519808",
+      "backend": "openai",
+      "model": "gpt-6-luna",
+      "reasoning_effort": "low",
+      "scheduled_trials": 252,
+      "task_clusters": 21,
+      "outcome_counts": {
+        "PASS": 168,
+        "FAIL": 0,
+        "UNCERTAIN": 63,
+        "NOT_RUN": 21
+      },
+      "audit_counts": {
+        "PASS": 169,
+        "FAIL": 62,
+        "NOT_RUN": 21
+      },
+      "diagnostic_counts": {
+        "FINAL_GRADE_PASS": 168,
+        "AUDIT_FAILED": 62,
+        "OPENAI_HTTP_400": 1,
+        "NOT_RUN": 21
+      },
+      "execution_status": "STOPPED",
+      "completed_trials": 231,
+      "stop_reason": "OPENAI_HTTP_400",
+      "complete_audited_execution": false,
+      "study_efficacy_decision": "UNCERTAIN",
+      "analysis_scope": "descriptive_only",
+      "finite_requirement_statuses": {
+        "R1": "UNCERTAIN",
+        "R2": "FAIL",
+        "R3": "UNCERTAIN",
+        "R4": "UNCERTAIN",
+        "R5": "UNCERTAIN",
+        "R6": "UNCERTAIN",
+        "R7": "FAIL",
+        "R8": "UNCERTAIN",
+        "R9": "UNCERTAIN"
+      },
+      "limits": {
+        "max_calls": 64,
+        "max_replans": 8,
+        "max_output_tokens": 8192,
+        "max_total_tokens": 512000,
+        "max_prompt_bytes": 384000,
+        "request_timeout_seconds": 90,
+        "trial_timeout_seconds": 1800,
+        "batch_timeout_seconds": 18000
+      },
+      "host_record": "experiments/method-study-live/scale/run-45667519808-attempt-1/host.json",
+      "summary": "experiments/method-study-live/scale/run-45667519808-attempt-1/summary.md",
+      "trial_table": "experiments/method-study-live/scale/run-45667519808-attempt-1/trials.csv",
+      "publication_receipt": "experiments/method-study-live/scale/run-45667519808-attempt-1/publication.json",
+      "raw_traces_in_git_archive": false,
+      "superseded_by": "method-scale-45703053665-1",
+      "limitations": [
+        "Original published results remain immutable: 62 audit failures, one HTTP 400 uncertainty, and 21 unrun trials.",
+        "The v2.5 replay-order diagnosis and later full rerun do not overwrite these original outcomes."
+      ]
+    },
+    {
+      "id": "method-scale-45703053665-1",
+      "path": "experiments/method-study-live/scale/run-45703053665-attempt-1",
+      "lifecycle": "current",
+      "evidence_kind": "published_structured_live_model_records",
+      "profile": "scale",
+      "protocol_revision": "v2.5",
+      "protocol_id": "8da9ed005341508f4c302d312023a03ae8588f20b0523abf9b6ebd4ad2a83fee",
+      "source_sha": "07905889ae5f08289915e5e78c4b301f841bb431",
+      "source_files_manifest": "experiments/method-study-live/scale/run-45703053665-attempt-1/manifest.json",
+      "run_id": "45703053665",
+      "run_attempt": 1,
+      "workflow_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45703053665",
+      "backend": "openai",
+      "model": "gpt-6-luna",
+      "reasoning_effort": "low",
+      "scheduled_trials": 252,
+      "task_clusters": 21,
+      "outcome_counts": {
+        "PASS": 215,
+        "FAIL": 37,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "audit_counts": {
+        "PASS": 252
+      },
+      "diagnostic_counts": {
+        "FINAL_GRADE_PASS": 215,
+        "CALL_BUDGET": 2,
+        "TOKEN_BUDGET_AFTER": 35
+      },
+      "execution_status": "COMPLETED",
+      "completed_trials": 252,
+      "stop_reason": null,
+      "complete_audited_execution": true,
+      "study_efficacy_decision": "UNCERTAIN",
+      "analysis_scope": "descriptive_only",
+      "finite_requirement_statuses": {
+        "R1": "UNCERTAIN",
+        "R2": "PASS",
+        "R3": "PASS",
+        "R4": "FAIL",
+        "R5": "UNCERTAIN",
+        "R6": "PASS",
+        "R7": "PASS",
+        "R8": "FAIL",
+        "R9": "UNCERTAIN"
+      },
+      "limits": {
+        "max_calls": 64,
+        "max_replans": 8,
+        "max_output_tokens": 8192,
+        "max_total_tokens": 512000,
+        "max_prompt_bytes": 384000,
+        "request_timeout_seconds": 90,
+        "trial_timeout_seconds": 1800,
+        "batch_timeout_seconds": 18000
+      },
+      "host_record": "experiments/method-study-live/scale/run-45703053665-attempt-1/host.json",
+      "summary": "experiments/method-study-live/scale/run-45703053665-attempt-1/summary.md",
+      "trial_table": "experiments/method-study-live/scale/run-45703053665-attempt-1/trials.csv",
+      "publication_receipt": "experiments/method-study-live/scale/run-45703053665-attempt-1/publication.json",
+      "raw_traces_in_git_archive": false,
+      "superseded_by": null,
+      "limitations": [
+        "Descriptive scale profile; efficacy decision UNCERTAIN is separate from finite scale-resilience FAIL.",
+        "All six adaptive assigned-fault trials at large/depth-5/dense failed before fault delivery.",
+        "Scaled variants share source instances; deeper fixtures also add executable certification work."
+      ]
+    },
+    {
+      "id": "method-study-45729335900-1",
+      "path": "experiments/method-study-live/study/run-45729335900-attempt-1",
+      "lifecycle": "current",
+      "evidence_kind": "published_structured_live_model_records",
+      "profile": "study",
+      "protocol_revision": "v2.5",
+      "protocol_id": "246ea3956e33e00fe9b27dccc1d03c3cc5f520dce5ebcde60fb0b6c1e22e8b91",
+      "source_sha": "129d8d4f2d885699c33aba51506b87079bdb70eb",
+      "source_files_manifest": "experiments/method-study-live/study/run-45729335900-attempt-1/manifest.json",
+      "run_id": "45729335900",
+      "run_attempt": 1,
+      "workflow_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45729335900",
+      "backend": "openai",
+      "model": "gpt-6-luna",
+      "reasoning_effort": "low",
+      "scheduled_trials": 216,
+      "task_clusters": 12,
+      "outcome_counts": {
+        "PASS": 176,
+        "FAIL": 40,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "audit_counts": {
+        "PASS": 216
+      },
+      "diagnostic_counts": {
+        "FINAL_GRADE_PASS": 176,
+        "OTHER_RECORDED_DIAGNOSTIC": 40
+      },
+      "execution_status": "COMPLETED",
+      "completed_trials": 216,
+      "stop_reason": null,
+      "complete_audited_execution": true,
+      "study_efficacy_decision": "FAIL",
+      "analysis_scope": "prespecified_study_rule",
+      "finite_requirement_statuses": {
+        "R1": "UNCERTAIN",
+        "R2": "UNCERTAIN",
+        "R3": "PASS",
+        "R4": "UNCERTAIN",
+        "R5": "UNCERTAIN",
+        "R6": "PASS",
+        "R7": "PASS",
+        "R8": "UNCERTAIN",
+        "R9": "UNCERTAIN"
+      },
+      "limits": {
+        "max_calls": 12,
+        "max_replans": 3,
+        "max_output_tokens": 2048,
+        "max_total_tokens": 64000,
+        "max_prompt_bytes": 48000,
+        "request_timeout_seconds": 90,
+        "trial_timeout_seconds": 1200,
+        "batch_timeout_seconds": 18000
+      },
+      "host_record": "experiments/method-study-live/study/run-45729335900-attempt-1/host.json",
+      "summary": "experiments/method-study-live/study/run-45729335900-attempt-1/summary.md",
+      "trial_table": "experiments/method-study-live/study/run-45729335900-attempt-1/trials.csv",
+      "publication_receipt": "experiments/method-study-live/study/run-45729335900-attempt-1/publication.json",
+      "raw_traces_in_git_archive": false,
+      "superseded_by": null,
+      "limitations": [
+        "Prespecified study decision FAIL; audited trial failures are retained.",
+        "Forty hierarchical trials stop at the initial-plan stage with one logical call and zero patches.",
+        "Assigned environment interventions do not always cause a delivered failure."
+      ]
+    },
+    {
+      "id": "method-reliability-45732751285-1",
+      "path": "experiments/method-study-live/reliability/run-45732751285-attempt-1",
+      "lifecycle": "current",
+      "evidence_kind": "published_structured_live_model_records",
+      "profile": "reliability",
+      "protocol_revision": "v2.5",
+      "protocol_id": "2c7d8eca0b43e4dac8ee1cebc87414ee3f881741d5b8bbe21de5c45c954b2153",
+      "source_sha": "983bf8c14e22eda6adea5b58113679b69ff0204a",
+      "source_files_manifest": "experiments/method-study-live/reliability/run-45732751285-attempt-1/manifest.json",
+      "run_id": "45732751285",
+      "run_attempt": 1,
+      "workflow_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45732751285",
+      "backend": "openai",
+      "model": "gpt-6-luna",
+      "reasoning_effort": "low",
+      "scheduled_trials": 720,
+      "task_clusters": 12,
+      "outcome_counts": {
+        "PASS": 717,
+        "FAIL": 3,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "audit_counts": {
+        "PASS": 720
+      },
+      "diagnostic_counts": {
+        "FINAL_GRADE_PASS": 717,
+        "TOKEN_BUDGET_AFTER": 2,
+        "CALL_BUDGET": 1
+      },
+      "execution_status": "COMPLETED",
+      "completed_trials": 720,
+      "stop_reason": null,
+      "complete_audited_execution": true,
+      "study_efficacy_decision": "UNCERTAIN",
+      "analysis_scope": "descriptive_only",
+      "finite_requirement_statuses": {
+        "R1": "UNCERTAIN",
+        "R2": "PASS",
+        "R3": "PASS",
+        "R4": "PASS",
+        "R5": "PASS",
+        "R6": "PASS",
+        "R7": "PASS",
+        "R8": "UNCERTAIN",
+        "R9": "PASS"
+      },
+      "limits": {
+        "max_calls": 24,
+        "max_replans": 4,
+        "max_output_tokens": 4096,
+        "max_total_tokens": 128000,
+        "max_prompt_bytes": 128000,
+        "request_timeout_seconds": 90,
+        "trial_timeout_seconds": 1800,
+        "batch_timeout_seconds": 18000
+      },
+      "host_record": "experiments/method-study-live/reliability/run-45732751285-attempt-1/host.json",
+      "summary": "experiments/method-study-live/reliability/run-45732751285-attempt-1/summary.md",
+      "trial_table": "experiments/method-study-live/reliability/run-45732751285-attempt-1/trials.csv",
+      "publication_receipt": "experiments/method-study-live/reliability/run-45732751285-attempt-1/publication.json",
+      "raw_traces_in_git_archive": false,
+      "superseded_by": null,
+      "limitations": [
+        "Descriptive reliability profile; twelve task identities, not 720 independent tasks.",
+        "Adaptive final acceptance in assigned fault trials is 119/120; accepted target-revision recovery is 113/120.",
+        "Seven finite requirements PASS does not imply comparative efficacy or a unified nine-requirement PASS."
+      ]
+    }
+  ],
+  "historical_collections": [
+    {
+      "id": "method-study-v1",
+      "path": "experiments/method-study-v1",
+      "lifecycle": "superseded",
+      "version_label": "v1",
+      "new_model_calls_in_analysis": null,
+      "evidence_kind": "historical_prepared_manifests",
+      "source_sha": null,
+      "protocol_revision_field": null,
+      "scope": "Prepared pilot/study designs; not execution evidence. Version label is the directory name; early manifests do not declare protocol_revision.",
+      "primary_records": [
+        "experiments/method-study-v1/pilot-manifest.json",
+        "experiments/method-study-v1/study-manifest.json"
+      ]
+    },
+    {
+      "id": "method-study-v2",
+      "path": "experiments/method-study-v2",
+      "lifecycle": "superseded",
+      "version_label": "v2",
+      "new_model_calls_in_analysis": null,
+      "evidence_kind": "offline_software_verification_and_historical_design",
+      "source_sha": "e7c7937d05eb91e61b68d229c4278f19015f43aa",
+      "source_revision_caveat": "Recorded working tree or baseline commit is not the full tested source identity; use the saved source_file_sha256 map.",
+      "unit_tests_passed": 228,
+      "simulated_trials": 1314,
+      "actual_api_calls": 0,
+      "scope": "Oracle/software validation, not live model effectiveness. Historical manifests must not be reused with changed sources.",
+      "primary_records": [
+        "experiments/method-study-v2/offline-verification.json"
+      ]
+    },
+    {
+      "id": "method-study-v2.1",
+      "path": "experiments/method-study-v2.1",
+      "lifecycle": "superseded",
+      "version_label": "v2.1",
+      "new_model_calls_in_analysis": null,
+      "evidence_kind": "offline_software_verification_and_historical_design",
+      "source_sha": "2bdfde5caf2c52ce8cf58cffbd8f969c642ea636",
+      "source_revision_caveat": "Recorded working tree or baseline commit is not the full tested source identity; use the saved source_file_sha256 map.",
+      "unit_tests_passed": 242,
+      "simulated_trials": 1314,
+      "actual_api_calls": 0,
+      "scope": "Oracle/software validation, not live model effectiveness. Historical manifests must not be reused with changed sources.",
+      "primary_records": [
+        "experiments/method-study-v2.1/offline-verification.json"
+      ]
+    },
+    {
+      "id": "method-study-v2.2",
+      "path": "experiments/method-study-v2.2",
+      "lifecycle": "archive",
+      "version_label": "v2.2",
+      "new_model_calls_in_analysis": 0,
+      "evidence_kind": "post_hoc_offline_analysis_of_saved_records",
+      "source_sha": "53b27de055d2796b2ea89c759d4118b18b696a45",
+      "source_run_id": "45566463441",
+      "source_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45566463441",
+      "analysis_id": "HGL-MECH-FOLLOWUP-20261125-01",
+      "scope": "post_hoc_offline_record_audit_and_candidate_plan_validation_not_new_model_execution",
+      "efficacy_decision": "UNCERTAIN",
+      "primary_records": [
+        "experiments/method-study-v2.2/results/HGL-MECH-FOLLOWUP-20261125-01/summary.json"
+      ],
+      "saved_live_trials": 108,
+      "saved_oracle_trials": 108,
+      "limitations": [
+        "The 216 audited rows mix 108 live records and 108 oracle records; they are not 216 live trials.",
+        "Candidate plan validation after observing failures is not a new successful execution."
+      ]
+    },
+    {
+      "id": "method-study-v2.3",
+      "path": "experiments/method-study-v2.3",
+      "lifecycle": "archive",
+      "version_label": "v2.3",
+      "new_model_calls_in_analysis": 0,
+      "evidence_kind": "post_hoc_offline_analysis_of_saved_records",
+      "source_sha": null,
+      "source_run_id": "45566463441",
+      "source_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45566463441",
+      "analysis_id": "HGL-WIRE-REGRESSION-20261125-01",
+      "scope": "Offline counterfactual wire serialization of recorded logical responses; no new model calls",
+      "efficacy_decision": "UNCERTAIN",
+      "primary_records": [
+        "experiments/method-study-v2.3/results/HGL-WIRE-REGRESSION-20261125-01/summary.json"
+      ],
+      "logical_response_roundtrips": 586,
+      "limitations": [
+        "Counts logical shared-plan response appearances; not unique billed calls.",
+        "Byte comparison excludes fixed system guidance, response schema, protocol framing and new plan-prompt wording.",
+        "Actual model behavior, token counts, costs and success rates are not estimated from bytes."
+      ]
+    },
+    {
+      "id": "method-study-v2.4",
+      "path": "experiments/method-study-v2.4",
+      "lifecycle": "superseded",
+      "version_label": "v2.4",
+      "new_model_calls_in_analysis": null,
+      "evidence_kind": "offline_software_verification_and_historical_design",
+      "source_sha": "2ef7b4f9f70d9f609f297eb65f205025ff9262b0",
+      "source_revision_caveat": "Recorded working tree or baseline commit is not the full tested source identity; use the saved source_file_sha256 map.",
+      "unit_tests_passed": 275,
+      "simulated_trials": 1314,
+      "actual_api_calls": 0,
+      "scope": "Oracle/software validation, not live model effectiveness. Historical manifests must not be reused with changed sources.",
+      "primary_records": [
+        "experiments/method-study-v2.4/offline-verification.json"
+      ]
+    }
+  ],
+  "hermes_runs": [
+    {
+      "id": "hermes-pilot-45452695213-1",
+      "lifecycle": "archive",
+      "evidence_location": "git_curated_artifact_import",
+      "path": "experiments/hermes-live/pilot/run-45452695213-attempt-1",
+      "run_id": "45452695213",
+      "run_attempt": 1,
+      "workflow_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45452695213",
+      "artifact_id": "14947224133",
+      "artifact_sha256": "7e2c1cc82251a40be0ccb5c45adefc4236a90e581dd800009559cb6f39da7270",
+      "source_sha": "14ca1496e82ac34fc3fcbe8047f178002efd7fb7",
+      "hermes_sha": "caafe5389ae585ef77387a962aee05b1bcf17029",
+      "backend": "luna",
+      "model": "gpt-6-luna",
+      "scheduled_trials": 1,
+      "outcome_counts": {
+        "PASS": 1,
+        "FAIL": 0,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "observed_replans": 0,
+      "verified_pass_after_replan": 0,
+      "evidence_kind": "curated_reports_of_hermes_execution",
+      "raw_traces_in_git_archive": false,
+      "limitations": [
+        "No flat or fixed-hierarchy comparator; no causal effectiveness estimate.",
+        "Reports record contemporaneous verification; retained artifacts omit raw streams and evaluator files, so a fresh raw-trace replay is unavailable.",
+        "External controller only; native Hermes goal/subgoal/Kanban integration is not implemented."
+      ],
+      "provenance": "experiments/hermes-live/pilot/run-45452695213-attempt-1/provenance.json",
+      "summary": "experiments/hermes-live/pilot/run-45452695213-attempt-1/summary.md",
+      "trial_table": "experiments/hermes-live/pilot/run-45452695213-attempt-1/attempts.csv",
+      "host_record": "experiments/hermes-live/pilot/run-45452695213-attempt-1/ci-result.json",
+      "imported_on": "2026-11-26"
+    },
+    {
+      "id": "hermes-benchmark-45455153574-1",
+      "lifecycle": "archive",
+      "evidence_location": "git_curated_artifact_import",
+      "path": "experiments/hermes-live/benchmark/run-45455153574-attempt-1",
+      "run_id": "45455153574",
+      "run_attempt": 1,
+      "workflow_run_url": "https://github.com/Unjuno/hiergoal-lab/actions/runs/45455153574",
+      "artifact_id": "14950967065",
+      "artifact_sha256": "2f38d0ac3ac7909ec3bf25c9449d8d0d727ada7d719fc559332005b2db968428",
+      "source_sha": "14ca1496e82ac34fc3fcbe8047f178002efd7fb7",
+      "hermes_sha": "caafe5389ae585ef77387a962aee05b1bcf17029",
+      "backend": "luna",
+      "model": "gpt-6-luna",
+      "scheduled_trials": 8,
+      "outcome_counts": {
+        "PASS": 8,
+        "FAIL": 0,
+        "UNCERTAIN": 0,
+        "NOT_RUN": 0
+      },
+      "observed_replans": 2,
+      "verified_pass_after_replan": 2,
+      "evidence_kind": "curated_reports_of_hermes_execution",
+      "raw_traces_in_git_archive": false,
+      "limitations": [
+        "No flat or fixed-hierarchy comparator; no causal effectiveness estimate.",
+        "Reports record contemporaneous verification; retained artifacts omit raw streams and evaluator files, so a fresh raw-trace replay is unavailable.",
+        "External controller only; native Hermes goal/subgoal/Kanban integration is not implemented."
+      ],
+      "provenance": "experiments/hermes-live/benchmark/run-45455153574-attempt-1/provenance.json",
+      "summary": "experiments/hermes-live/benchmark/run-45455153574-attempt-1/summary.md",
+      "trial_table": "experiments/hermes-live/benchmark/run-45455153574-attempt-1/attempts.csv",
+      "host_record": "experiments/hermes-live/benchmark/run-45455153574-attempt-1/ci-result.json",
+      "imported_on": "2026-11-26"
+    }
+  ]
+}

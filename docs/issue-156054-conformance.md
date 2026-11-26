@@ -1,5 +1,7 @@
 # Conformance to Hermes Issue #156054
 
+> **Scope and status note — 2026-11-26 JST.** This page preserves the historical conformance assessment of the legacy external Hermes controller. The table and statements such as “not attempted” or “neither backend has completed a live experiment” describe that earlier assessment, not the whole repository today. Real Hermes pilot/benchmark reports and later Hermes-independent method-comparison results now exist; neither establishes native Hermes integration or general performance superiority. See [the current results and evidence boundaries](results_20261126_ja.md). The later Luna runs do not establish that the OpenCode Free route was executed.
+
 Specification: https://github.com/NousResearch/hermes-agent/issues/156054
 
 This research repository is an **experimental prototype of the proposed behavior**, not the upstream Hermes implementation. The H-JEPA paper motivates hierarchical planning but does not establish LLM-agent benefits.
