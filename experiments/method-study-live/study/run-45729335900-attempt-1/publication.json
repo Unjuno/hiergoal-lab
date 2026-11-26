@@ -1,0 +1,30 @@
+{
+  "schema": "hiergoal.publication.v1",
+  "profile": "study",
+  "run_id": "45729335900",
+  "run_attempt": "1",
+  "source_commit": "129d8d4f2d885699c33aba51506b87079bdb70eb",
+  "live_step": "success",
+  "collection_step": "success",
+  "scope": "audited structured results; raw prompts, traces, responses and artifacts excluded",
+  "state": "COLLECTED",
+  "complete_audited_execution": true,
+  "scheduled_trials": 216,
+  "outcomes": {
+    "FAIL": 40,
+    "NOT_RUN": 0,
+    "PASS": 176,
+    "UNCERTAIN": 0
+  },
+  "files": {
+    "execution.json": "4bb11019c114490e9058ff8426a8393ee4ecbcfc89e39ce394c1aadfae3de2c9",
+    "host.json": "7d98653d9752ad416a472c58eb4e6a9db6fd0136884d1d708d33b1f350900514",
+    "manifest.json": "0f12076a3aa4a4d5ae80c5e4a95dc9bed602a0c4ef16db7618f8d86ec2a6f8e6",
+    "results.json": "8f097c23ba179a6c91f2c6a70f86e79f79e60993006c63ac7e0d9e72b2f1ce2c",
+    "summary.json": "371516dd7a8c33290022fc38265a51efc7e652ac4c5c5e52321c60684fb0ec44",
+    "summary.md": "3c69bdfba8bc850d93cc49f6a91baa2b36ef5b676c5f829976babeda347c74fb",
+    "trials.csv": "8e3024804f49b9f3d9053f2bd4719c1a7586509b800b91095aa7b8d2928756a3"
+  },
+  "protocol_id": "246ea3956e33e00fe9b27dccc1d03c3cc5f520dce5ebcde60fb0b6c1e22e8b91",
+  "protocol_revision": "v2.5"
+}
