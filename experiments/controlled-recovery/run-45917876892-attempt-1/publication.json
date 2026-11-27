@@ -1,0 +1,62 @@
+{
+  "schema_version": "hiergoal.controlled_recovery.publication.v1",
+  "repository": "Unjuno/hiergoal-lab",
+  "run_id": "45917876892",
+  "run_attempt": "1",
+  "execution_commit": "510409cf9bb580a1e8cf180cbb92405f6ac61214",
+  "protocol_id": "d36c836de43c41cb0248a95abaa6af810c0eafd896f606207b20ba4b7a3533a1",
+  "files": {
+    "audits.json": {
+      "sha256": "c756f3cc2b690639dae819a85b5fe9f5b15f90efcfded0dfb77bbaaa1cf7f8e1",
+      "bytes": 7858
+    },
+    "authorization.json": {
+      "sha256": "11e1dacf0e4d498a458a4f6d1adccf789264b5cac4f208aa67f83e9ae9ff9b0e",
+      "bytes": 667
+    },
+    "execution.json": {
+      "sha256": "f7fccb1350098d22dcd77ecfce585bc24ca0be8b100679a09e896a1786552a42",
+      "bytes": 171
+    },
+    "host.json": {
+      "sha256": "90d21af683792b64c82e13a025bd08115c74451e8c31457f381f4822abfa14d7",
+      "bytes": 463
+    },
+    "manifest.json": {
+      "sha256": "7e8eebd329c6de076da094ddbcc1dcc2c8ca104d457235c04fa3d8c8678d69bc",
+      "bytes": 67383
+    },
+    "preparations/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2/result.json": {
+      "sha256": "d3b1edcf13a715616dc80019f0e29b7fa21592954c40d19e776ac387c9cb9b90",
+      "bytes": 1425
+    },
+    "preparations/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2/trace.jsonl": {
+      "sha256": "a7cd916682298c8cbe619464c3b18ef6e9db7eeb215ad9f09063316803c18438",
+      "bytes": 30187
+    },
+    "preparations.json": {
+      "sha256": "efb6c5af17e53b5d8e459805653b01e3b5493ee4cdfa7d84eaf1b653b9b3d12a",
+      "bytes": 6461
+    },
+    "results.json": {
+      "sha256": "776489f295a47e73ec4bf8878922652f6179902e5d5c86cff8ca8032366e322f",
+      "bytes": 28103
+    },
+    "summary.json": {
+      "sha256": "4358934a1b1341424fa5351999548832ca9ff587fd421977243a42a68d7de503",
+      "bytes": 10137
+    },
+    "summary.md": {
+      "sha256": "f5a9e7586fa51c403248a7d9de7d8ddde983640544980afff96df2d2a1a93d12",
+      "bytes": 1839
+    },
+    "trials.csv": {
+      "sha256": "5af6b66a5ae70fb9de7a448e73def178e514085b3f31be6c04cde30b6c2fa632",
+      "bytes": 6525
+    }
+  },
+  "file_count": 12,
+  "total_bytes": 161219,
+  "raw_synthetic_model_evidence": true,
+  "content_policy": "Fixed synthetic tasks and full recorded model text are untrusted data; never execute artifact contents."
+}

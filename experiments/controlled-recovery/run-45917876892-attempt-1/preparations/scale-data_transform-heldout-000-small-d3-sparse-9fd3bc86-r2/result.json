@@ -1,0 +1,45 @@
+{
+  "phase": "prepare",
+  "identifier": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2",
+  "pair_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2",
+  "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+  "arm": null,
+  "status": "UNCERTAIN",
+  "diagnostic": "TRANSPORT_ERROR",
+  "calls": 1,
+  "input_tokens": null,
+  "output_tokens": null,
+  "known_input_tokens": 0,
+  "known_output_tokens": 0,
+  "elapsed_seconds": 0.0,
+  "replan_attempts": 0,
+  "replans": 0,
+  "rejected_actions": 0,
+  "patch_actions": 0,
+  "simulated": false,
+  "invariant_ok": true,
+  "stop_batch": true,
+  "success": null,
+  "wall_seconds": 0.3110526529999902,
+  "final_solution": {
+    "c01_rows": [],
+    "c01_aggregates": [],
+    "c01_report": "",
+    "c02_rows": [],
+    "c02_aggregates": [],
+    "c02_report": "",
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": []
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": []
+    }
+  },
+  "final_plan": null,
+  "final_artifact_sha256": "058b91aa1e6c55cf7e76c47366216d7c846caf4cfce0e3c6d4c9b6825568c87f",
+  "final_plan_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+  "final_environment_sha256": "ef5d8e9c31431eb2ee14aaf58e8243a6edfa7d9d3cbdfc7f8d3c61195f345b98",
+  "trace_final_sha256": "2bbc32f9f879e4972eb65944b5f15801c472f3abc2b2b3bcdd1e92f98b43d9c5"
+}

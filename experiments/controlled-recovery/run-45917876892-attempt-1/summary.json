@@ -1,0 +1,381 @@
+{
+  "schema_version": "hiergoal.controlled_recovery_summary.v1",
+  "protocol_id": "d36c836de43c41cb0248a95abaa6af810c0eafd896f606207b20ba4b7a3533a1",
+  "backend": "openai",
+  "model": "gpt-6-luna",
+  "profile": "controlled_recovery_pilot",
+  "simulated": false,
+  "measurement_conditions": {
+    "host": {
+      "timestamp_utc": "2026-11-27T00:39:47.269085+00:00",
+      "git_commit": "510409cf9bb580a1e8cf180cbb92405f6ac61214",
+      "working_tree_dirty": false,
+      "python": "3.12.3",
+      "platform": "Linux-7.0.0-1018-aws-x86_64-with-glibc2.39",
+      "cpu": "Intel(R) Xeon(R) 6975P-C",
+      "cpu_clock_mhz_observed_range": [
+        3613.784,
+        3897.867
+      ],
+      "logical_cpus": 4,
+      "memory_bytes": 16464273408,
+      "batch_size": 1,
+      "model_hardware": "Provider-managed; not observable"
+    },
+    "model": "gpt-6-luna",
+    "observed_models": [],
+    "reasoning_effort": "low",
+    "batch_size": 1,
+    "limits": {
+      "max_calls": 8,
+      "max_replans": 1,
+      "max_total_tokens": 64000,
+      "max_output_tokens": 4096,
+      "max_prompt_bytes": 48000,
+      "request_timeout_seconds": 90,
+      "trial_timeout_seconds": 600,
+      "batch_timeout_seconds": 14400
+    },
+    "provider_hardware": "Provider-managed and not observable"
+  },
+  "unique_tasks": 6,
+  "scheduled_pairs": 12,
+  "scheduled_trials": 24,
+  "preparation": {
+    "assigned": 12,
+    "statuses": {
+      "UNCERTAIN": 1,
+      "NOT_RUN": 11
+    },
+    "verified_source_pass": 0,
+    "known_tokens": 0,
+    "calls_started": 1,
+    "tokens": {
+      "n": 0,
+      "median": null,
+      "range": null
+    },
+    "wall_seconds": {
+      "n": 1,
+      "median": 0.3110526529999902,
+      "range": [
+        0.3110526529999902,
+        0.3110526529999902
+      ]
+    }
+  },
+  "by_arm": {
+    "fixed": {
+      "assigned": 12,
+      "attempted": 0,
+      "valid_observed": 0,
+      "successful": 0,
+      "recovery_rate_observed": null,
+      "statuses": {
+        "NOT_RUN_BATCH_STOP": 12
+      },
+      "calls": {
+        "n": 0,
+        "median": null,
+        "range": null
+      },
+      "tokens": {
+        "n": 0,
+        "median": null,
+        "range": null
+      },
+      "wall_seconds": {
+        "n": 0,
+        "median": null,
+        "range": null
+      },
+      "replan_attempts": 0,
+      "replans_accepted": 0,
+      "replans_rejected": 0,
+      "replans_budget_unapplied": 0,
+      "replans_unresolved": 0,
+      "cost_scope": "Repair phase only; source generation is reported separately."
+    },
+    "adaptive": {
+      "assigned": 12,
+      "attempted": 0,
+      "valid_observed": 0,
+      "successful": 0,
+      "recovery_rate_observed": null,
+      "statuses": {
+        "NOT_RUN_BATCH_STOP": 12
+      },
+      "calls": {
+        "n": 0,
+        "median": null,
+        "range": null
+      },
+      "tokens": {
+        "n": 0,
+        "median": null,
+        "range": null
+      },
+      "wall_seconds": {
+        "n": 0,
+        "median": null,
+        "range": null
+      },
+      "replan_attempts": 0,
+      "replans_accepted": 0,
+      "replans_rejected": 0,
+      "replans_budget_unapplied": 0,
+      "replans_unresolved": 0,
+      "cost_scope": "Repair phase only; source generation is reported separately."
+    }
+  },
+  "by_family": {
+    "code_repair": {
+      "fixed": {
+        "assigned": 4,
+        "attempted": 0,
+        "valid_observed": 0,
+        "successful": 0,
+        "recovery_rate_observed": null,
+        "statuses": {
+          "NOT_RUN_BATCH_STOP": 4
+        },
+        "calls": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "tokens": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "wall_seconds": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "replan_attempts": 0,
+        "replans_accepted": 0,
+        "replans_rejected": 0,
+        "replans_budget_unapplied": 0,
+        "replans_unresolved": 0,
+        "cost_scope": "Repair phase only; source generation is reported separately."
+      },
+      "adaptive": {
+        "assigned": 4,
+        "attempted": 0,
+        "valid_observed": 0,
+        "successful": 0,
+        "recovery_rate_observed": null,
+        "statuses": {
+          "NOT_RUN_BATCH_STOP": 4
+        },
+        "calls": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "tokens": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "wall_seconds": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "replan_attempts": 0,
+        "replans_accepted": 0,
+        "replans_rejected": 0,
+        "replans_budget_unapplied": 0,
+        "replans_unresolved": 0,
+        "cost_scope": "Repair phase only; source generation is reported separately."
+      }
+    },
+    "data_transform": {
+      "fixed": {
+        "assigned": 4,
+        "attempted": 0,
+        "valid_observed": 0,
+        "successful": 0,
+        "recovery_rate_observed": null,
+        "statuses": {
+          "NOT_RUN_BATCH_STOP": 4
+        },
+        "calls": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "tokens": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "wall_seconds": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "replan_attempts": 0,
+        "replans_accepted": 0,
+        "replans_rejected": 0,
+        "replans_budget_unapplied": 0,
+        "replans_unresolved": 0,
+        "cost_scope": "Repair phase only; source generation is reported separately."
+      },
+      "adaptive": {
+        "assigned": 4,
+        "attempted": 0,
+        "valid_observed": 0,
+        "successful": 0,
+        "recovery_rate_observed": null,
+        "statuses": {
+          "NOT_RUN_BATCH_STOP": 4
+        },
+        "calls": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "tokens": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "wall_seconds": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "replan_attempts": 0,
+        "replans_accepted": 0,
+        "replans_rejected": 0,
+        "replans_budget_unapplied": 0,
+        "replans_unresolved": 0,
+        "cost_scope": "Repair phase only; source generation is reported separately."
+      }
+    },
+    "scheduling": {
+      "fixed": {
+        "assigned": 4,
+        "attempted": 0,
+        "valid_observed": 0,
+        "successful": 0,
+        "recovery_rate_observed": null,
+        "statuses": {
+          "NOT_RUN_BATCH_STOP": 4
+        },
+        "calls": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "tokens": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "wall_seconds": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "replan_attempts": 0,
+        "replans_accepted": 0,
+        "replans_rejected": 0,
+        "replans_budget_unapplied": 0,
+        "replans_unresolved": 0,
+        "cost_scope": "Repair phase only; source generation is reported separately."
+      },
+      "adaptive": {
+        "assigned": 4,
+        "attempted": 0,
+        "valid_observed": 0,
+        "successful": 0,
+        "recovery_rate_observed": null,
+        "statuses": {
+          "NOT_RUN_BATCH_STOP": 4
+        },
+        "calls": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "tokens": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "wall_seconds": {
+          "n": 0,
+          "median": null,
+          "range": null
+        },
+        "replan_attempts": 0,
+        "replans_accepted": 0,
+        "replans_rejected": 0,
+        "replans_budget_unapplied": 0,
+        "replans_unresolved": 0,
+        "cost_scope": "Repair phase only; source generation is reported separately."
+      }
+    }
+  },
+  "paired": {
+    "both_recover": 0,
+    "adaptive_only": 0,
+    "fixed_only": 0,
+    "neither": 0,
+    "incomplete": 12,
+    "source_failure": 0,
+    "complete_pairs": 0,
+    "assigned_pairs": 12,
+    "observed_difference_percentage_points": null,
+    "task_mean_differences": {}
+  },
+  "audit_status": "INCOMPLETE",
+  "apparatus_decision": "UNCERTAIN",
+  "efficacy_decision": "UNCERTAIN",
+  "efficacy_reason": "A six-task apparatus pilot is not a powered confirmatory effectiveness study.",
+  "confidence_interval": null,
+  "confidence_interval_reason": "No confirmatory interval from 12 dependent repetitions / 6 tasks; an all-tie bootstrap is not an equivalence proof.",
+  "ceiling_observed": false,
+  "evidence": {
+    "valid_repair_traces": 0,
+    "source_trace_audits": {
+      "PASS": 1,
+      "FAIL": 0,
+      "NOT_RUN": 11
+    },
+    "repair_trace_audits": {
+      "PASS": 0,
+      "FAIL": 0,
+      "NOT_RUN": 24
+    },
+    "root_unchanged_trials": 0,
+    "locality_preserved_trials": 0,
+    "locality_violating_trials": 0,
+    "unrelated_field_observations": 0,
+    "state_snapshots": 0,
+    "leaf_transitions": 0,
+    "milestone_transitions": 0
+  },
+  "cost": {
+    "known_tokens": 0,
+    "preparation_known_tokens": 0,
+    "repair_known_tokens": 0,
+    "complete_usage": false,
+    "calls_started": 1,
+    "billing_dollars": null,
+    "note": "Observed tokens and requests; not an invoice. Preparation is charged once, separately from repair budgets."
+  },
+  "limitations": [
+    "Task parameters are unused, but task families and graders are reused.",
+    "The estimand is repair conditional on successful blinded model-generated preparation.",
+    "Adaptive adds one diagnosis-plus-instruction revision; the components are not separately identified.",
+    "No scale/depth generalization, trigger specificity, broad subtree restructuring, or Hermes integration is tested.",
+    "Repeated gate/field observations are not independent tasks.",
+    "A valid hash chain and semantic replay do not constitute provider-signed proof of API provenance."
+  ]
+}
