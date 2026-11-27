@@ -43,6 +43,9 @@ six unused task instances, twelve identical post-failure checkpoints, and twenty
 fixed/adaptive repair slots. Its preparation, repair budgets, and replay auditor are
 separate from v2.5. See its [execution and evidence index](experiments/controlled-recovery/README.md).
 This pilot tests the apparatus and feasibility; it cannot establish comparative efficacy.
+Its first authorized live launch stopped at OpenAI authentication (`401 / expired_secret_key`)
+before any repair trial. The final code passed 358 offline tests; see the
+[launch status and restart steps](docs/recovery_pilot_status_20261127_ja.md).
 
 1. [Latest results](docs/results_20261126_ja.md): what ran, what passed, and which claims remain unresolved.
 2. [Discussion](docs/discussion_20261126_ja.md): observed failure stages, causal hypotheses, and their limits.

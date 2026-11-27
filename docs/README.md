@@ -8,6 +8,7 @@
 
 | 文書 | 用途 |
 |---|---|
+| [Controlled Recovery構築・起動状況 — 2026-11-27](recovery_pilot_status_20261127_ja.md) | 新基盤の検証、実APIの期限切れキーによる停止、証拠と再開手順 |
 | [最新結果 — 2026-11-26](results_20261126_ja.md) | 実行済みのStudy・Scale・Reliability、初期Hermesの結果と主張の範囲 |
 | [考察整理 — 2026-11-26](discussion_20261126_ja.md) | 観測事実、原因候補、未検証の仮説を区別する |
 | [リポジトリ構成](repository_map_ja.md) | コード、課題、採点、テスト、workflow、保存物の対応 |
