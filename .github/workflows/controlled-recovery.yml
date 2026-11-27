@@ -1,0 +1,152 @@
+name: Controlled recovery pilot
+run-name: Controlled recovery ${{ inputs.mode || 'validated request or prepare' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'prepare: offline only / run: explicitly execute the frozen 24-trial pilot'
+        type: choice
+        options: [prepare, run]
+        default: prepare
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - 'hiergoal/recovery*.py'
+      - 'tests/test_controlled_recovery*.py'
+      - 'docs/controlled_recovery*.md'
+      - '.github/workflows/controlled-recovery.yml'
+      - 'experiments/controlled-recovery/launch-pilot-20261127.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hiergoal-live-experiment
+  cancel-in-progress: false
+
+jobs:
+  study:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 260
+    outputs:
+      live: ${{ steps.authorization.outputs.live }}
+    env:
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Offline regression tests (no credential)
+        run: python3 -m unittest discover -s tests -v
+      - name: Validate controlled recovery apparatus offline (no credential)
+        run: python3 -m hiergoal.recovery check --output runs/recovery-check
+      - name: Freeze exact pilot before any model request
+        run: python3 -m hiergoal.recovery prepare --output runs/controlled-recovery
+      - name: Validate explicit one-shot or manual launch authorization (no credential)
+        id: authorization
+        run: |
+          python3 -m hiergoal.recovery_launch validate-launch \
+            --manifest runs/controlled-recovery/manifest.json \
+            --event-path "$GITHUB_EVENT_PATH" --event-name "$GITHUB_EVENT_NAME" \
+            --actor "$GITHUB_ACTOR" --repository "$GITHUB_REPOSITORY" \
+            --ref "$GITHUB_REF" --run-attempt "$GITHUB_RUN_ATTEMPT" \
+            --output runs/controlled-recovery/authorization.json
+      - name: Check authorized live prerequisites (no inference)
+        if: ${{ steps.authorization.outputs.live == 'true' }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          test "$GITHUB_REF" = refs/heads/main || { echo 'Live recovery runs require main.'; exit 1; }
+          test "$GITHUB_RUN_ATTEMPT" = 1 || { echo 'Implicit reruns are disabled.'; exit 1; }
+          test -n "$OPENAI_API_KEY" || { echo 'Configure repository Actions secret OPENAI_API_KEY.'; exit 1; }
+      - name: Execute only the explicitly authorized bounded pilot
+        if: ${{ steps.authorization.outputs.live == 'true' }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: https://api.openai.com/v1
+        run: python3 -m hiergoal.recovery run --output runs/controlled-recovery --execute --approve-paid-api
+      - name: Collect and audit all retained evidence, including incomplete runs
+        if: ${{ always() }}
+        run: |
+          if test -f runs/controlled-recovery/manifest.json; then
+            python3 -m hiergoal.recovery collect --output runs/controlled-recovery
+            if test -f runs/controlled-recovery/summary.md; then
+              cat runs/controlled-recovery/summary.md >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+      - name: Retain full raw synthetic evidence and offline checks
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: controlled-recovery-full-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            runs/controlled-recovery/
+            runs/recovery-check/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: false
+      - name: Export bounded allowlisted synthetic evidence without a credential
+        if: ${{ always() && steps.authorization.outputs.live == 'true' }}
+        run: |
+          python3 -m hiergoal.recovery_launch export \
+            --source runs/controlled-recovery --destination "$RUNNER_TEMP/recovery-public" \
+            --run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT" --commit "$GITHUB_SHA"
+      - name: Transfer only checksummed inert evidence to publication job
+        if: ${{ always() && steps.authorization.outputs.live == 'true' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: controlled-recovery-public-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/recovery-public/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: false
+
+  publish:
+    needs: study
+    if: ${{ always() && needs.study.outputs.live == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: controlled-recovery-public-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/recovery-public
+      - name: Verify exact run identity, allowlist, sizes and every checksum
+        run: |
+          python3 -m hiergoal.recovery_launch verify \
+            --destination "$RUNNER_TEMP/recovery-public" \
+            --run-id "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT" --commit "$GITHUB_SHA"
+      - name: Permanently archive evidence without executing artifact contents
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          public="$RUNNER_TEMP/recovery-public"
+          target="experiments/controlled-recovery/run-$GITHUB_RUN_ID-attempt-$GITHUB_RUN_ATTEMPT"
+          for retry in 1 2 3; do
+            git fetch --no-tags origin refs/heads/main
+            git checkout --detach FETCH_HEAD
+            if test -e "$target"; then
+              diff -qr "$public" "$target"
+              echo "Identical evidence already archived: $target" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            mkdir -p "$target"
+            cp -R "$public/." "$target/"
+            git add -- "$target"
+            git commit -m "Archive controlled recovery pilot run $GITHUB_RUN_ID attempt $GITHUB_RUN_ATTEMPT"
+            if git push origin HEAD:refs/heads/main; then
+              echo "Permanent evidence: $target" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+          done
+          echo 'Permanent archive failed; the uploaded full evidence artifact remains available.'
+          exit 1

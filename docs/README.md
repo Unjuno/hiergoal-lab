@@ -18,6 +18,7 @@
 
 | 文書 | 内容 | 読む際の注意 |
 |---|---|---|
+| [Controlled Recovery Pilot](controlled_recovery_protocol_ja.md) | 同じ故障後状態から固定指示と一度の再計画を比較する24試行 | 新しい独立プロトコル。6固有課題の装置パイロットで、有効性の確証は行わない |
 | [比較実験プロトコル](method_study_ja.md) | 三方式、課題族、予算、故障、採点、解析、コマンド | プロトコル指紋対象。当時の本文を保持 |
 | [9要件の検証可能性監査](method_requirements_audit_ja.md) | R1〜R9の証拠と判定範囲 | プロトコル指紋対象。当時の本文を保持 |
 | [実API実験の開始条件と永続保存](method_live_launch_ja.md) | 手動実行、公開結果、raw artifact、終了確認 | 実行前に確認。現在の成績は最新結果を参照 |

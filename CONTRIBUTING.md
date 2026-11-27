@@ -50,9 +50,11 @@ python3 -m hiergoal.study check --profile pilot --output runs/local-check-pilot
 | `offline.yml` | オフライン検証 | 手動dispatchなし | なし |
 | `method-study.yml` | 対象ファイル変更時は`prepare` | `prepare` | 明示的な`run` |
 | `live-experiment.yml` | 対象ファイル変更時は`check` | `check` | 明示的な`smoke`・`pilot`・`benchmark` |
+| `controlled-recovery.yml` | 通常の変更はオフライン検証・`prepare` | `prepare` | 明示的な`run`、または所有者が承認した単独の一度限りの起動依頼追加 |
 
 Hermes workflowの`check`は実Hermesのインストール・CLI確認を含むが、モデルAPIは呼ばない。
 既存の有料実行フラグ・認証経路を省略する変更は行わない。
+Controlled Recoveryの専用起動依頼は実装commit・protocol・予算の一致を検査し、変更や再実行を受け付けない。[専用プロトコル](docs/controlled_recovery_protocol_ja.md)を参照する。
 
 ## 変更を説明する
 

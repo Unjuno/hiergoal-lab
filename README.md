@@ -38,6 +38,12 @@ and used four defect conditions of one CSV-ledger task. See the
 
 ## Read in this order
 
+The next focused study is the [Controlled Recovery Pilot](docs/controlled_recovery_protocol_ja.md):
+six unused task instances, twelve identical post-failure checkpoints, and twenty-four
+fixed/adaptive repair slots. Its preparation, repair budgets, and replay auditor are
+separate from v2.5. See its [execution and evidence index](experiments/controlled-recovery/README.md).
+This pilot tests the apparatus and feasibility; it cannot establish comparative efficacy.
+
 1. [Latest results](docs/results_20261126_ja.md): what ran, what passed, and which claims remain unresolved.
 2. [Discussion](docs/discussion_20261126_ja.md): observed failure stages, causal hypotheses, and their limits.
 3. [Repository map](docs/repository_map_ja.md): code, evaluation, workflows, and evidence locations.
