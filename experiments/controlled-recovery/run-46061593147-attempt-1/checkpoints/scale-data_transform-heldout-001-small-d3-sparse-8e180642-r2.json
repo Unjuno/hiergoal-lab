@@ -1,0 +1,1849 @@
+{
+  "schema_version": "hiergoal.recovery_checkpoint.v1",
+  "protocol_id": "d36c836de43c41cb0248a95abaa6af810c0eafd896f606207b20ba4b7a3533a1",
+  "pair_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2",
+  "task": {
+    "family": "data_transform",
+    "instance": 1,
+    "split": "heldout",
+    "seed": 20261127,
+    "scale": {
+      "size": "small",
+      "depth": 3,
+      "density": "sparse"
+    },
+    "fault_kind": "forced_subgoal",
+    "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+    "root_sha256": "ac6dcc4a987bab784fe6d2db0376742f09ea391dc5a48a283fc34d4fc3717200",
+    "initial_public_spec_sha256": "d6662c804afba6f84d48b1309a24950ffc04ef11ed8aa9c9a8bdf398b12ecef5",
+    "initial_environment_sha256": "a0c668170e96cb2b745bfdb6f5e48059707046fa895608e20a5564419bc9dc26",
+    "planned_tree": {
+      "leaf_count": 8,
+      "group_count": 2,
+      "goal_count": 11,
+      "max_depth": 2,
+      "depth_levels": 3,
+      "depth_unit": "edges_from_root",
+      "tree_edges": 10,
+      "dependency_edges": 6,
+      "dependency_density": 0.21428571428571427,
+      "independent_branch_count": 2,
+      "component_count": 2,
+      "domain_gate_count": 6,
+      "certification_gate_count": 2
+    }
+  },
+  "root_contract": {
+    "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+    "family": "data_transform",
+    "split": "heldout",
+    "seed": 20261127,
+    "instance": 1,
+    "instance_seed": 10238940635289442739,
+    "contract_version": 1,
+    "objective": "Satisfy every domain and certification gate against the current component environments.",
+    "environment_policy": "An environment update changes one component only. Task objectives, hierarchy, and acceptance rules remain fixed.",
+    "benchmark_scope": "Prescribed-hierarchy bounded scale fixture; domain gates and certification gates are not independent task observations.",
+    "scale": {
+      "size": "small",
+      "depth": 3,
+      "density": "sparse"
+    },
+    "gates": {
+      "c01_rows": "Component c01: Normalize, filter, deduplicate, and sort source rows.",
+      "c01_aggregates": "Component c01: Aggregate normalized row counts and signed integer cents by client.",
+      "c01_report": "Component c01: Render exact sorted client totals and grand total.",
+      "c01_certify_1": "Certify component c01 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass.",
+      "c02_rows": "Component c02: Normalize, filter, deduplicate, and sort source rows.",
+      "c02_aggregates": "Component c02: Aggregate normalized row counts and signed integer cents by client.",
+      "c02_report": "Component c02: Render exact sorted client totals and grand total.",
+      "c02_certify_1": "Certify component c02 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass."
+    },
+    "dependencies": {
+      "c01_rows": [],
+      "c01_aggregates": [
+        "c01_rows"
+      ],
+      "c01_report": [
+        "c01_aggregates"
+      ],
+      "c01_certify_1": [
+        "c01_report"
+      ],
+      "c02_rows": [],
+      "c02_aggregates": [
+        "c02_rows"
+      ],
+      "c02_report": [
+        "c02_aggregates"
+      ],
+      "c02_certify_1": [
+        "c02_report"
+      ]
+    },
+    "solution_shape": {
+      "c01_rows": [
+        {
+          "record_id": "string",
+          "client": "string",
+          "kind": "sale or refund",
+          "quantity": "integer",
+          "unit_cents": "integer",
+          "net_cents": "integer"
+        }
+      ],
+      "c01_aggregates": [
+        {
+          "client": "string",
+          "count": "integer",
+          "net_cents": "integer"
+        }
+      ],
+      "c01_report": "string",
+      "c01_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c01_report"
+        ]
+      },
+      "c02_rows": [
+        {
+          "record_id": "string",
+          "client": "string",
+          "kind": "sale or refund",
+          "quantity": "integer",
+          "unit_cents": "integer",
+          "net_cents": "integer"
+        }
+      ],
+      "c02_aggregates": [
+        {
+          "client": "string",
+          "count": "integer",
+          "net_cents": "integer"
+        }
+      ],
+      "c02_report": "string",
+      "c02_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c02_report"
+        ]
+      }
+    },
+    "hierarchy": {
+      "groups": [
+        {
+          "id": "M1",
+          "parent": "G0",
+          "title": "Verify component c01 at grouping level 1"
+        },
+        {
+          "id": "M2",
+          "parent": "G0",
+          "title": "Verify component c02 at grouping level 1"
+        }
+      ],
+      "gate_parents": {
+        "c01_rows": "M1",
+        "c01_aggregates": "M1",
+        "c01_report": "M1",
+        "c01_certify_1": "M1",
+        "c02_rows": "M2",
+        "c02_aggregates": "M2",
+        "c02_report": "M2",
+        "c02_certify_1": "M2"
+      },
+      "depth_levels": 3
+    },
+    "gate_artifact_fields": {
+      "c01_rows": [
+        "c01_rows"
+      ],
+      "c01_aggregates": [
+        "c01_aggregates"
+      ],
+      "c01_report": [
+        "c01_report"
+      ],
+      "c01_certify_1": [
+        "c01_certify_1"
+      ],
+      "c02_rows": [
+        "c02_rows"
+      ],
+      "c02_aggregates": [
+        "c02_aggregates"
+      ],
+      "c02_report": [
+        "c02_report"
+      ],
+      "c02_certify_1": [
+        "c02_certify_1"
+      ]
+    },
+    "domain_gates": [
+      "c01_rows",
+      "c01_aggregates",
+      "c01_report",
+      "c02_rows",
+      "c02_aggregates",
+      "c02_report"
+    ],
+    "certification_gates": [
+      "c01_certify_1",
+      "c02_certify_1"
+    ],
+    "component_contracts": {
+      "c01": {
+        "task_id": "data_transform-heldout-008-2a0e100d",
+        "family": "data_transform",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 8,
+        "instance_seed": 3030377249723155738,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "rows": "Normalize, filter, deduplicate, and sort source rows.",
+          "aggregates": "Aggregate normalized row counts and signed integer cents by client.",
+          "report": "Render exact sorted client totals and grand total."
+        },
+        "dependencies": {
+          "rows": [],
+          "aggregates": [
+            "rows"
+          ],
+          "report": [
+            "aggregates"
+          ]
+        },
+        "solution_shape": {
+          "rows": [
+            {
+              "record_id": "string",
+              "client": "string",
+              "kind": "sale or refund",
+              "quantity": "integer",
+              "unit_cents": "integer",
+              "net_cents": "integer"
+            }
+          ],
+          "aggregates": [
+            {
+              "client": "string",
+              "count": "integer",
+              "net_cents": "integer"
+            }
+          ],
+          "report": "string"
+        },
+        "normalization_rules": [
+          "Visit source records in the given order. Strip whitespace from every value; uppercase record_id and client; lowercase kind and status.",
+          "Keep only status ok, nonempty record_id and client, kind sale or refund, quantity matching ASCII [0-9]{1,2} and integer 1..50, and unit_price matching ASCII [0-9]{1,5}.[0-9]{2} with a literal decimal point.",
+          "Skip invalid records. Keep the first VALID record for each normalized record_id; invalid earlier records do not reserve an ID. Sort output rows by record_id using lexical order.",
+          "unit_cents is exact decimal unit_price times 100. net_cents is quantity times unit_cents, negative for refund and positive for sale. Preserve kind and quantity in rows.",
+          "Aggregate per normalized client, sorted lexically. count counts retained records, not items; net_cents sums signed row cents."
+        ],
+        "report_format": "No trailing newline. First line CLIENT COUNT NET. Then one line per aggregate: <client> <count> <net amount with exactly two decimal places>. Last line TOTAL <retained record count> <grand net amount with exactly two decimal places>. Single spaces; negative signs only for negative amounts.",
+        "arithmetic": "Exact integer cents, no binary floating point or rounding.",
+        "final_check": "Independent source-to-output recomputation checks the same public records and rules; no secret source records are required."
+      },
+      "c02": {
+        "task_id": "data_transform-heldout-009-0b148da4",
+        "family": "data_transform",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 9,
+        "instance_seed": 798418771123547344,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "rows": "Normalize, filter, deduplicate, and sort source rows.",
+          "aggregates": "Aggregate normalized row counts and signed integer cents by client.",
+          "report": "Render exact sorted client totals and grand total."
+        },
+        "dependencies": {
+          "rows": [],
+          "aggregates": [
+            "rows"
+          ],
+          "report": [
+            "aggregates"
+          ]
+        },
+        "solution_shape": {
+          "rows": [
+            {
+              "record_id": "string",
+              "client": "string",
+              "kind": "sale or refund",
+              "quantity": "integer",
+              "unit_cents": "integer",
+              "net_cents": "integer"
+            }
+          ],
+          "aggregates": [
+            {
+              "client": "string",
+              "count": "integer",
+              "net_cents": "integer"
+            }
+          ],
+          "report": "string"
+        },
+        "normalization_rules": [
+          "Visit source records in the given order. Strip whitespace from every value; uppercase record_id and client; lowercase kind and status.",
+          "Keep only status ok, nonempty record_id and client, kind sale or refund, quantity matching ASCII [0-9]{1,2} and integer 1..50, and unit_price matching ASCII [0-9]{1,5}.[0-9]{2} with a literal decimal point.",
+          "Skip invalid records. Keep the first VALID record for each normalized record_id; invalid earlier records do not reserve an ID. Sort output rows by record_id using lexical order.",
+          "unit_cents is exact decimal unit_price times 100. net_cents is quantity times unit_cents, negative for refund and positive for sale. Preserve kind and quantity in rows.",
+          "Aggregate per normalized client, sorted lexically. count counts retained records, not items; net_cents sums signed row cents."
+        ],
+        "report_format": "No trailing newline. First line CLIENT COUNT NET. Then one line per aggregate: <client> <count> <net amount with exactly two decimal places>. Last line TOTAL <retained record count> <grand net amount with exactly two decimal places>. Single spaces; negative signs only for negative amounts.",
+        "arithmetic": "Exact integer cents, no binary floating point or rounding.",
+        "final_check": "Independent source-to-output recomputation checks the same public records and rules; no secret source records are required."
+      }
+    },
+    "composition_rules": [
+      "Prefix all artifact fields with the component ID. For code_repair, each stage expression is a separate prefixed field, without an expressions wrapper.",
+      "Grade each component with its published domain rules. A gate passes only when its own artifact and every declared prerequisite pass.",
+      "Certification fields have exactly environment_revision and checked_gates. The integer must equal the current component revision; checked_gates must exactly equal that gate's ordered direct prerequisites.",
+      "Additional direct dependencies are explicit verification obligations. Dense and sparse variants may have the same transitive closure; density is a direct-edge burden, not a claim of additional independent information.",
+      "Independent components have no cross-component dependencies or shared resources; same-named jobs and resources in distinct components are separate namespaces.",
+      "Increasing prescribed depth adds executable certification leaves. It does not hold the leaf count fixed or demonstrate autonomous hierarchy discovery."
+    ],
+    "topology": {
+      "leaf_count": 8,
+      "group_count": 2,
+      "goal_count": 11,
+      "max_depth": 2,
+      "depth_levels": 3,
+      "depth_unit": "edges_from_root",
+      "tree_edges": 10,
+      "dependency_edges": 6,
+      "dependency_density": 0.21428571428571427,
+      "independent_branch_count": 2,
+      "component_count": 2,
+      "domain_gate_count": 6,
+      "certification_gate_count": 2
+    }
+  },
+  "root_sha256": "ac6dcc4a987bab784fe6d2db0376742f09ea391dc5a48a283fc34d4fc3717200",
+  "public_spec": {
+    "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+    "family": "data_transform",
+    "split": "heldout",
+    "seed": 20261127,
+    "instance": 1,
+    "instance_seed": 10238940635289442739,
+    "contract_version": 1,
+    "objective": "Satisfy every domain and certification gate against the current component environments.",
+    "environment_policy": "An environment update changes one component only. Task objectives, hierarchy, and acceptance rules remain fixed.",
+    "benchmark_scope": "Prescribed-hierarchy bounded scale fixture; domain gates and certification gates are not independent task observations.",
+    "scale": {
+      "size": "small",
+      "depth": 3,
+      "density": "sparse"
+    },
+    "gates": {
+      "c01_rows": "Component c01: Normalize, filter, deduplicate, and sort source rows.",
+      "c01_aggregates": "Component c01: Aggregate normalized row counts and signed integer cents by client.",
+      "c01_report": "Component c01: Render exact sorted client totals and grand total.",
+      "c01_certify_1": "Certify component c01 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass.",
+      "c02_rows": "Component c02: Normalize, filter, deduplicate, and sort source rows.",
+      "c02_aggregates": "Component c02: Aggregate normalized row counts and signed integer cents by client.",
+      "c02_report": "Component c02: Render exact sorted client totals and grand total.",
+      "c02_certify_1": "Certify component c02 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass."
+    },
+    "dependencies": {
+      "c01_rows": [],
+      "c01_aggregates": [
+        "c01_rows"
+      ],
+      "c01_report": [
+        "c01_aggregates"
+      ],
+      "c01_certify_1": [
+        "c01_report"
+      ],
+      "c02_rows": [],
+      "c02_aggregates": [
+        "c02_rows"
+      ],
+      "c02_report": [
+        "c02_aggregates"
+      ],
+      "c02_certify_1": [
+        "c02_report"
+      ]
+    },
+    "solution_shape": {
+      "c01_rows": [
+        {
+          "record_id": "string",
+          "client": "string",
+          "kind": "sale or refund",
+          "quantity": "integer",
+          "unit_cents": "integer",
+          "net_cents": "integer"
+        }
+      ],
+      "c01_aggregates": [
+        {
+          "client": "string",
+          "count": "integer",
+          "net_cents": "integer"
+        }
+      ],
+      "c01_report": "string",
+      "c01_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c01_report"
+        ]
+      },
+      "c02_rows": [
+        {
+          "record_id": "string",
+          "client": "string",
+          "kind": "sale or refund",
+          "quantity": "integer",
+          "unit_cents": "integer",
+          "net_cents": "integer"
+        }
+      ],
+      "c02_aggregates": [
+        {
+          "client": "string",
+          "count": "integer",
+          "net_cents": "integer"
+        }
+      ],
+      "c02_report": "string",
+      "c02_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c02_report"
+        ]
+      }
+    },
+    "hierarchy": {
+      "groups": [
+        {
+          "id": "M1",
+          "parent": "G0",
+          "title": "Verify component c01 at grouping level 1"
+        },
+        {
+          "id": "M2",
+          "parent": "G0",
+          "title": "Verify component c02 at grouping level 1"
+        }
+      ],
+      "gate_parents": {
+        "c01_rows": "M1",
+        "c01_aggregates": "M1",
+        "c01_report": "M1",
+        "c01_certify_1": "M1",
+        "c02_rows": "M2",
+        "c02_aggregates": "M2",
+        "c02_report": "M2",
+        "c02_certify_1": "M2"
+      },
+      "depth_levels": 3
+    },
+    "gate_artifact_fields": {
+      "c01_rows": [
+        "c01_rows"
+      ],
+      "c01_aggregates": [
+        "c01_aggregates"
+      ],
+      "c01_report": [
+        "c01_report"
+      ],
+      "c01_certify_1": [
+        "c01_certify_1"
+      ],
+      "c02_rows": [
+        "c02_rows"
+      ],
+      "c02_aggregates": [
+        "c02_aggregates"
+      ],
+      "c02_report": [
+        "c02_report"
+      ],
+      "c02_certify_1": [
+        "c02_certify_1"
+      ]
+    },
+    "domain_gates": [
+      "c01_rows",
+      "c01_aggregates",
+      "c01_report",
+      "c02_rows",
+      "c02_aggregates",
+      "c02_report"
+    ],
+    "certification_gates": [
+      "c01_certify_1",
+      "c02_certify_1"
+    ],
+    "component_contracts": {
+      "c01": {
+        "task_id": "data_transform-heldout-008-2a0e100d",
+        "family": "data_transform",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 8,
+        "instance_seed": 3030377249723155738,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "rows": "Normalize, filter, deduplicate, and sort source rows.",
+          "aggregates": "Aggregate normalized row counts and signed integer cents by client.",
+          "report": "Render exact sorted client totals and grand total."
+        },
+        "dependencies": {
+          "rows": [],
+          "aggregates": [
+            "rows"
+          ],
+          "report": [
+            "aggregates"
+          ]
+        },
+        "solution_shape": {
+          "rows": [
+            {
+              "record_id": "string",
+              "client": "string",
+              "kind": "sale or refund",
+              "quantity": "integer",
+              "unit_cents": "integer",
+              "net_cents": "integer"
+            }
+          ],
+          "aggregates": [
+            {
+              "client": "string",
+              "count": "integer",
+              "net_cents": "integer"
+            }
+          ],
+          "report": "string"
+        },
+        "normalization_rules": [
+          "Visit source records in the given order. Strip whitespace from every value; uppercase record_id and client; lowercase kind and status.",
+          "Keep only status ok, nonempty record_id and client, kind sale or refund, quantity matching ASCII [0-9]{1,2} and integer 1..50, and unit_price matching ASCII [0-9]{1,5}.[0-9]{2} with a literal decimal point.",
+          "Skip invalid records. Keep the first VALID record for each normalized record_id; invalid earlier records do not reserve an ID. Sort output rows by record_id using lexical order.",
+          "unit_cents is exact decimal unit_price times 100. net_cents is quantity times unit_cents, negative for refund and positive for sale. Preserve kind and quantity in rows.",
+          "Aggregate per normalized client, sorted lexically. count counts retained records, not items; net_cents sums signed row cents."
+        ],
+        "report_format": "No trailing newline. First line CLIENT COUNT NET. Then one line per aggregate: <client> <count> <net amount with exactly two decimal places>. Last line TOTAL <retained record count> <grand net amount with exactly two decimal places>. Single spaces; negative signs only for negative amounts.",
+        "arithmetic": "Exact integer cents, no binary floating point or rounding.",
+        "final_check": "Independent source-to-output recomputation checks the same public records and rules; no secret source records are required."
+      },
+      "c02": {
+        "task_id": "data_transform-heldout-009-0b148da4",
+        "family": "data_transform",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 9,
+        "instance_seed": 798418771123547344,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "rows": "Normalize, filter, deduplicate, and sort source rows.",
+          "aggregates": "Aggregate normalized row counts and signed integer cents by client.",
+          "report": "Render exact sorted client totals and grand total."
+        },
+        "dependencies": {
+          "rows": [],
+          "aggregates": [
+            "rows"
+          ],
+          "report": [
+            "aggregates"
+          ]
+        },
+        "solution_shape": {
+          "rows": [
+            {
+              "record_id": "string",
+              "client": "string",
+              "kind": "sale or refund",
+              "quantity": "integer",
+              "unit_cents": "integer",
+              "net_cents": "integer"
+            }
+          ],
+          "aggregates": [
+            {
+              "client": "string",
+              "count": "integer",
+              "net_cents": "integer"
+            }
+          ],
+          "report": "string"
+        },
+        "normalization_rules": [
+          "Visit source records in the given order. Strip whitespace from every value; uppercase record_id and client; lowercase kind and status.",
+          "Keep only status ok, nonempty record_id and client, kind sale or refund, quantity matching ASCII [0-9]{1,2} and integer 1..50, and unit_price matching ASCII [0-9]{1,5}.[0-9]{2} with a literal decimal point.",
+          "Skip invalid records. Keep the first VALID record for each normalized record_id; invalid earlier records do not reserve an ID. Sort output rows by record_id using lexical order.",
+          "unit_cents is exact decimal unit_price times 100. net_cents is quantity times unit_cents, negative for refund and positive for sale. Preserve kind and quantity in rows.",
+          "Aggregate per normalized client, sorted lexically. count counts retained records, not items; net_cents sums signed row cents."
+        ],
+        "report_format": "No trailing newline. First line CLIENT COUNT NET. Then one line per aggregate: <client> <count> <net amount with exactly two decimal places>. Last line TOTAL <retained record count> <grand net amount with exactly two decimal places>. Single spaces; negative signs only for negative amounts.",
+        "arithmetic": "Exact integer cents, no binary floating point or rounding.",
+        "final_check": "Independent source-to-output recomputation checks the same public records and rules; no secret source records are required."
+      }
+    },
+    "composition_rules": [
+      "Prefix all artifact fields with the component ID. For code_repair, each stage expression is a separate prefixed field, without an expressions wrapper.",
+      "Grade each component with its published domain rules. A gate passes only when its own artifact and every declared prerequisite pass.",
+      "Certification fields have exactly environment_revision and checked_gates. The integer must equal the current component revision; checked_gates must exactly equal that gate's ordered direct prerequisites.",
+      "Additional direct dependencies are explicit verification obligations. Dense and sparse variants may have the same transitive closure; density is a direct-edge burden, not a claim of additional independent information.",
+      "Independent components have no cross-component dependencies or shared resources; same-named jobs and resources in distinct components are separate namespaces.",
+      "Increasing prescribed depth adds executable certification leaves. It does not hold the leaf count fixed or demonstrate autonomous hierarchy discovery."
+    ],
+    "topology": {
+      "leaf_count": 8,
+      "group_count": 2,
+      "goal_count": 11,
+      "max_depth": 2,
+      "depth_levels": 3,
+      "depth_unit": "edges_from_root",
+      "tree_edges": 10,
+      "dependency_edges": 6,
+      "dependency_density": 0.21428571428571427,
+      "independent_branch_count": 2,
+      "component_count": 2,
+      "domain_gate_count": 6,
+      "certification_gate_count": 2
+    },
+    "environment": {
+      "components": {
+        "c01": {
+          "records": [
+            {
+              "record_id": " 2A0E1-01 ",
+              "client": " pine ",
+              "quantity": " 5 ",
+              "unit_price": "NaN",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-01 ",
+              "client": " pine ",
+              "quantity": " 5 ",
+              "unit_price": " 4.65 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-02 ",
+              "client": " oak ",
+              "quantity": " 1 ",
+              "unit_price": " 20.00 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-03 ",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 24.03 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-04 ",
+              "client": " pine ",
+              "quantity": " 3 ",
+              "unit_price": " 10.17 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-05 ",
+              "client": " oak ",
+              "quantity": " 5 ",
+              "unit_price": " 20.66 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-06 ",
+              "client": " elm ",
+              "quantity": " 4 ",
+              "unit_price": " 19.12 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-02 ",
+              "client": "DUPLICATE",
+              "quantity": "50",
+              "unit_price": "999.99",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "2A0E1-VOID",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 24.03 ",
+              "kind": " ReFuNd ",
+              "status": " void "
+            },
+            {
+              "record_id": "2A0E1-BAD",
+              "client": " pine ",
+              "quantity": "2.5",
+              "unit_price": " 10.17 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "2A0E1-EMPTY",
+              "client": " ",
+              "quantity": " 5 ",
+              "unit_price": " 20.66 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            }
+          ]
+        },
+        "c02": {
+          "records": [
+            {
+              "record_id": " 0B148-01 ",
+              "client": " cedar ",
+              "quantity": " 3 ",
+              "unit_price": "NaN",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-01 ",
+              "client": " cedar ",
+              "quantity": " 3 ",
+              "unit_price": " 22.88 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-02 ",
+              "client": " fir ",
+              "quantity": " 4 ",
+              "unit_price": " 20.81 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-03 ",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 19.82 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-04 ",
+              "client": " cedar ",
+              "quantity": " 2 ",
+              "unit_price": " 17.60 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-05 ",
+              "client": " fir ",
+              "quantity": " 4 ",
+              "unit_price": " 1.29 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-06 ",
+              "client": " elm ",
+              "quantity": " 3 ",
+              "unit_price": " 5.39 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-02 ",
+              "client": "DUPLICATE",
+              "quantity": "50",
+              "unit_price": "999.99",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "0B148-VOID",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 19.82 ",
+              "kind": " ReFuNd ",
+              "status": " void "
+            },
+            {
+              "record_id": "0B148-BAD",
+              "client": " cedar ",
+              "quantity": "2.5",
+              "unit_price": " 17.60 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "0B148-EMPTY",
+              "client": " ",
+              "quantity": " 4 ",
+              "unit_price": " 1.29 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            }
+          ]
+        }
+      },
+      "component_revisions": {
+        "c01": 0,
+        "c02": 0
+      }
+    },
+    "environment_revision": 0
+  },
+  "public_spec_sha256": "d6662c804afba6f84d48b1309a24950ffc04ef11ed8aa9c9a8bdf398b12ecef5",
+  "plan": {
+    "milestones": [
+      {
+        "id": "M1",
+        "parent": "G0",
+        "title": "Verify component c01 at grouping level 1"
+      },
+      {
+        "id": "M2",
+        "parent": "G0",
+        "title": "Verify component c02 at grouping level 1"
+      }
+    ],
+    "leaves": {
+      "S1": {
+        "id": "S1",
+        "parent": "M1",
+        "instruction": "Process c01 source records in their given order. Strip whitespace from every value; uppercase record_id and client, and lowercase kind and status. Retain only records with status `ok`, nonempty record_id and client, kind `sale` or `refund`, quantity matching ASCII `[0-9]{1,2}` and in 1..50, and unit_price matching ASCII `[0-9]{1,5}.[0-9]{2}` with a literal decimal point. Skip invalid records without reserving their IDs; retain only the first valid record for each normalized record_id. Sort retained rows lexically by record_id. Compute unit_cents exactly from the decimal price and net_cents as quantity times unit_cents, negative for refunds and positive for sales; preserve kind and quantity.",
+        "checks": [
+          "c01_rows"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S2": {
+        "id": "S2",
+        "parent": "M1",
+        "instruction": "Using the completed c01_rows, group retained rows by normalized client in lexical order. For each client, count retained records and sum signed net_cents exactly as integers. Preserve the result as the required client/count/net_cents aggregate entries; do not use floating-point arithmetic.",
+        "checks": [
+          "c01_aggregates"
+        ],
+        "depends_on": [
+          "S1"
+        ],
+        "revision": 0
+      },
+      "S3": {
+        "id": "S3",
+        "parent": "M1",
+        "instruction": "Using c01_aggregates, render the exact report with no trailing newline: first `CLIENT COUNT NET`, then one line per client in lexical order as `<client> <count> <net amount with exactly two decimal places>`, then `TOTAL <retained record count> <grand net amount with exactly two decimal places>`. Convert integer cents to decimal text exactly, with single spaces and a minus sign only for negative amounts.",
+        "checks": [
+          "c01_report"
+        ],
+        "depends_on": [
+          "S2"
+        ],
+        "revision": 0
+      },
+      "S4": {
+        "id": "S4",
+        "parent": "M1",
+        "instruction": "Check that c01_report and its declared prerequisites pass against the current c01 environment. Then provide the certification artifact with environment_revision equal to the current c01 component revision (currently 0) and checked_gates exactly [\"c01_report\"] in that order.",
+        "checks": [
+          "c01_certify_1"
+        ],
+        "depends_on": [
+          "S3"
+        ],
+        "revision": 0
+      },
+      "S5": {
+        "id": "S5",
+        "parent": "M2",
+        "instruction": "Process c02 source records in their given order. Strip whitespace from every value; uppercase record_id and client, and lowercase kind and status. Retain only records with status `ok`, nonempty record_id and client, kind `sale` or `refund`, quantity matching ASCII `[0-9]{1,2}` and in 1..50, and unit_price matching ASCII `[0-9]{1,5}.[0-9]{2}` with a literal decimal point. Skip invalid records without reserving their IDs; retain only the first valid record for each normalized record_id. Sort retained rows lexically by record_id. Compute unit_cents exactly from the decimal price and net_cents as quantity times unit_cents, negative for refunds and positive for sales; preserve kind and quantity.",
+        "checks": [
+          "c02_rows"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S6": {
+        "id": "S6",
+        "parent": "M2",
+        "instruction": "Using the completed c02_rows, group retained rows by normalized client in lexical order. For each client, count retained records and sum signed net_cents exactly as integers. Preserve the result as the required client/count/net_cents aggregate entries; do not use floating-point arithmetic.",
+        "checks": [
+          "c02_aggregates"
+        ],
+        "depends_on": [
+          "S5"
+        ],
+        "revision": 0
+      },
+      "S7": {
+        "id": "S7",
+        "parent": "M2",
+        "instruction": "Using c02_aggregates, render the exact report with no trailing newline: first `CLIENT COUNT NET`, then one line per client in lexical order as `<client> <count> <net amount with exactly two decimal places>`, then `TOTAL <retained record count> <grand net amount with exactly two decimal places>`. Convert integer cents to decimal text exactly, with single spaces and a minus sign only for negative amounts.",
+        "checks": [
+          "c02_report"
+        ],
+        "depends_on": [
+          "S6"
+        ],
+        "revision": 0
+      },
+      "S8": {
+        "id": "S8",
+        "parent": "M2",
+        "instruction": "Check that c02_report and its declared prerequisites pass against the current c02 environment. Then provide the certification artifact with environment_revision equal to the current c02 component revision (currently 0) and checked_gates exactly [\"c02_report\"] in that order.",
+        "checks": [
+          "c02_certify_1"
+        ],
+        "depends_on": [
+          "S7"
+        ],
+        "revision": 0
+      }
+    }
+  },
+  "plan_sha256": "6b3a2e2a0700df1021b8108870a7f0c904ea622f4f7913c7580154165c92ca62",
+  "source_solution": {
+    "c01_rows": [
+      {
+        "record_id": "2A0E1-01",
+        "client": "PINE",
+        "kind": "sale",
+        "quantity": 5,
+        "unit_cents": 465,
+        "net_cents": 2325
+      },
+      {
+        "record_id": "2A0E1-02",
+        "client": "OAK",
+        "kind": "sale",
+        "quantity": 1,
+        "unit_cents": 2000,
+        "net_cents": 2000
+      },
+      {
+        "record_id": "2A0E1-03",
+        "client": "ELM",
+        "kind": "refund",
+        "quantity": 5,
+        "unit_cents": 2403,
+        "net_cents": -12015
+      },
+      {
+        "record_id": "2A0E1-04",
+        "client": "PINE",
+        "kind": "sale",
+        "quantity": 3,
+        "unit_cents": 1017,
+        "net_cents": 3051
+      },
+      {
+        "record_id": "2A0E1-05",
+        "client": "OAK",
+        "kind": "refund",
+        "quantity": 5,
+        "unit_cents": 2066,
+        "net_cents": -10330
+      },
+      {
+        "record_id": "2A0E1-06",
+        "client": "ELM",
+        "kind": "sale",
+        "quantity": 4,
+        "unit_cents": 1912,
+        "net_cents": 7648
+      }
+    ],
+    "c01_aggregates": [
+      {
+        "client": "ELM",
+        "count": 2,
+        "net_cents": -4367
+      },
+      {
+        "client": "OAK",
+        "count": 2,
+        "net_cents": -8330
+      },
+      {
+        "client": "PINE",
+        "count": 2,
+        "net_cents": 5376
+      }
+    ],
+    "c01_report": "CLIENT COUNT NET\nELM 2 -43.67\nOAK 2 -83.30\nPINE 2 53.76\nTOTAL 6 -73.21",
+    "c02_rows": [
+      {
+        "record_id": "0B148-01",
+        "client": "CEDAR",
+        "kind": "sale",
+        "quantity": 3,
+        "unit_cents": 2288,
+        "net_cents": 6864
+      },
+      {
+        "record_id": "0B148-02",
+        "client": "FIR",
+        "kind": "sale",
+        "quantity": 4,
+        "unit_cents": 2081,
+        "net_cents": 8324
+      },
+      {
+        "record_id": "0B148-03",
+        "client": "ELM",
+        "kind": "refund",
+        "quantity": 5,
+        "unit_cents": 1982,
+        "net_cents": -9910
+      },
+      {
+        "record_id": "0B148-04",
+        "client": "CEDAR",
+        "kind": "sale",
+        "quantity": 2,
+        "unit_cents": 1760,
+        "net_cents": 3520
+      },
+      {
+        "record_id": "0B148-05",
+        "client": "FIR",
+        "kind": "refund",
+        "quantity": 4,
+        "unit_cents": 129,
+        "net_cents": -516
+      },
+      {
+        "record_id": "0B148-06",
+        "client": "ELM",
+        "kind": "sale",
+        "quantity": 3,
+        "unit_cents": 539,
+        "net_cents": 1617
+      }
+    ],
+    "c02_aggregates": [
+      {
+        "client": "CEDAR",
+        "count": 2,
+        "net_cents": 10384
+      },
+      {
+        "client": "ELM",
+        "count": 2,
+        "net_cents": -8293
+      },
+      {
+        "client": "FIR",
+        "count": 2,
+        "net_cents": 7808
+      }
+    ],
+    "c02_report": "CLIENT COUNT NET\nCEDAR 2 103.84\nELM 2 -82.93\nFIR 2 78.08\nTOTAL 6 98.99",
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c01_report"
+      ]
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c02_report"
+      ]
+    }
+  },
+  "source_solution_sha256": "686c019990d172a3e5538d74041f31fd88f63920fda4fc4978a80b2a563940a8",
+  "source_public_grade": {
+    "c01_rows": {
+      "passed": true,
+      "message": "Normalized rows passed."
+    },
+    "c01_aggregates": {
+      "passed": true,
+      "message": "Aggregates passed."
+    },
+    "c01_report": {
+      "passed": true,
+      "message": "Report passed."
+    },
+    "c01_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    },
+    "c02_rows": {
+      "passed": true,
+      "message": "Normalized rows passed."
+    },
+    "c02_aggregates": {
+      "passed": true,
+      "message": "Aggregates passed."
+    },
+    "c02_report": {
+      "passed": true,
+      "message": "Report passed."
+    },
+    "c02_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    }
+  },
+  "source_hidden_grade": {
+    "c01_rows": {
+      "passed": true,
+      "message": "Normalized rows passed."
+    },
+    "c01_aggregates": {
+      "passed": true,
+      "message": "Aggregates passed."
+    },
+    "c01_report": {
+      "passed": true,
+      "message": "Report passed."
+    },
+    "c01_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    },
+    "c02_rows": {
+      "passed": true,
+      "message": "Normalized rows passed."
+    },
+    "c02_aggregates": {
+      "passed": true,
+      "message": "Aggregates passed."
+    },
+    "c02_report": {
+      "passed": true,
+      "message": "Report passed."
+    },
+    "c02_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    }
+  },
+  "source_trace_sha256": "14580443ceecd5c347d579ca96bcbbf4ad706988aa541507bb1c3504d4dfb448",
+  "failed_solution": {
+    "c01_rows": [
+      {
+        "record_id": "2A0E1-01",
+        "client": "PINE",
+        "kind": "sale",
+        "quantity": 5,
+        "unit_cents": 465,
+        "net_cents": 2325
+      },
+      {
+        "record_id": "2A0E1-02",
+        "client": "OAK",
+        "kind": "sale",
+        "quantity": 1,
+        "unit_cents": 2000,
+        "net_cents": 2000
+      },
+      {
+        "record_id": "2A0E1-03",
+        "client": "ELM",
+        "kind": "refund",
+        "quantity": 5,
+        "unit_cents": 2403,
+        "net_cents": -12015
+      },
+      {
+        "record_id": "2A0E1-04",
+        "client": "PINE",
+        "kind": "sale",
+        "quantity": 3,
+        "unit_cents": 1017,
+        "net_cents": 3051
+      },
+      {
+        "record_id": "2A0E1-05",
+        "client": "OAK",
+        "kind": "refund",
+        "quantity": 5,
+        "unit_cents": 2066,
+        "net_cents": -10330
+      },
+      {
+        "record_id": "2A0E1-06",
+        "client": "ELM",
+        "kind": "sale",
+        "quantity": 4,
+        "unit_cents": 1912,
+        "net_cents": 7648
+      }
+    ],
+    "c01_aggregates": [
+      {
+        "client": "ELM",
+        "count": 2,
+        "net_cents": -4367
+      },
+      {
+        "client": "OAK",
+        "count": 2,
+        "net_cents": -8330
+      },
+      {
+        "client": "PINE",
+        "count": 2,
+        "net_cents": 5376
+      }
+    ],
+    "c01_report": "CLIENT COUNT NET\nELM 2 -43.67\nOAK 2 -83.30\nPINE 2 53.76\nTOTAL 6 -73.21",
+    "c02_rows": [
+      {
+        "record_id": "0B148-01",
+        "client": "CEDAR",
+        "kind": "sale",
+        "quantity": 3,
+        "unit_cents": 2288,
+        "net_cents": 6865
+      },
+      {
+        "record_id": "0B148-02",
+        "client": "FIR",
+        "kind": "sale",
+        "quantity": 4,
+        "unit_cents": 2081,
+        "net_cents": 8324
+      },
+      {
+        "record_id": "0B148-03",
+        "client": "ELM",
+        "kind": "refund",
+        "quantity": 5,
+        "unit_cents": 1982,
+        "net_cents": -9910
+      },
+      {
+        "record_id": "0B148-04",
+        "client": "CEDAR",
+        "kind": "sale",
+        "quantity": 2,
+        "unit_cents": 1760,
+        "net_cents": 3520
+      },
+      {
+        "record_id": "0B148-05",
+        "client": "FIR",
+        "kind": "refund",
+        "quantity": 4,
+        "unit_cents": 129,
+        "net_cents": -516
+      },
+      {
+        "record_id": "0B148-06",
+        "client": "ELM",
+        "kind": "sale",
+        "quantity": 3,
+        "unit_cents": 539,
+        "net_cents": 1617
+      }
+    ],
+    "c02_aggregates": [
+      {
+        "client": "CEDAR",
+        "count": 2,
+        "net_cents": 10384
+      },
+      {
+        "client": "ELM",
+        "count": 2,
+        "net_cents": -8293
+      },
+      {
+        "client": "FIR",
+        "count": 2,
+        "net_cents": 7808
+      }
+    ],
+    "c02_report": "CLIENT COUNT NET\nCEDAR 2 103.84\nELM 2 -82.93\nFIR 2 78.08\nTOTAL 6 98.99",
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c01_report"
+      ]
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c02_report"
+      ]
+    }
+  },
+  "failed_solution_sha256": "e532e0c162a6b628e279affe26cbeb0a722462266b5e4fab7f89391f779756ef",
+  "public_feedback": {
+    "c01_rows": {
+      "passed": true,
+      "message": "Normalized rows passed."
+    },
+    "c01_aggregates": {
+      "passed": true,
+      "message": "Aggregates passed."
+    },
+    "c01_report": {
+      "passed": true,
+      "message": "Report passed."
+    },
+    "c01_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    },
+    "c02_rows": {
+      "passed": false,
+      "message": "Rows do not satisfy source normalization."
+    },
+    "c02_aggregates": {
+      "passed": false,
+      "message": "At least one authoritative prerequisite has not passed."
+    },
+    "c02_report": {
+      "passed": false,
+      "message": "At least one authoritative prerequisite has not passed."
+    },
+    "c02_certify_1": {
+      "passed": false,
+      "message": "At least one authoritative prerequisite has not passed."
+    }
+  },
+  "fault_receipt": {
+    "kind": "forced_subgoal",
+    "perturbation_type": "subgoal",
+    "target_component": "c02",
+    "target_gate": "c02_rows",
+    "affected_gates": [
+      "c02_rows",
+      "c02_aggregates",
+      "c02_report",
+      "c02_certify_1"
+    ],
+    "unaffected_gates": [
+      "c01_rows",
+      "c01_aggregates",
+      "c01_report",
+      "c01_certify_1"
+    ],
+    "changed_fields": [
+      "c02_rows"
+    ],
+    "delivered": true,
+    "domain_fault_delivered": true,
+    "certification_invalidated": true,
+    "status": "delivered",
+    "seed": 20261127,
+    "instance_seed": 10238940635289442739,
+    "environment_revision": 0,
+    "environment_before": {
+      "components": {
+        "c01": {
+          "records": [
+            {
+              "record_id": " 2A0E1-01 ",
+              "client": " pine ",
+              "quantity": " 5 ",
+              "unit_price": "NaN",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-01 ",
+              "client": " pine ",
+              "quantity": " 5 ",
+              "unit_price": " 4.65 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-02 ",
+              "client": " oak ",
+              "quantity": " 1 ",
+              "unit_price": " 20.00 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-03 ",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 24.03 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-04 ",
+              "client": " pine ",
+              "quantity": " 3 ",
+              "unit_price": " 10.17 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-05 ",
+              "client": " oak ",
+              "quantity": " 5 ",
+              "unit_price": " 20.66 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-06 ",
+              "client": " elm ",
+              "quantity": " 4 ",
+              "unit_price": " 19.12 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-02 ",
+              "client": "DUPLICATE",
+              "quantity": "50",
+              "unit_price": "999.99",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "2A0E1-VOID",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 24.03 ",
+              "kind": " ReFuNd ",
+              "status": " void "
+            },
+            {
+              "record_id": "2A0E1-BAD",
+              "client": " pine ",
+              "quantity": "2.5",
+              "unit_price": " 10.17 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "2A0E1-EMPTY",
+              "client": " ",
+              "quantity": " 5 ",
+              "unit_price": " 20.66 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            }
+          ]
+        },
+        "c02": {
+          "records": [
+            {
+              "record_id": " 0B148-01 ",
+              "client": " cedar ",
+              "quantity": " 3 ",
+              "unit_price": "NaN",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-01 ",
+              "client": " cedar ",
+              "quantity": " 3 ",
+              "unit_price": " 22.88 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-02 ",
+              "client": " fir ",
+              "quantity": " 4 ",
+              "unit_price": " 20.81 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-03 ",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 19.82 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-04 ",
+              "client": " cedar ",
+              "quantity": " 2 ",
+              "unit_price": " 17.60 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-05 ",
+              "client": " fir ",
+              "quantity": " 4 ",
+              "unit_price": " 1.29 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-06 ",
+              "client": " elm ",
+              "quantity": " 3 ",
+              "unit_price": " 5.39 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-02 ",
+              "client": "DUPLICATE",
+              "quantity": "50",
+              "unit_price": "999.99",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "0B148-VOID",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 19.82 ",
+              "kind": " ReFuNd ",
+              "status": " void "
+            },
+            {
+              "record_id": "0B148-BAD",
+              "client": " cedar ",
+              "quantity": "2.5",
+              "unit_price": " 17.60 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "0B148-EMPTY",
+              "client": " ",
+              "quantity": " 4 ",
+              "unit_price": " 1.29 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            }
+          ]
+        }
+      },
+      "component_revisions": {
+        "c01": 0,
+        "c02": 0
+      }
+    },
+    "environment_after": {
+      "components": {
+        "c01": {
+          "records": [
+            {
+              "record_id": " 2A0E1-01 ",
+              "client": " pine ",
+              "quantity": " 5 ",
+              "unit_price": "NaN",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-01 ",
+              "client": " pine ",
+              "quantity": " 5 ",
+              "unit_price": " 4.65 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-02 ",
+              "client": " oak ",
+              "quantity": " 1 ",
+              "unit_price": " 20.00 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-03 ",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 24.03 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-04 ",
+              "client": " pine ",
+              "quantity": " 3 ",
+              "unit_price": " 10.17 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-05 ",
+              "client": " oak ",
+              "quantity": " 5 ",
+              "unit_price": " 20.66 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-06 ",
+              "client": " elm ",
+              "quantity": " 4 ",
+              "unit_price": " 19.12 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 2A0E1-02 ",
+              "client": "DUPLICATE",
+              "quantity": "50",
+              "unit_price": "999.99",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "2A0E1-VOID",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 24.03 ",
+              "kind": " ReFuNd ",
+              "status": " void "
+            },
+            {
+              "record_id": "2A0E1-BAD",
+              "client": " pine ",
+              "quantity": "2.5",
+              "unit_price": " 10.17 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "2A0E1-EMPTY",
+              "client": " ",
+              "quantity": " 5 ",
+              "unit_price": " 20.66 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            }
+          ]
+        },
+        "c02": {
+          "records": [
+            {
+              "record_id": " 0B148-01 ",
+              "client": " cedar ",
+              "quantity": " 3 ",
+              "unit_price": "NaN",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-01 ",
+              "client": " cedar ",
+              "quantity": " 3 ",
+              "unit_price": " 22.88 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-02 ",
+              "client": " fir ",
+              "quantity": " 4 ",
+              "unit_price": " 20.81 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-03 ",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 19.82 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-04 ",
+              "client": " cedar ",
+              "quantity": " 2 ",
+              "unit_price": " 17.60 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-05 ",
+              "client": " fir ",
+              "quantity": " 4 ",
+              "unit_price": " 1.29 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-06 ",
+              "client": " elm ",
+              "quantity": " 3 ",
+              "unit_price": " 5.39 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": " 0B148-02 ",
+              "client": "DUPLICATE",
+              "quantity": "50",
+              "unit_price": "999.99",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "0B148-VOID",
+              "client": " elm ",
+              "quantity": " 5 ",
+              "unit_price": " 19.82 ",
+              "kind": " ReFuNd ",
+              "status": " void "
+            },
+            {
+              "record_id": "0B148-BAD",
+              "client": " cedar ",
+              "quantity": "2.5",
+              "unit_price": " 17.60 ",
+              "kind": " Sale ",
+              "status": " OK "
+            },
+            {
+              "record_id": "0B148-EMPTY",
+              "client": " ",
+              "quantity": " 4 ",
+              "unit_price": " 1.29 ",
+              "kind": " ReFuNd ",
+              "status": " OK "
+            }
+          ]
+        }
+      },
+      "component_revisions": {
+        "c01": 0,
+        "c02": 0
+      }
+    },
+    "before_grade": {
+      "c01_rows": {
+        "passed": true,
+        "message": "Normalized rows passed."
+      },
+      "c01_aggregates": {
+        "passed": true,
+        "message": "Aggregates passed."
+      },
+      "c01_report": {
+        "passed": true,
+        "message": "Report passed."
+      },
+      "c01_certify_1": {
+        "passed": true,
+        "message": "Current component certification passed."
+      },
+      "c02_rows": {
+        "passed": true,
+        "message": "Normalized rows passed."
+      },
+      "c02_aggregates": {
+        "passed": true,
+        "message": "Aggregates passed."
+      },
+      "c02_report": {
+        "passed": true,
+        "message": "Report passed."
+      },
+      "c02_certify_1": {
+        "passed": true,
+        "message": "Current component certification passed."
+      }
+    },
+    "after_grade": {
+      "c01_rows": {
+        "passed": true,
+        "message": "Normalized rows passed."
+      },
+      "c01_aggregates": {
+        "passed": true,
+        "message": "Aggregates passed."
+      },
+      "c01_report": {
+        "passed": true,
+        "message": "Report passed."
+      },
+      "c01_certify_1": {
+        "passed": true,
+        "message": "Current component certification passed."
+      },
+      "c02_rows": {
+        "passed": false,
+        "message": "Rows do not satisfy source normalization."
+      },
+      "c02_aggregates": {
+        "passed": false,
+        "message": "At least one authoritative prerequisite has not passed."
+      },
+      "c02_report": {
+        "passed": false,
+        "message": "At least one authoritative prerequisite has not passed."
+      },
+      "c02_certify_1": {
+        "passed": false,
+        "message": "At least one authoritative prerequisite has not passed."
+      }
+    },
+    "raw_domain_after_grade": {
+      "c02_rows": {
+        "passed": false,
+        "message": "Rows do not satisfy source normalization."
+      },
+      "c02_aggregates": {
+        "passed": false,
+        "message": "Aggregates do not satisfy row/source totals."
+      },
+      "c02_report": {
+        "passed": true,
+        "message": "Report passed."
+      }
+    },
+    "unaffected_artifacts_unchanged": true,
+    "unrelated_component_gates": [
+      "c01_rows",
+      "c01_aggregates",
+      "c01_report",
+      "c01_certify_1"
+    ],
+    "subgoal_fault_count": 1
+  },
+  "target_leaf_id": "S5",
+  "repair_history": [],
+  "source_visibility": "archival_only_never_repair_prompt",
+  "checkpoint_sha256": "8bb187e4609bd3a341187767b098a5c8376aa2d4e580a85a71a79951a33a73a0"
+}

@@ -1,0 +1,206 @@
+{
+  "phase": "prepare",
+  "identifier": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1",
+  "pair_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1",
+  "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+  "arm": null,
+  "status": "PASS",
+  "diagnostic": "INDEPENDENT_GRADING_PASS",
+  "calls": 2,
+  "input_tokens": 5822,
+  "output_tokens": 1629,
+  "known_input_tokens": 5822,
+  "known_output_tokens": 1629,
+  "elapsed_seconds": 11.957975039000019,
+  "replan_attempts": 0,
+  "replans": 0,
+  "rejected_actions": 0,
+  "patch_actions": 1,
+  "simulated": false,
+  "invariant_ok": true,
+  "stop_batch": false,
+  "success": true,
+  "wall_seconds": 11.96893528000004,
+  "final_solution": {
+    "c01_assignments": [
+      {
+        "resource": "R1",
+        "start": 1,
+        "task_id": "J1"
+      },
+      {
+        "resource": "R1",
+        "start": 4,
+        "task_id": "J2"
+      },
+      {
+        "resource": "R2",
+        "start": 4,
+        "task_id": "J3"
+      },
+      {
+        "resource": "R1",
+        "start": 7,
+        "task_id": "J4"
+      },
+      {
+        "resource": "R2",
+        "start": 11,
+        "task_id": "J5"
+      }
+    ],
+    "c02_assignments": [
+      {
+        "resource": "R1",
+        "start": 1,
+        "task_id": "J1"
+      },
+      {
+        "resource": "R2",
+        "start": 3,
+        "task_id": "J2"
+      },
+      {
+        "resource": "R1",
+        "start": 4,
+        "task_id": "J3"
+      },
+      {
+        "resource": "R2",
+        "start": 8,
+        "task_id": "J4"
+      },
+      {
+        "resource": "R1",
+        "start": 10,
+        "task_id": "J5"
+      }
+    ],
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c01_precedence"
+      ]
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c02_precedence"
+      ]
+    }
+  },
+  "final_plan": {
+    "milestones": [
+      {
+        "id": "M1",
+        "parent": "G0",
+        "title": "Verify component c01 at grouping level 1"
+      },
+      {
+        "id": "M2",
+        "parent": "G0",
+        "title": "Verify component c02 at grouping level 1"
+      }
+    ],
+    "leaves": {
+      "S1": {
+        "id": "S1",
+        "parent": "M1",
+        "instruction": "For component c01 at environment revision 0, assign each job exactly once as follows: J1 to R1 at slot 1, J2 to R1 at slot 4, J3 to R2 at slot 4, J4 to R1 at slot 7, and J5 to R1 at slot 11. Use integer start slots and retain each job's published duration. Recompute the schedule if the component environment changes.",
+        "checks": [
+          "c01_assignments"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S2": {
+        "id": "S2",
+        "parent": "M1",
+        "instruction": "Using the c01 assignment schedule, check that every job uses a permitted resource, runs within its release and deadline, and occupies no slot in common with another job on that resource or with a published unavailable interval. Treat intervals as half-open, so adjacent jobs are allowed. Recompute against the latest c01 environment.",
+        "checks": [
+          "c01_resources"
+        ],
+        "depends_on": [
+          "S1"
+        ],
+        "revision": 0
+      },
+      "S3": {
+        "id": "S3",
+        "parent": "M1",
+        "instruction": "Using the c01 assignment schedule, check every published precedence edge: the after job must start no earlier than the before job's finish plus the published lag. Recompute this check against the latest c01 environment.",
+        "checks": [
+          "c01_precedence"
+        ],
+        "depends_on": [
+          "S1",
+          "S2"
+        ],
+        "revision": 0
+      },
+      "S4": {
+        "id": "S4",
+        "parent": "M1",
+        "instruction": "After c01_precedence passes, certify component c01 by reporting environment_revision 0 and checked_gates [\"c01_precedence\"] in that exact order. Confirm the referenced gate passes against the current environment; use the current component revision if it has changed.",
+        "checks": [
+          "c01_certify_1"
+        ],
+        "depends_on": [
+          "S3"
+        ],
+        "revision": 0
+      },
+      "S5": {
+        "id": "S5",
+        "parent": "M2",
+        "instruction": "For component c02 at environment revision 0, assign each job exactly once as follows: J1 to R1 at slot 1, J2 to R2 at slot 3, J3 to R2 at slot 5, J4 to R2 at slot 9, and J5 to R1 at slot 11. Use integer start slots and retain each job's published duration. Recompute the schedule if the component environment changes.",
+        "checks": [
+          "c02_assignments"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S6": {
+        "id": "S6",
+        "parent": "M2",
+        "instruction": "Using the c02 assignment schedule, check that every job uses a permitted resource, runs within its release and deadline, and occupies no slot in common with another job on that resource or with a published unavailable interval. Treat intervals as half-open, so adjacent jobs are allowed. Recompute against the latest c02 environment.",
+        "checks": [
+          "c02_resources"
+        ],
+        "depends_on": [
+          "S5"
+        ],
+        "revision": 0
+      },
+      "S7": {
+        "id": "S7",
+        "parent": "M2",
+        "instruction": "Using the c02 assignment schedule, check every published precedence edge: the after job must start no earlier than the before job's finish plus the published lag. Recompute this check against the latest c02 environment.",
+        "checks": [
+          "c02_precedence"
+        ],
+        "depends_on": [
+          "S5",
+          "S6"
+        ],
+        "revision": 0
+      },
+      "S8": {
+        "id": "S8",
+        "parent": "M2",
+        "instruction": "After c02_precedence passes, certify component c02 by reporting environment_revision 0 and checked_gates [\"c02_precedence\"] in that exact order. Confirm the referenced gate passes against the current environment; use the current component revision if it has changed.",
+        "checks": [
+          "c02_certify_1"
+        ],
+        "depends_on": [
+          "S7"
+        ],
+        "revision": 0
+      }
+    }
+  },
+  "final_artifact_sha256": "deacac72c6e18753add96c2614e9834cc35059a8be9c0cded3b1a714442196cf",
+  "final_plan_sha256": "407a2ac99d453d7a929c8e78f71a9836b1c694096c10209d8490e127fd3d5a1c",
+  "final_environment_sha256": "415b91126646d6ccfd5087b60c9ca917243af6878fd1671498bf89feed97e2b6",
+  "trace_final_sha256": "bf7afef98939d7b34f23957b7c610319b87e5cc0721cb6909c7564627daf2bb4"
+}

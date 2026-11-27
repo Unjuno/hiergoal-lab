@@ -1,0 +1,206 @@
+{
+  "phase": "repair",
+  "identifier": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2-fixed",
+  "pair_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2",
+  "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+  "arm": "fixed",
+  "status": "PASS",
+  "diagnostic": "INDEPENDENT_GRADING_PASS",
+  "calls": 1,
+  "input_tokens": 3831,
+  "output_tokens": 325,
+  "known_input_tokens": 3831,
+  "known_output_tokens": 325,
+  "elapsed_seconds": 2.6826037790000328,
+  "replan_attempts": 0,
+  "replans": 0,
+  "rejected_actions": 0,
+  "patch_actions": 1,
+  "simulated": false,
+  "invariant_ok": true,
+  "stop_batch": false,
+  "success": true,
+  "wall_seconds": 2.6890266290000113,
+  "final_solution": {
+    "c01_assignments": [
+      {
+        "resource": "R1",
+        "start": 1,
+        "task_id": "J1"
+      },
+      {
+        "resource": "R2",
+        "start": 3,
+        "task_id": "J2"
+      },
+      {
+        "resource": "R1",
+        "start": 4,
+        "task_id": "J3"
+      },
+      {
+        "resource": "R2",
+        "start": 8,
+        "task_id": "J4"
+      },
+      {
+        "resource": "R1",
+        "start": 12,
+        "task_id": "J5"
+      }
+    ],
+    "c02_assignments": [
+      {
+        "task_id": "J1",
+        "resource": "R1",
+        "start": 2
+      },
+      {
+        "task_id": "J2",
+        "resource": "R1",
+        "start": 7
+      },
+      {
+        "task_id": "J3",
+        "resource": "R2",
+        "start": 4
+      },
+      {
+        "task_id": "J4",
+        "resource": "R1",
+        "start": 10
+      },
+      {
+        "task_id": "J5",
+        "resource": "R2",
+        "start": 12
+      }
+    ],
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c01_precedence"
+      ]
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c02_precedence"
+      ]
+    }
+  },
+  "final_plan": {
+    "milestones": [
+      {
+        "id": "M1",
+        "parent": "G0",
+        "title": "Verify component c01 at grouping level 1"
+      },
+      {
+        "id": "M2",
+        "parent": "G0",
+        "title": "Verify component c02 at grouping level 1"
+      }
+    ],
+    "leaves": {
+      "S1": {
+        "id": "S1",
+        "parent": "M1",
+        "instruction": "Assign J1 to R1 starting at slot 1, J2 to R2 starting at slot 3, J3 to R1 starting at slot 4, J4 to R2 starting at slot 8, and J5 to R1 starting at slot 12. Each job runs for its published duration without interruption.",
+        "checks": [
+          "c01_assignments"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S2": {
+        "id": "S2",
+        "parent": "M1",
+        "instruction": "For the current c01 schedule, verify each job uses a permitted resource, starts no earlier than release and finishes by deadline; verify no same-resource job intervals overlap and no job intersects that resource's unavailable interval.",
+        "checks": [
+          "c01_resources"
+        ],
+        "depends_on": [
+          "S1"
+        ],
+        "revision": 0
+      },
+      "S3": {
+        "id": "S3",
+        "parent": "M1",
+        "instruction": "For the current c01 schedule, verify every published precedence edge: the after job must start at or after the before job's finish plus the edge's lag. Confirm the schedule uses the published current assignments.",
+        "checks": [
+          "c01_precedence"
+        ],
+        "depends_on": [
+          "S1",
+          "S2"
+        ],
+        "revision": 0
+      },
+      "S4": {
+        "id": "S4",
+        "parent": "M1",
+        "instruction": "At component revision 0, verify that c01_precedence passes for the current schedule, then record environment_revision as 0 and checked_gates as [\"c01_precedence\"].",
+        "checks": [
+          "c01_certify_1"
+        ],
+        "depends_on": [
+          "S3"
+        ],
+        "revision": 0
+      },
+      "S5": {
+        "id": "S5",
+        "parent": "M2",
+        "instruction": "Assign J1 to R1 starting at slot 2, J2 to R2 starting at slot 5, J3 to R1 starting at slot 4, J4 to R1 starting at slot 8, and J5 to R2 starting at slot 10. Each job runs for its published duration without interruption.",
+        "checks": [
+          "c02_assignments"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S6": {
+        "id": "S6",
+        "parent": "M2",
+        "instruction": "For the current c02 schedule, verify each job uses a permitted resource, starts no earlier than release and finishes by deadline; verify no same-resource job intervals overlap and no job intersects that resource's unavailable interval.",
+        "checks": [
+          "c02_resources"
+        ],
+        "depends_on": [
+          "S5"
+        ],
+        "revision": 0
+      },
+      "S7": {
+        "id": "S7",
+        "parent": "M2",
+        "instruction": "For the current c02 schedule, verify every published precedence edge: the after job must start at or after the before job's finish plus the edge's lag. Confirm the schedule uses the published current assignments.",
+        "checks": [
+          "c02_precedence"
+        ],
+        "depends_on": [
+          "S5",
+          "S6"
+        ],
+        "revision": 0
+      },
+      "S8": {
+        "id": "S8",
+        "parent": "M2",
+        "instruction": "At component revision 0, verify that c02_precedence passes for the current schedule, then record environment_revision as 0 and checked_gates as [\"c02_precedence\"].",
+        "checks": [
+          "c02_certify_1"
+        ],
+        "depends_on": [
+          "S7"
+        ],
+        "revision": 0
+      }
+    }
+  },
+  "final_artifact_sha256": "90a4cdc7156fa1541083c5284254619bbd0dba218e673f110d9e4eb99d6093d6",
+  "final_plan_sha256": "08a7680886eca92a4335a91d54743595b3213de92317f104e863c13308206b3c",
+  "final_environment_sha256": "3ba0fe9931f1473e48ea564bd93d9aaaa07ed0ea90f2f8f4b3ab6c34f1c24d85",
+  "trace_final_sha256": "8fa55469fda847e155c650b6c75d15bfb26f2a141854b2112345ab258e8174e2"
+}

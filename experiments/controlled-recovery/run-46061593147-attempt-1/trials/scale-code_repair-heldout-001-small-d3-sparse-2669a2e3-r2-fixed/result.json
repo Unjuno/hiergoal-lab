@@ -1,0 +1,156 @@
+{
+  "phase": "repair",
+  "identifier": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2-fixed",
+  "pair_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2",
+  "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+  "arm": "fixed",
+  "status": "PASS",
+  "diagnostic": "INDEPENDENT_GRADING_PASS",
+  "calls": 1,
+  "input_tokens": 3766,
+  "output_tokens": 46,
+  "known_input_tokens": 3766,
+  "known_output_tokens": 46,
+  "elapsed_seconds": 1.0250720839999872,
+  "replan_attempts": 0,
+  "replans": 0,
+  "rejected_actions": 0,
+  "patch_actions": 1,
+  "simulated": false,
+  "invariant_ok": true,
+  "stop_batch": false,
+  "success": true,
+  "wall_seconds": 1.0344638459999942,
+  "final_solution": {
+    "c01_base": "max(0, x - floor) * multiplier + y",
+    "c01_adjusted": "min(cap, max(0, base + rate * z))",
+    "c01_total": "adjusted + (bonus if z >= 0 else -bonus)",
+    "c02_base": "max(0, x - floor) * multiplier + y",
+    "c02_adjusted": "min(cap, max(0, base + rate * z))",
+    "c02_total": "adjusted + (bonus if z >= 0 else -bonus)",
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c01_total"
+      ]
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c02_total"
+      ]
+    }
+  },
+  "final_plan": {
+    "milestones": [
+      {
+        "id": "M1",
+        "parent": "G0",
+        "title": "Verify component c01 at grouping level 1"
+      },
+      {
+        "id": "M2",
+        "parent": "G0",
+        "title": "Verify component c02 at grouping level 1"
+      }
+    ],
+    "leaves": {
+      "S1": {
+        "id": "S1",
+        "parent": "M1",
+        "instruction": "Define c01_base as the integer expression max(0, x - floor) * multiplier + y.",
+        "checks": [
+          "c01_base"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S2": {
+        "id": "S2",
+        "parent": "M1",
+        "instruction": "Define c01_adjusted as the integer expression min(max(c01_base + rate * z, 0), cap), clamping base plus rate times z to the inclusive range from zero through cap.",
+        "checks": [
+          "c01_adjusted"
+        ],
+        "depends_on": [
+          "S1"
+        ],
+        "revision": 0
+      },
+      "S3": {
+        "id": "S3",
+        "parent": "M1",
+        "instruction": "Define c01_total as the integer expression adjusted + bonus if z >= 0, otherwise adjusted - bonus.",
+        "checks": [
+          "c01_total"
+        ],
+        "depends_on": [
+          "S2"
+        ],
+        "revision": 0
+      },
+      "S4": {
+        "id": "S4",
+        "parent": "M1",
+        "instruction": "Certify c01 by providing c01_certify_1 with environment_revision equal to the current c01 component revision and checked_gates exactly [\"c01_total\"]. Confirm the referenced gate passes.",
+        "checks": [
+          "c01_certify_1"
+        ],
+        "depends_on": [
+          "S3"
+        ],
+        "revision": 0
+      },
+      "S5": {
+        "id": "S5",
+        "parent": "M2",
+        "instruction": "Define c02_base as the integer expression max(0, x - floor) * multiplier + y.",
+        "checks": [
+          "c02_base"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S6": {
+        "id": "S6",
+        "parent": "M2",
+        "instruction": "Define c02_adjusted as the integer expression min(max(c02_base + rate * z, 0), cap), clamping base plus rate times z to the inclusive range from zero through cap.",
+        "checks": [
+          "c02_adjusted"
+        ],
+        "depends_on": [
+          "S5"
+        ],
+        "revision": 0
+      },
+      "S7": {
+        "id": "S7",
+        "parent": "M2",
+        "instruction": "Define c02_total as the integer expression adjusted + bonus if z >= 0, otherwise adjusted - bonus.",
+        "checks": [
+          "c02_total"
+        ],
+        "depends_on": [
+          "S6"
+        ],
+        "revision": 0
+      },
+      "S8": {
+        "id": "S8",
+        "parent": "M2",
+        "instruction": "Certify c02 by providing c02_certify_1 with environment_revision equal to the current c02 component revision and checked_gates exactly [\"c02_total\"]. Confirm the referenced gate passes.",
+        "checks": [
+          "c02_certify_1"
+        ],
+        "depends_on": [
+          "S7"
+        ],
+        "revision": 0
+      }
+    }
+  },
+  "final_artifact_sha256": "0653999c0005b6184be4e07e60adab0dcf50f02ec04d42b1d3ee581550fa73df",
+  "final_plan_sha256": "8ed4d8ae287071b7a77ecabd19495a50e31db31e8acb95a6b4228ab350585f00",
+  "final_environment_sha256": "28f61d13e0463672b8d4337bed50d11e7f4048c1137cb1483d9fe0edf61757ba",
+  "trace_final_sha256": "a7a8aecbde0c8c0815e7c4bf920c49849a7cc13992d690d77a5011532aaefbdd"
+}

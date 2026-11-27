@@ -1,0 +1,206 @@
+{
+  "phase": "prepare",
+  "identifier": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2",
+  "pair_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2",
+  "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+  "arm": null,
+  "status": "PASS",
+  "diagnostic": "INDEPENDENT_GRADING_PASS",
+  "calls": 2,
+  "input_tokens": 5822,
+  "output_tokens": 1828,
+  "known_input_tokens": 5822,
+  "known_output_tokens": 1828,
+  "elapsed_seconds": 12.672294875000006,
+  "replan_attempts": 0,
+  "replans": 0,
+  "rejected_actions": 0,
+  "patch_actions": 1,
+  "simulated": false,
+  "invariant_ok": true,
+  "stop_batch": false,
+  "success": true,
+  "wall_seconds": 12.683022945999994,
+  "final_solution": {
+    "c01_assignments": [
+      {
+        "resource": "R2",
+        "start": 1,
+        "task_id": "J1"
+      },
+      {
+        "resource": "R1",
+        "start": 4,
+        "task_id": "J2"
+      },
+      {
+        "resource": "R2",
+        "start": 4,
+        "task_id": "J3"
+      },
+      {
+        "resource": "R1",
+        "start": 7,
+        "task_id": "J4"
+      },
+      {
+        "resource": "R1",
+        "start": 11,
+        "task_id": "J5"
+      }
+    ],
+    "c02_assignments": [
+      {
+        "resource": "R1",
+        "start": 1,
+        "task_id": "J1"
+      },
+      {
+        "resource": "R2",
+        "start": 3,
+        "task_id": "J2"
+      },
+      {
+        "resource": "R1",
+        "start": 4,
+        "task_id": "J3"
+      },
+      {
+        "resource": "R2",
+        "start": 8,
+        "task_id": "J4"
+      },
+      {
+        "resource": "R1",
+        "start": 10,
+        "task_id": "J5"
+      }
+    ],
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c01_precedence"
+      ]
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c02_precedence"
+      ]
+    }
+  },
+  "final_plan": {
+    "milestones": [
+      {
+        "id": "M1",
+        "parent": "G0",
+        "title": "Verify component c01 at grouping level 1"
+      },
+      {
+        "id": "M2",
+        "parent": "G0",
+        "title": "Verify component c02 at grouping level 1"
+      }
+    ],
+    "leaves": {
+      "S1": {
+        "id": "S1",
+        "parent": "M1",
+        "instruction": "Assign J1 to R1 at slot 1, J2 to R1 at slot 4, J3 to R2 at slot 4, J4 to R2 at slot 6, and J5 to R1 at slot 10. Record each job exactly once using its task_id, resource, and integer start slot.",
+        "checks": [
+          "c01_assignments"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S2": {
+        "id": "S2",
+        "parent": "M1",
+        "instruction": "Using the c01 assignments, verify each job is on a permitted resource, starts at or after release, finishes by its deadline, and occupies no unavailable or already occupied slot. The proposed schedule is J1 on R1 at 1, J2 on R1 at 4, J3 on R2 at 4, J4 on R2 at 6, and J5 on R1 at 10; check half-open intervals against the current environment.",
+        "checks": [
+          "c01_resources"
+        ],
+        "depends_on": [
+          "S1"
+        ],
+        "revision": 0
+      },
+      "S3": {
+        "id": "S3",
+        "parent": "M1",
+        "instruction": "Using the c01 assignments, verify every precedence edge against the current environment: J2 starts at least 1 slot after J1 finishes; J3 starts no earlier than J1 finishes; J4 starts at least 1 slot after J2 finishes and no earlier than J3 finishes; J5 starts at least 1 slot after J4 finishes. The proposed schedule is J1 1–3, J2 4–5, J3 4–6, J4 6–9, J5 10–12.",
+        "checks": [
+          "c01_precedence"
+        ],
+        "depends_on": [
+          "S1",
+          "S2"
+        ],
+        "revision": 0
+      },
+      "S4": {
+        "id": "S4",
+        "parent": "M1",
+        "instruction": "At component c01 revision 0, verify that c01_precedence passes. Provide the certification artifact with environment_revision set to 0 and checked_gates set to [\"c01_precedence\"], in that order.",
+        "checks": [
+          "c01_certify_1"
+        ],
+        "depends_on": [
+          "S3"
+        ],
+        "revision": 0
+      },
+      "S5": {
+        "id": "S5",
+        "parent": "M2",
+        "instruction": "Assign J1 to R1 at slot 1, J2 to R2 at slot 3, J3 to R1 at slot 4, J4 to R2 at slot 8, and J5 to R1 at slot 10. Record each job exactly once using its task_id, resource, and integer start slot.",
+        "checks": [
+          "c02_assignments"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S6": {
+        "id": "S6",
+        "parent": "M2",
+        "instruction": "Using the c02 assignments, verify each job is on a permitted resource, starts at or after release, finishes by its deadline, and occupies no unavailable or already occupied slot. The proposed schedule is J1 on R1 at 1, J2 on R2 at 3, J3 on R1 at 4, J4 on R2 at 8, and J5 on R1 at 10; check half-open intervals against the current environment.",
+        "checks": [
+          "c02_resources"
+        ],
+        "depends_on": [
+          "S5"
+        ],
+        "revision": 0
+      },
+      "S7": {
+        "id": "S7",
+        "parent": "M2",
+        "instruction": "Using the c02 assignments, verify every precedence edge against the current environment: J2 and J3 each start at least 1 slot after J1 finishes; J4 starts no earlier than J2 finishes and at least 1 slot after J3 finishes; J5 starts no earlier than J4 finishes. The proposed schedule is J1 1–2, J2 3–5, J3 4–7, J4 8–10, J5 10–11.",
+        "checks": [
+          "c02_precedence"
+        ],
+        "depends_on": [
+          "S5",
+          "S6"
+        ],
+        "revision": 0
+      },
+      "S8": {
+        "id": "S8",
+        "parent": "M2",
+        "instruction": "At component c02 revision 0, verify that c02_precedence passes. Provide the certification artifact with environment_revision set to 0 and checked_gates set to [\"c02_precedence\"], in that order.",
+        "checks": [
+          "c02_certify_1"
+        ],
+        "depends_on": [
+          "S7"
+        ],
+        "revision": 0
+      }
+    }
+  },
+  "final_artifact_sha256": "d792b3dcbca49c8b83f9bfc24c2f87c9deb78a476580cc5bff76ef639bc43cbb",
+  "final_plan_sha256": "1c064ea718baa18a186453137af78a6e06ace5ce0fb8e49f935ea94c0812959b",
+  "final_environment_sha256": "415b91126646d6ccfd5087b60c9ca917243af6878fd1671498bf89feed97e2b6",
+  "trace_final_sha256": "79819f792723c275ab89dbcd69158e18c736de37bfa5f9a13c96728c276360b9"
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "hiergoal.controlled_recovery.authorization.v1",
+  "live": true,
+  "mode": "run",
+  "event": "workflow_dispatch",
+  "protocol_id": "d36c836de43c41cb0248a95abaa6af810c0eafd896f606207b20ba4b7a3533a1",
+  "execution_commit": "af2781154078f0c7476a62e931f1aee54ea87698",
+  "source_commit": "af2781154078f0c7476a62e931f1aee54ea87698",
+  "request_id": "workflow_dispatch",
+  "request_sha256": "071a884e9b606e8a3714ac74557675de4cb9b31ee284da38f4c78c7482f70c5d",
+  "approved_by": "Unjuno",
+  "allow_paid_api": true,
+  "limits_sha256": "70642ec8011d4c474f64e26a7e1219625391a8c18582b62fa10800f33293be42",
+  "max_pairs": 12,
+  "max_trials": 24,
+  "max_logical_calls": 288
+}

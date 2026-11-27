@@ -1,0 +1,1632 @@
+{
+  "schema_version": "hiergoal.recovery_checkpoint.v1",
+  "protocol_id": "d36c836de43c41cb0248a95abaa6af810c0eafd896f606207b20ba4b7a3533a1",
+  "pair_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1",
+  "task": {
+    "family": "scheduling",
+    "instance": 0,
+    "split": "heldout",
+    "seed": 20261127,
+    "scale": {
+      "size": "small",
+      "depth": 3,
+      "density": "sparse"
+    },
+    "fault_kind": "forced_subgoal",
+    "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+    "root_sha256": "653324dcf367763680b3c9e39c0fe4b4a3f272c418b4fd307540e33b012b838c",
+    "initial_public_spec_sha256": "3ba0fe9931f1473e48ea564bd93d9aaaa07ed0ea90f2f8f4b3ab6c34f1c24d85",
+    "initial_environment_sha256": "5b0d7e01f8107ffe8accdf865172d879aff4ecf12ec869523c32a5630dbb0b31",
+    "planned_tree": {
+      "leaf_count": 8,
+      "group_count": 2,
+      "goal_count": 11,
+      "max_depth": 2,
+      "depth_levels": 3,
+      "depth_unit": "edges_from_root",
+      "tree_edges": 10,
+      "dependency_edges": 8,
+      "dependency_density": 0.2857142857142857,
+      "independent_branch_count": 2,
+      "component_count": 2,
+      "domain_gate_count": 6,
+      "certification_gate_count": 2
+    }
+  },
+  "root_contract": {
+    "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+    "family": "scheduling",
+    "split": "heldout",
+    "seed": 20261127,
+    "instance": 0,
+    "instance_seed": 7092896352046012630,
+    "contract_version": 1,
+    "objective": "Satisfy every domain and certification gate against the current component environments.",
+    "environment_policy": "An environment update changes one component only. Task objectives, hierarchy, and acceptance rules remain fixed.",
+    "benchmark_scope": "Prescribed-hierarchy bounded scale fixture; domain gates and certification gates are not independent task observations.",
+    "scale": {
+      "size": "small",
+      "depth": 3,
+      "density": "sparse"
+    },
+    "gates": {
+      "c01_assignments": "Component c01: Assign every job exactly once to a permitted resource within its time window.",
+      "c01_resources": "Component c01: Respect one-job resource capacity and every unavailable interval.",
+      "c01_precedence": "Component c01: Respect every predecessor finish time plus minimum lag.",
+      "c01_certify_1": "Certify component c01 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass.",
+      "c02_assignments": "Component c02: Assign every job exactly once to a permitted resource within its time window.",
+      "c02_resources": "Component c02: Respect one-job resource capacity and every unavailable interval.",
+      "c02_precedence": "Component c02: Respect every predecessor finish time plus minimum lag.",
+      "c02_certify_1": "Certify component c02 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass."
+    },
+    "dependencies": {
+      "c01_assignments": [],
+      "c01_resources": [
+        "c01_assignments"
+      ],
+      "c01_precedence": [
+        "c01_assignments",
+        "c01_resources"
+      ],
+      "c01_certify_1": [
+        "c01_precedence"
+      ],
+      "c02_assignments": [],
+      "c02_resources": [
+        "c02_assignments"
+      ],
+      "c02_precedence": [
+        "c02_assignments",
+        "c02_resources"
+      ],
+      "c02_certify_1": [
+        "c02_precedence"
+      ]
+    },
+    "solution_shape": {
+      "c01_assignments": [
+        {
+          "task_id": "string",
+          "resource": "string",
+          "start": "integer slot"
+        }
+      ],
+      "c01_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c01_precedence"
+        ]
+      },
+      "c02_assignments": [
+        {
+          "task_id": "string",
+          "resource": "string",
+          "start": "integer slot"
+        }
+      ],
+      "c02_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c02_precedence"
+        ]
+      }
+    },
+    "hierarchy": {
+      "groups": [
+        {
+          "id": "M1",
+          "parent": "G0",
+          "title": "Verify component c01 at grouping level 1"
+        },
+        {
+          "id": "M2",
+          "parent": "G0",
+          "title": "Verify component c02 at grouping level 1"
+        }
+      ],
+      "gate_parents": {
+        "c01_assignments": "M1",
+        "c01_resources": "M1",
+        "c01_precedence": "M1",
+        "c01_certify_1": "M1",
+        "c02_assignments": "M2",
+        "c02_resources": "M2",
+        "c02_precedence": "M2",
+        "c02_certify_1": "M2"
+      },
+      "depth_levels": 3
+    },
+    "gate_artifact_fields": {
+      "c01_assignments": [
+        "c01_assignments"
+      ],
+      "c01_resources": [
+        "c01_assignments"
+      ],
+      "c01_precedence": [
+        "c01_assignments"
+      ],
+      "c01_certify_1": [
+        "c01_certify_1"
+      ],
+      "c02_assignments": [
+        "c02_assignments"
+      ],
+      "c02_resources": [
+        "c02_assignments"
+      ],
+      "c02_precedence": [
+        "c02_assignments"
+      ],
+      "c02_certify_1": [
+        "c02_certify_1"
+      ]
+    },
+    "domain_gates": [
+      "c01_assignments",
+      "c01_resources",
+      "c01_precedence",
+      "c02_assignments",
+      "c02_resources",
+      "c02_precedence"
+    ],
+    "certification_gates": [
+      "c01_certify_1",
+      "c02_certify_1"
+    ],
+    "component_contracts": {
+      "c01": {
+        "task_id": "scheduling-heldout-000-18c9ab44",
+        "family": "scheduling",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 0,
+        "instance_seed": 1786147038485666713,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "assignments": "Assign every job exactly once to a permitted resource within its time window.",
+          "resources": "Respect one-job resource capacity and every unavailable interval.",
+          "precedence": "Respect every predecessor finish time plus minimum lag."
+        },
+        "dependencies": {
+          "assignments": [],
+          "resources": [
+            "assignments"
+          ],
+          "precedence": [
+            "assignments",
+            "resources"
+          ]
+        },
+        "solution_shape": {
+          "assignments": [
+            {
+              "task_id": "string",
+              "resource": "string",
+              "start": "integer slot"
+            }
+          ]
+        },
+        "scheduling_rules": [
+          "Any feasible schedule is accepted. There is no canonical order, target schedule, or makespan objective. Assignment array order is irrelevant.",
+          "Every job runs without interruption for its given duration on exactly one resource in its permitted resources list.",
+          "Start at or after release; finish at or before deadline. Starts and durations are integer slots. One slot is 60 seconds.",
+          "Intervals are half-open: [start, start + duration). Adjacent intervals are allowed; a job must never intersect a resource's unavailable intervals or another job on that resource.",
+          "For every precedence edge, the after job starts at or after the before job finishes plus lag."
+        ],
+        "final_check": "Independent occupied-slot and precedence checks validate the same public constraints, accepting every feasible schedule."
+      },
+      "c02": {
+        "task_id": "scheduling-heldout-001-c7a7f065",
+        "family": "scheduling",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 1,
+        "instance_seed": 14386731853052186730,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "assignments": "Assign every job exactly once to a permitted resource within its time window.",
+          "resources": "Respect one-job resource capacity and every unavailable interval.",
+          "precedence": "Respect every predecessor finish time plus minimum lag."
+        },
+        "dependencies": {
+          "assignments": [],
+          "resources": [
+            "assignments"
+          ],
+          "precedence": [
+            "assignments",
+            "resources"
+          ]
+        },
+        "solution_shape": {
+          "assignments": [
+            {
+              "task_id": "string",
+              "resource": "string",
+              "start": "integer slot"
+            }
+          ]
+        },
+        "scheduling_rules": [
+          "Any feasible schedule is accepted. There is no canonical order, target schedule, or makespan objective. Assignment array order is irrelevant.",
+          "Every job runs without interruption for its given duration on exactly one resource in its permitted resources list.",
+          "Start at or after release; finish at or before deadline. Starts and durations are integer slots. One slot is 60 seconds.",
+          "Intervals are half-open: [start, start + duration). Adjacent intervals are allowed; a job must never intersect a resource's unavailable intervals or another job on that resource.",
+          "For every precedence edge, the after job starts at or after the before job finishes plus lag."
+        ],
+        "final_check": "Independent occupied-slot and precedence checks validate the same public constraints, accepting every feasible schedule."
+      }
+    },
+    "composition_rules": [
+      "Prefix all artifact fields with the component ID. For code_repair, each stage expression is a separate prefixed field, without an expressions wrapper.",
+      "Grade each component with its published domain rules. A gate passes only when its own artifact and every declared prerequisite pass.",
+      "Certification fields have exactly environment_revision and checked_gates. The integer must equal the current component revision; checked_gates must exactly equal that gate's ordered direct prerequisites.",
+      "Additional direct dependencies are explicit verification obligations. Dense and sparse variants may have the same transitive closure; density is a direct-edge burden, not a claim of additional independent information.",
+      "Independent components have no cross-component dependencies or shared resources; same-named jobs and resources in distinct components are separate namespaces.",
+      "Increasing prescribed depth adds executable certification leaves. It does not hold the leaf count fixed or demonstrate autonomous hierarchy discovery."
+    ],
+    "topology": {
+      "leaf_count": 8,
+      "group_count": 2,
+      "goal_count": 11,
+      "max_depth": 2,
+      "depth_levels": 3,
+      "depth_unit": "edges_from_root",
+      "tree_edges": 10,
+      "dependency_edges": 8,
+      "dependency_density": 0.2857142857142857,
+      "independent_branch_count": 2,
+      "component_count": 2,
+      "domain_gate_count": 6,
+      "certification_gate_count": 2
+    }
+  },
+  "root_sha256": "653324dcf367763680b3c9e39c0fe4b4a3f272c418b4fd307540e33b012b838c",
+  "public_spec": {
+    "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+    "family": "scheduling",
+    "split": "heldout",
+    "seed": 20261127,
+    "instance": 0,
+    "instance_seed": 7092896352046012630,
+    "contract_version": 1,
+    "objective": "Satisfy every domain and certification gate against the current component environments.",
+    "environment_policy": "An environment update changes one component only. Task objectives, hierarchy, and acceptance rules remain fixed.",
+    "benchmark_scope": "Prescribed-hierarchy bounded scale fixture; domain gates and certification gates are not independent task observations.",
+    "scale": {
+      "size": "small",
+      "depth": 3,
+      "density": "sparse"
+    },
+    "gates": {
+      "c01_assignments": "Component c01: Assign every job exactly once to a permitted resource within its time window.",
+      "c01_resources": "Component c01: Respect one-job resource capacity and every unavailable interval.",
+      "c01_precedence": "Component c01: Respect every predecessor finish time plus minimum lag.",
+      "c01_certify_1": "Certify component c01 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass.",
+      "c02_assignments": "Component c02: Assign every job exactly once to a permitted resource within its time window.",
+      "c02_resources": "Component c02: Respect one-job resource capacity and every unavailable interval.",
+      "c02_precedence": "Component c02: Respect every predecessor finish time plus minimum lag.",
+      "c02_certify_1": "Certify component c02 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass."
+    },
+    "dependencies": {
+      "c01_assignments": [],
+      "c01_resources": [
+        "c01_assignments"
+      ],
+      "c01_precedence": [
+        "c01_assignments",
+        "c01_resources"
+      ],
+      "c01_certify_1": [
+        "c01_precedence"
+      ],
+      "c02_assignments": [],
+      "c02_resources": [
+        "c02_assignments"
+      ],
+      "c02_precedence": [
+        "c02_assignments",
+        "c02_resources"
+      ],
+      "c02_certify_1": [
+        "c02_precedence"
+      ]
+    },
+    "solution_shape": {
+      "c01_assignments": [
+        {
+          "task_id": "string",
+          "resource": "string",
+          "start": "integer slot"
+        }
+      ],
+      "c01_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c01_precedence"
+        ]
+      },
+      "c02_assignments": [
+        {
+          "task_id": "string",
+          "resource": "string",
+          "start": "integer slot"
+        }
+      ],
+      "c02_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c02_precedence"
+        ]
+      }
+    },
+    "hierarchy": {
+      "groups": [
+        {
+          "id": "M1",
+          "parent": "G0",
+          "title": "Verify component c01 at grouping level 1"
+        },
+        {
+          "id": "M2",
+          "parent": "G0",
+          "title": "Verify component c02 at grouping level 1"
+        }
+      ],
+      "gate_parents": {
+        "c01_assignments": "M1",
+        "c01_resources": "M1",
+        "c01_precedence": "M1",
+        "c01_certify_1": "M1",
+        "c02_assignments": "M2",
+        "c02_resources": "M2",
+        "c02_precedence": "M2",
+        "c02_certify_1": "M2"
+      },
+      "depth_levels": 3
+    },
+    "gate_artifact_fields": {
+      "c01_assignments": [
+        "c01_assignments"
+      ],
+      "c01_resources": [
+        "c01_assignments"
+      ],
+      "c01_precedence": [
+        "c01_assignments"
+      ],
+      "c01_certify_1": [
+        "c01_certify_1"
+      ],
+      "c02_assignments": [
+        "c02_assignments"
+      ],
+      "c02_resources": [
+        "c02_assignments"
+      ],
+      "c02_precedence": [
+        "c02_assignments"
+      ],
+      "c02_certify_1": [
+        "c02_certify_1"
+      ]
+    },
+    "domain_gates": [
+      "c01_assignments",
+      "c01_resources",
+      "c01_precedence",
+      "c02_assignments",
+      "c02_resources",
+      "c02_precedence"
+    ],
+    "certification_gates": [
+      "c01_certify_1",
+      "c02_certify_1"
+    ],
+    "component_contracts": {
+      "c01": {
+        "task_id": "scheduling-heldout-000-18c9ab44",
+        "family": "scheduling",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 0,
+        "instance_seed": 1786147038485666713,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "assignments": "Assign every job exactly once to a permitted resource within its time window.",
+          "resources": "Respect one-job resource capacity and every unavailable interval.",
+          "precedence": "Respect every predecessor finish time plus minimum lag."
+        },
+        "dependencies": {
+          "assignments": [],
+          "resources": [
+            "assignments"
+          ],
+          "precedence": [
+            "assignments",
+            "resources"
+          ]
+        },
+        "solution_shape": {
+          "assignments": [
+            {
+              "task_id": "string",
+              "resource": "string",
+              "start": "integer slot"
+            }
+          ]
+        },
+        "scheduling_rules": [
+          "Any feasible schedule is accepted. There is no canonical order, target schedule, or makespan objective. Assignment array order is irrelevant.",
+          "Every job runs without interruption for its given duration on exactly one resource in its permitted resources list.",
+          "Start at or after release; finish at or before deadline. Starts and durations are integer slots. One slot is 60 seconds.",
+          "Intervals are half-open: [start, start + duration). Adjacent intervals are allowed; a job must never intersect a resource's unavailable intervals or another job on that resource.",
+          "For every precedence edge, the after job starts at or after the before job finishes plus lag."
+        ],
+        "final_check": "Independent occupied-slot and precedence checks validate the same public constraints, accepting every feasible schedule."
+      },
+      "c02": {
+        "task_id": "scheduling-heldout-001-c7a7f065",
+        "family": "scheduling",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 1,
+        "instance_seed": 14386731853052186730,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "assignments": "Assign every job exactly once to a permitted resource within its time window.",
+          "resources": "Respect one-job resource capacity and every unavailable interval.",
+          "precedence": "Respect every predecessor finish time plus minimum lag."
+        },
+        "dependencies": {
+          "assignments": [],
+          "resources": [
+            "assignments"
+          ],
+          "precedence": [
+            "assignments",
+            "resources"
+          ]
+        },
+        "solution_shape": {
+          "assignments": [
+            {
+              "task_id": "string",
+              "resource": "string",
+              "start": "integer slot"
+            }
+          ]
+        },
+        "scheduling_rules": [
+          "Any feasible schedule is accepted. There is no canonical order, target schedule, or makespan objective. Assignment array order is irrelevant.",
+          "Every job runs without interruption for its given duration on exactly one resource in its permitted resources list.",
+          "Start at or after release; finish at or before deadline. Starts and durations are integer slots. One slot is 60 seconds.",
+          "Intervals are half-open: [start, start + duration). Adjacent intervals are allowed; a job must never intersect a resource's unavailable intervals or another job on that resource.",
+          "For every precedence edge, the after job starts at or after the before job finishes plus lag."
+        ],
+        "final_check": "Independent occupied-slot and precedence checks validate the same public constraints, accepting every feasible schedule."
+      }
+    },
+    "composition_rules": [
+      "Prefix all artifact fields with the component ID. For code_repair, each stage expression is a separate prefixed field, without an expressions wrapper.",
+      "Grade each component with its published domain rules. A gate passes only when its own artifact and every declared prerequisite pass.",
+      "Certification fields have exactly environment_revision and checked_gates. The integer must equal the current component revision; checked_gates must exactly equal that gate's ordered direct prerequisites.",
+      "Additional direct dependencies are explicit verification obligations. Dense and sparse variants may have the same transitive closure; density is a direct-edge burden, not a claim of additional independent information.",
+      "Independent components have no cross-component dependencies or shared resources; same-named jobs and resources in distinct components are separate namespaces.",
+      "Increasing prescribed depth adds executable certification leaves. It does not hold the leaf count fixed or demonstrate autonomous hierarchy discovery."
+    ],
+    "topology": {
+      "leaf_count": 8,
+      "group_count": 2,
+      "goal_count": 11,
+      "max_depth": 2,
+      "depth_levels": 3,
+      "depth_unit": "edges_from_root",
+      "tree_edges": 10,
+      "dependency_edges": 8,
+      "dependency_density": 0.2857142857142857,
+      "independent_branch_count": 2,
+      "component_count": 2,
+      "domain_gate_count": 6,
+      "certification_gate_count": 2
+    },
+    "environment": {
+      "components": {
+        "c01": {
+          "resources": [
+            "R1",
+            "R2"
+          ],
+          "jobs": [
+            {
+              "task_id": "J1",
+              "duration": 1,
+              "release": 1,
+              "deadline": 12,
+              "resources": [
+                "R1",
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J2",
+              "duration": 3,
+              "release": 1,
+              "deadline": 16,
+              "resources": [
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J3",
+              "duration": 3,
+              "release": 2,
+              "deadline": 20,
+              "resources": [
+                "R1",
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J4",
+              "duration": 3,
+              "release": 1,
+              "deadline": 24,
+              "resources": [
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J5",
+              "duration": 2,
+              "release": 0,
+              "deadline": 28,
+              "resources": [
+                "R1",
+                "R2"
+              ]
+            }
+          ],
+          "precedence": [
+            {
+              "before": "J1",
+              "after": "J2",
+              "lag": 1
+            },
+            {
+              "before": "J1",
+              "after": "J3",
+              "lag": 0
+            },
+            {
+              "before": "J2",
+              "after": "J4",
+              "lag": 0
+            },
+            {
+              "before": "J3",
+              "after": "J4",
+              "lag": 1
+            },
+            {
+              "before": "J4",
+              "after": "J5",
+              "lag": 1
+            }
+          ],
+          "horizon": 32,
+          "unavailable": [
+            {
+              "resource": "R1",
+              "start": 3,
+              "end": 4
+            },
+            {
+              "resource": "R2",
+              "start": 6,
+              "end": 7
+            }
+          ]
+        },
+        "c02": {
+          "resources": [
+            "R1",
+            "R2"
+          ],
+          "jobs": [
+            {
+              "task_id": "J1",
+              "duration": 2,
+              "release": 2,
+              "deadline": 12,
+              "resources": [
+                "R2",
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J2",
+              "duration": 2,
+              "release": 1,
+              "deadline": 16,
+              "resources": [
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J3",
+              "duration": 2,
+              "release": 2,
+              "deadline": 20,
+              "resources": [
+                "R2",
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J4",
+              "duration": 2,
+              "release": 2,
+              "deadline": 24,
+              "resources": [
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J5",
+              "duration": 3,
+              "release": 2,
+              "deadline": 28,
+              "resources": [
+                "R2",
+                "R1"
+              ]
+            }
+          ],
+          "precedence": [
+            {
+              "before": "J1",
+              "after": "J2",
+              "lag": 1
+            },
+            {
+              "before": "J1",
+              "after": "J3",
+              "lag": 0
+            },
+            {
+              "before": "J2",
+              "after": "J4",
+              "lag": 1
+            },
+            {
+              "before": "J3",
+              "after": "J4",
+              "lag": 1
+            },
+            {
+              "before": "J4",
+              "after": "J5",
+              "lag": 0
+            }
+          ],
+          "horizon": 32,
+          "unavailable": [
+            {
+              "resource": "R2",
+              "start": 3,
+              "end": 4
+            },
+            {
+              "resource": "R1",
+              "start": 6,
+              "end": 7
+            }
+          ]
+        }
+      },
+      "component_revisions": {
+        "c01": 0,
+        "c02": 0
+      }
+    },
+    "environment_revision": 0
+  },
+  "public_spec_sha256": "3ba0fe9931f1473e48ea564bd93d9aaaa07ed0ea90f2f8f4b3ab6c34f1c24d85",
+  "plan": {
+    "milestones": [
+      {
+        "id": "M1",
+        "parent": "G0",
+        "title": "Verify component c01 at grouping level 1"
+      },
+      {
+        "id": "M2",
+        "parent": "G0",
+        "title": "Verify component c02 at grouping level 1"
+      }
+    ],
+    "leaves": {
+      "S1": {
+        "id": "S1",
+        "parent": "M1",
+        "instruction": "Using the current c01 environment, assign each job exactly once with an integer start and a permitted resource. A feasible assignment is J1 on R1 at 1, J2 on R2 at 3, J3 on R2 at 7, J4 on R2 at 11, and J5 on R1 at 4. Recompute if the environment changes, preserving all published job windows and resource constraints.",
+        "checks": [
+          "c01_assignments"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S2": {
+        "id": "S2",
+        "parent": "M1",
+        "instruction": "Using the c01 assignment, verify every job uses a permitted resource, starts no earlier than release, finishes by its deadline, avoids that resource's unavailable intervals, and does not overlap another job on the same resource. Treat intervals as half-open so adjacent jobs are allowed; recompute these checks against the current environment.",
+        "checks": [
+          "c01_resources"
+        ],
+        "depends_on": [
+          "S1"
+        ],
+        "revision": 0
+      },
+      "S3": {
+        "id": "S3",
+        "parent": "M1",
+        "instruction": "Using the c01 assignment, check every published precedence edge: the after job must start no earlier than the before job's finish plus the edge's lag. For the proposed assignment, verify all five edges against the current environment; if any constraint or assignment changes, recompute and check again.",
+        "checks": [
+          "c01_precedence"
+        ],
+        "depends_on": [
+          "S1",
+          "S2"
+        ],
+        "revision": 0
+      },
+      "S4": {
+        "id": "S4",
+        "parent": "M1",
+        "instruction": "Check that c01_precedence passes against the current c01 environment and assignment. Then provide the certification artifact with environment_revision equal to the current c01 component revision and checked_gates exactly [\"c01_precedence\"]. Do not certify if the referenced gate fails.",
+        "checks": [
+          "c01_certify_1"
+        ],
+        "depends_on": [
+          "S3"
+        ],
+        "revision": 0
+      },
+      "S5": {
+        "id": "S5",
+        "parent": "M2",
+        "instruction": "Using the current c02 environment, assign each job exactly once with an integer start and a permitted resource. A feasible assignment is J1 on R2 at 4, J2 on R1 at 1, J3 on R2 at 6, J4 on R1 at 10, and J5 on R1 at 12. Recompute if the environment changes, preserving all published job windows and resource constraints.",
+        "checks": [
+          "c02_assignments"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S6": {
+        "id": "S6",
+        "parent": "M2",
+        "instruction": "Using the c02 assignment, verify every job uses a permitted resource, starts no earlier than release, finishes by its deadline, avoids that resource's unavailable intervals, and does not overlap another job on the same resource. Treat intervals as half-open so adjacent jobs are allowed; recompute these checks against the current environment.",
+        "checks": [
+          "c02_resources"
+        ],
+        "depends_on": [
+          "S5"
+        ],
+        "revision": 0
+      },
+      "S7": {
+        "id": "S7",
+        "parent": "M2",
+        "instruction": "Using the c02 assignment, check every published precedence edge: the after job must start no earlier than the before job's finish plus the edge's lag. For the proposed assignment, verify all five edges against the current environment; if any constraint or assignment changes, recompute and check again.",
+        "checks": [
+          "c02_precedence"
+        ],
+        "depends_on": [
+          "S5",
+          "S6"
+        ],
+        "revision": 0
+      },
+      "S8": {
+        "id": "S8",
+        "parent": "M2",
+        "instruction": "Check that c02_precedence passes against the current c02 environment and assignment. Then provide the certification artifact with environment_revision equal to the current c02 component revision and checked_gates exactly [\"c02_precedence\"]. Do not certify if the referenced gate fails.",
+        "checks": [
+          "c02_certify_1"
+        ],
+        "depends_on": [
+          "S7"
+        ],
+        "revision": 0
+      }
+    }
+  },
+  "plan_sha256": "28b5679f72b4a55f3e2abc6a5a74e505a7260c4b0c8189c592ec95b2d6902bd7",
+  "source_solution": {
+    "c01_assignments": [
+      {
+        "resource": "R1",
+        "start": 1,
+        "task_id": "J1"
+      },
+      {
+        "resource": "R2",
+        "start": 3,
+        "task_id": "J2"
+      },
+      {
+        "resource": "R1",
+        "start": 4,
+        "task_id": "J3"
+      },
+      {
+        "resource": "R2",
+        "start": 8,
+        "task_id": "J4"
+      },
+      {
+        "resource": "R1",
+        "start": 12,
+        "task_id": "J5"
+      }
+    ],
+    "c02_assignments": [
+      {
+        "resource": "R1",
+        "start": 2,
+        "task_id": "J1"
+      },
+      {
+        "resource": "R1",
+        "start": 7,
+        "task_id": "J2"
+      },
+      {
+        "resource": "R2",
+        "start": 4,
+        "task_id": "J3"
+      },
+      {
+        "resource": "R1",
+        "start": 10,
+        "task_id": "J4"
+      },
+      {
+        "resource": "R2",
+        "start": 12,
+        "task_id": "J5"
+      }
+    ],
+    "c01_certify_1": {
+      "checked_gates": [
+        "c01_precedence"
+      ],
+      "environment_revision": 0
+    },
+    "c02_certify_1": {
+      "checked_gates": [
+        "c02_precedence"
+      ],
+      "environment_revision": 0
+    }
+  },
+  "source_solution_sha256": "90a4cdc7156fa1541083c5284254619bbd0dba218e673f110d9e4eb99d6093d6",
+  "source_public_grade": {
+    "c01_assignments": {
+      "passed": true,
+      "message": "Assignments and windows passed."
+    },
+    "c01_resources": {
+      "passed": true,
+      "message": "Resource capacity and availability passed."
+    },
+    "c01_precedence": {
+      "passed": true,
+      "message": "Precedence passed."
+    },
+    "c01_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    },
+    "c02_assignments": {
+      "passed": true,
+      "message": "Assignments and windows passed."
+    },
+    "c02_resources": {
+      "passed": true,
+      "message": "Resource capacity and availability passed."
+    },
+    "c02_precedence": {
+      "passed": true,
+      "message": "Precedence passed."
+    },
+    "c02_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    }
+  },
+  "source_hidden_grade": {
+    "c01_assignments": {
+      "passed": true,
+      "message": "Assignments and windows passed."
+    },
+    "c01_resources": {
+      "passed": true,
+      "message": "Resource capacity and availability passed."
+    },
+    "c01_precedence": {
+      "passed": true,
+      "message": "Precedence passed."
+    },
+    "c01_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    },
+    "c02_assignments": {
+      "passed": true,
+      "message": "Assignments and windows passed."
+    },
+    "c02_resources": {
+      "passed": true,
+      "message": "Resource capacity and availability passed."
+    },
+    "c02_precedence": {
+      "passed": true,
+      "message": "Precedence passed."
+    },
+    "c02_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    }
+  },
+  "source_trace_sha256": "df4555463004fac5b086ea946df2ed4e2214087a1ea42ca2b0abb8a1bdc4a6ff",
+  "failed_solution": {
+    "c01_assignments": [
+      {
+        "resource": "R1",
+        "start": -1,
+        "task_id": "J1"
+      },
+      {
+        "resource": "R2",
+        "start": 3,
+        "task_id": "J2"
+      },
+      {
+        "resource": "R1",
+        "start": 4,
+        "task_id": "J3"
+      },
+      {
+        "resource": "R2",
+        "start": 8,
+        "task_id": "J4"
+      },
+      {
+        "resource": "R1",
+        "start": 12,
+        "task_id": "J5"
+      }
+    ],
+    "c02_assignments": [
+      {
+        "resource": "R1",
+        "start": 2,
+        "task_id": "J1"
+      },
+      {
+        "resource": "R1",
+        "start": 7,
+        "task_id": "J2"
+      },
+      {
+        "resource": "R2",
+        "start": 4,
+        "task_id": "J3"
+      },
+      {
+        "resource": "R1",
+        "start": 10,
+        "task_id": "J4"
+      },
+      {
+        "resource": "R2",
+        "start": 12,
+        "task_id": "J5"
+      }
+    ],
+    "c01_certify_1": {
+      "checked_gates": [
+        "c01_precedence"
+      ],
+      "environment_revision": 0
+    },
+    "c02_certify_1": {
+      "checked_gates": [
+        "c02_precedence"
+      ],
+      "environment_revision": 0
+    }
+  },
+  "failed_solution_sha256": "e0675bbcdf4a35262d215386ce0e6656b7848478f2a7e54e28e5144f069b4ff8",
+  "public_feedback": {
+    "c01_assignments": {
+      "passed": false,
+      "message": "Assignments, capabilities, or windows are invalid."
+    },
+    "c01_resources": {
+      "passed": false,
+      "message": "At least one authoritative prerequisite has not passed."
+    },
+    "c01_precedence": {
+      "passed": false,
+      "message": "At least one authoritative prerequisite has not passed."
+    },
+    "c01_certify_1": {
+      "passed": false,
+      "message": "At least one authoritative prerequisite has not passed."
+    },
+    "c02_assignments": {
+      "passed": true,
+      "message": "Assignments and windows passed."
+    },
+    "c02_resources": {
+      "passed": true,
+      "message": "Resource capacity and availability passed."
+    },
+    "c02_precedence": {
+      "passed": true,
+      "message": "Precedence passed."
+    },
+    "c02_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    }
+  },
+  "fault_receipt": {
+    "kind": "forced_subgoal",
+    "perturbation_type": "subgoal",
+    "target_component": "c01",
+    "target_gate": "c01_assignments",
+    "affected_gates": [
+      "c01_assignments",
+      "c01_resources",
+      "c01_precedence",
+      "c01_certify_1"
+    ],
+    "unaffected_gates": [
+      "c02_assignments",
+      "c02_resources",
+      "c02_precedence",
+      "c02_certify_1"
+    ],
+    "changed_fields": [
+      "c01_assignments"
+    ],
+    "delivered": true,
+    "domain_fault_delivered": true,
+    "certification_invalidated": true,
+    "status": "delivered",
+    "seed": 20261127,
+    "instance_seed": 7092896352046012630,
+    "environment_revision": 0,
+    "environment_before": {
+      "components": {
+        "c01": {
+          "resources": [
+            "R1",
+            "R2"
+          ],
+          "jobs": [
+            {
+              "task_id": "J1",
+              "duration": 1,
+              "release": 1,
+              "deadline": 12,
+              "resources": [
+                "R1",
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J2",
+              "duration": 3,
+              "release": 1,
+              "deadline": 16,
+              "resources": [
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J3",
+              "duration": 3,
+              "release": 2,
+              "deadline": 20,
+              "resources": [
+                "R1",
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J4",
+              "duration": 3,
+              "release": 1,
+              "deadline": 24,
+              "resources": [
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J5",
+              "duration": 2,
+              "release": 0,
+              "deadline": 28,
+              "resources": [
+                "R1",
+                "R2"
+              ]
+            }
+          ],
+          "precedence": [
+            {
+              "before": "J1",
+              "after": "J2",
+              "lag": 1
+            },
+            {
+              "before": "J1",
+              "after": "J3",
+              "lag": 0
+            },
+            {
+              "before": "J2",
+              "after": "J4",
+              "lag": 0
+            },
+            {
+              "before": "J3",
+              "after": "J4",
+              "lag": 1
+            },
+            {
+              "before": "J4",
+              "after": "J5",
+              "lag": 1
+            }
+          ],
+          "horizon": 32,
+          "unavailable": [
+            {
+              "resource": "R1",
+              "start": 3,
+              "end": 4
+            },
+            {
+              "resource": "R2",
+              "start": 6,
+              "end": 7
+            }
+          ]
+        },
+        "c02": {
+          "resources": [
+            "R1",
+            "R2"
+          ],
+          "jobs": [
+            {
+              "task_id": "J1",
+              "duration": 2,
+              "release": 2,
+              "deadline": 12,
+              "resources": [
+                "R2",
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J2",
+              "duration": 2,
+              "release": 1,
+              "deadline": 16,
+              "resources": [
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J3",
+              "duration": 2,
+              "release": 2,
+              "deadline": 20,
+              "resources": [
+                "R2",
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J4",
+              "duration": 2,
+              "release": 2,
+              "deadline": 24,
+              "resources": [
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J5",
+              "duration": 3,
+              "release": 2,
+              "deadline": 28,
+              "resources": [
+                "R2",
+                "R1"
+              ]
+            }
+          ],
+          "precedence": [
+            {
+              "before": "J1",
+              "after": "J2",
+              "lag": 1
+            },
+            {
+              "before": "J1",
+              "after": "J3",
+              "lag": 0
+            },
+            {
+              "before": "J2",
+              "after": "J4",
+              "lag": 1
+            },
+            {
+              "before": "J3",
+              "after": "J4",
+              "lag": 1
+            },
+            {
+              "before": "J4",
+              "after": "J5",
+              "lag": 0
+            }
+          ],
+          "horizon": 32,
+          "unavailable": [
+            {
+              "resource": "R2",
+              "start": 3,
+              "end": 4
+            },
+            {
+              "resource": "R1",
+              "start": 6,
+              "end": 7
+            }
+          ]
+        }
+      },
+      "component_revisions": {
+        "c01": 0,
+        "c02": 0
+      }
+    },
+    "environment_after": {
+      "components": {
+        "c01": {
+          "resources": [
+            "R1",
+            "R2"
+          ],
+          "jobs": [
+            {
+              "task_id": "J1",
+              "duration": 1,
+              "release": 1,
+              "deadline": 12,
+              "resources": [
+                "R1",
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J2",
+              "duration": 3,
+              "release": 1,
+              "deadline": 16,
+              "resources": [
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J3",
+              "duration": 3,
+              "release": 2,
+              "deadline": 20,
+              "resources": [
+                "R1",
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J4",
+              "duration": 3,
+              "release": 1,
+              "deadline": 24,
+              "resources": [
+                "R2"
+              ]
+            },
+            {
+              "task_id": "J5",
+              "duration": 2,
+              "release": 0,
+              "deadline": 28,
+              "resources": [
+                "R1",
+                "R2"
+              ]
+            }
+          ],
+          "precedence": [
+            {
+              "before": "J1",
+              "after": "J2",
+              "lag": 1
+            },
+            {
+              "before": "J1",
+              "after": "J3",
+              "lag": 0
+            },
+            {
+              "before": "J2",
+              "after": "J4",
+              "lag": 0
+            },
+            {
+              "before": "J3",
+              "after": "J4",
+              "lag": 1
+            },
+            {
+              "before": "J4",
+              "after": "J5",
+              "lag": 1
+            }
+          ],
+          "horizon": 32,
+          "unavailable": [
+            {
+              "resource": "R1",
+              "start": 3,
+              "end": 4
+            },
+            {
+              "resource": "R2",
+              "start": 6,
+              "end": 7
+            }
+          ]
+        },
+        "c02": {
+          "resources": [
+            "R1",
+            "R2"
+          ],
+          "jobs": [
+            {
+              "task_id": "J1",
+              "duration": 2,
+              "release": 2,
+              "deadline": 12,
+              "resources": [
+                "R2",
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J2",
+              "duration": 2,
+              "release": 1,
+              "deadline": 16,
+              "resources": [
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J3",
+              "duration": 2,
+              "release": 2,
+              "deadline": 20,
+              "resources": [
+                "R2",
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J4",
+              "duration": 2,
+              "release": 2,
+              "deadline": 24,
+              "resources": [
+                "R1"
+              ]
+            },
+            {
+              "task_id": "J5",
+              "duration": 3,
+              "release": 2,
+              "deadline": 28,
+              "resources": [
+                "R2",
+                "R1"
+              ]
+            }
+          ],
+          "precedence": [
+            {
+              "before": "J1",
+              "after": "J2",
+              "lag": 1
+            },
+            {
+              "before": "J1",
+              "after": "J3",
+              "lag": 0
+            },
+            {
+              "before": "J2",
+              "after": "J4",
+              "lag": 1
+            },
+            {
+              "before": "J3",
+              "after": "J4",
+              "lag": 1
+            },
+            {
+              "before": "J4",
+              "after": "J5",
+              "lag": 0
+            }
+          ],
+          "horizon": 32,
+          "unavailable": [
+            {
+              "resource": "R2",
+              "start": 3,
+              "end": 4
+            },
+            {
+              "resource": "R1",
+              "start": 6,
+              "end": 7
+            }
+          ]
+        }
+      },
+      "component_revisions": {
+        "c01": 0,
+        "c02": 0
+      }
+    },
+    "before_grade": {
+      "c01_assignments": {
+        "passed": true,
+        "message": "Assignments and windows passed."
+      },
+      "c01_resources": {
+        "passed": true,
+        "message": "Resource capacity and availability passed."
+      },
+      "c01_precedence": {
+        "passed": true,
+        "message": "Precedence passed."
+      },
+      "c01_certify_1": {
+        "passed": true,
+        "message": "Current component certification passed."
+      },
+      "c02_assignments": {
+        "passed": true,
+        "message": "Assignments and windows passed."
+      },
+      "c02_resources": {
+        "passed": true,
+        "message": "Resource capacity and availability passed."
+      },
+      "c02_precedence": {
+        "passed": true,
+        "message": "Precedence passed."
+      },
+      "c02_certify_1": {
+        "passed": true,
+        "message": "Current component certification passed."
+      }
+    },
+    "after_grade": {
+      "c01_assignments": {
+        "passed": false,
+        "message": "Assignments, capabilities, or windows are invalid."
+      },
+      "c01_resources": {
+        "passed": false,
+        "message": "At least one authoritative prerequisite has not passed."
+      },
+      "c01_precedence": {
+        "passed": false,
+        "message": "At least one authoritative prerequisite has not passed."
+      },
+      "c01_certify_1": {
+        "passed": false,
+        "message": "At least one authoritative prerequisite has not passed."
+      },
+      "c02_assignments": {
+        "passed": true,
+        "message": "Assignments and windows passed."
+      },
+      "c02_resources": {
+        "passed": true,
+        "message": "Resource capacity and availability passed."
+      },
+      "c02_precedence": {
+        "passed": true,
+        "message": "Precedence passed."
+      },
+      "c02_certify_1": {
+        "passed": true,
+        "message": "Current component certification passed."
+      }
+    },
+    "raw_domain_after_grade": {
+      "c01_assignments": {
+        "passed": false,
+        "message": "Assignments, capabilities, or windows are invalid."
+      },
+      "c01_resources": {
+        "passed": false,
+        "message": "Resource overlap or calendar violation."
+      },
+      "c01_precedence": {
+        "passed": false,
+        "message": "Precedence or lag constraints are invalid."
+      }
+    },
+    "unaffected_artifacts_unchanged": true,
+    "unrelated_component_gates": [
+      "c02_assignments",
+      "c02_resources",
+      "c02_precedence",
+      "c02_certify_1"
+    ],
+    "subgoal_fault_count": 1,
+    "target_entity": {
+      "component": "c01",
+      "kind": "job",
+      "task_id": "J1"
+    },
+    "target_field": {
+      "artifact_field": "c01_assignments",
+      "field": "start"
+    }
+  },
+  "target_leaf_id": "S1",
+  "repair_history": [],
+  "source_visibility": "archival_only_never_repair_prompt",
+  "checkpoint_sha256": "f210d454c717615f19224cab459598912ce3118ac34d910e77b8a0d8aefe014c"
+}

@@ -1,0 +1,286 @@
+{
+  "phase": "prepare",
+  "identifier": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1",
+  "pair_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1",
+  "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+  "arm": null,
+  "status": "PASS",
+  "diagnostic": "INDEPENDENT_GRADING_PASS",
+  "calls": 2,
+  "input_tokens": 7076,
+  "output_tokens": 1924,
+  "known_input_tokens": 7076,
+  "known_output_tokens": 1924,
+  "elapsed_seconds": 11.72650117400002,
+  "replan_attempts": 0,
+  "replans": 0,
+  "rejected_actions": 0,
+  "patch_actions": 1,
+  "simulated": false,
+  "invariant_ok": true,
+  "stop_batch": false,
+  "success": true,
+  "wall_seconds": 11.739323514999967,
+  "final_solution": {
+    "c01_rows": [
+      {
+        "client": "FIR",
+        "kind": "sale",
+        "net_cents": 2397,
+        "quantity": 1,
+        "record_id": "BB617-01",
+        "unit_cents": 2397
+      },
+      {
+        "client": "ALDER",
+        "kind": "sale",
+        "net_cents": 556,
+        "quantity": 4,
+        "record_id": "BB617-02",
+        "unit_cents": 139
+      },
+      {
+        "client": "PINE",
+        "kind": "refund",
+        "net_cents": -500,
+        "quantity": 2,
+        "record_id": "BB617-03",
+        "unit_cents": 250
+      },
+      {
+        "client": "FIR",
+        "kind": "sale",
+        "net_cents": 6120,
+        "quantity": 4,
+        "record_id": "BB617-04",
+        "unit_cents": 1530
+      },
+      {
+        "client": "ALDER",
+        "kind": "refund",
+        "net_cents": -2883,
+        "quantity": 3,
+        "record_id": "BB617-05",
+        "unit_cents": 961
+      },
+      {
+        "client": "PINE",
+        "kind": "sale",
+        "net_cents": 635,
+        "quantity": 5,
+        "record_id": "BB617-06",
+        "unit_cents": 127
+      }
+    ],
+    "c01_aggregates": [
+      {
+        "client": "ALDER",
+        "count": 2,
+        "net_cents": -2327
+      },
+      {
+        "client": "FIR",
+        "count": 2,
+        "net_cents": 8517
+      },
+      {
+        "client": "PINE",
+        "count": 2,
+        "net_cents": 135
+      }
+    ],
+    "c01_report": "CLIENT COUNT NET\nALDER 2 -23.27\nFIR 2 85.17\nPINE 2 1.35\nTOTAL 6 63.25",
+    "c02_rows": [
+      {
+        "client": "ELM",
+        "kind": "sale",
+        "net_cents": 9104,
+        "quantity": 4,
+        "record_id": "ED78F-01",
+        "unit_cents": 2276
+      },
+      {
+        "client": "OAK",
+        "kind": "sale",
+        "net_cents": 1899,
+        "quantity": 1,
+        "record_id": "ED78F-02",
+        "unit_cents": 1899
+      },
+      {
+        "client": "BIRCH",
+        "kind": "refund",
+        "net_cents": -4240,
+        "quantity": 5,
+        "record_id": "ED78F-03",
+        "unit_cents": 848
+      },
+      {
+        "client": "ELM",
+        "kind": "sale",
+        "net_cents": 1296,
+        "quantity": 3,
+        "record_id": "ED78F-04",
+        "unit_cents": 432
+      },
+      {
+        "client": "OAK",
+        "kind": "refund",
+        "net_cents": -6610,
+        "quantity": 5,
+        "record_id": "ED78F-05",
+        "unit_cents": 1322
+      },
+      {
+        "client": "BIRCH",
+        "kind": "sale",
+        "net_cents": 4206,
+        "quantity": 2,
+        "record_id": "ED78F-06",
+        "unit_cents": 2103
+      }
+    ],
+    "c02_aggregates": [
+      {
+        "client": "BIRCH",
+        "count": 2,
+        "net_cents": -34
+      },
+      {
+        "client": "ELM",
+        "count": 2,
+        "net_cents": 10400
+      },
+      {
+        "client": "OAK",
+        "count": 2,
+        "net_cents": -4711
+      }
+    ],
+    "c02_report": "CLIENT COUNT NET\nBIRCH 2 -0.34\nELM 2 104.00\nOAK 2 -47.11\nTOTAL 6 56.55",
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c01_report"
+      ]
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c02_report"
+      ]
+    }
+  },
+  "final_plan": {
+    "milestones": [
+      {
+        "id": "M1",
+        "parent": "G0",
+        "title": "Verify component c01 at grouping level 1"
+      },
+      {
+        "id": "M2",
+        "parent": "G0",
+        "title": "Verify component c02 at grouping level 1"
+      }
+    ],
+    "leaves": {
+      "S1": {
+        "id": "S1",
+        "parent": "M1",
+        "instruction": "Process current c01 source records in given order. Strip whitespace from every value; uppercase record_id and client, lowercase kind and status. Retain only records with status ok, nonempty normalized record_id and client, kind sale or refund, ASCII quantity [0-9]{1,2} whose value is 1..50, and unit_price matching [0-9]{1,5}.[0-9]{2} with a literal decimal point. Skip invalid records; among valid records retain only the first for each normalized record_id. Compute exact integer unit_cents from the decimal price and net_cents as quantity times unit_cents, negative for refunds and positive for sales. Sort retained rows lexically by record_id and emit the specified row fields.",
+        "checks": [
+          "c01_rows"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S2": {
+        "id": "S2",
+        "parent": "M1",
+        "instruction": "Using the current c01_rows artifact, group retained rows by normalized client in lexical order. For each client, count retained records and sum signed net_cents as exact integers. Produce c01_aggregates as an array of objects with client, count, and net_cents; do not count items or use floating-point arithmetic.",
+        "checks": [
+          "c01_aggregates"
+        ],
+        "depends_on": [
+          "S1"
+        ],
+        "revision": 0
+      },
+      "S3": {
+        "id": "S3",
+        "parent": "M1",
+        "instruction": "Using the current c01_aggregates artifact, render c01_report with no trailing newline: first line CLIENT COUNT NET; then one line per client in lexical order as <client> <count> <net amount with exactly two decimal places>; final line TOTAL <retained record count> <grand net amount with exactly two decimal places>. Format cents exactly as decimal amounts, use single spaces, and include a minus sign only for negative amounts.",
+        "checks": [
+          "c01_report"
+        ],
+        "depends_on": [
+          "S2"
+        ],
+        "revision": 0
+      },
+      "S4": {
+        "id": "S4",
+        "parent": "M1",
+        "instruction": "Read the current c01 component revision and verify that the direct prerequisite c01_report passes against the current c01 environment. Produce c01_certify_1 with environment_revision equal to that revision and checked_gates exactly [\"c01_report\"], in that order; certify only if the prerequisite actually passes.",
+        "checks": [
+          "c01_certify_1"
+        ],
+        "depends_on": [
+          "S3"
+        ],
+        "revision": 0
+      },
+      "S5": {
+        "id": "S5",
+        "parent": "M2",
+        "instruction": "Process current c02 source records in given order. Strip whitespace from every value; uppercase record_id and client, lowercase kind and status. Retain only records with status ok, nonempty normalized record_id and client, kind sale or refund, ASCII quantity [0-9]{1,2} whose value is 1..50, and unit_price matching [0-9]{1,5}.[0-9]{2} with a literal decimal point. Skip invalid records; among valid records retain only the first for each normalized record_id. Compute exact integer unit_cents from the decimal price and net_cents as quantity times unit_cents, negative for refunds and positive for sales. Sort retained rows lexically by record_id and emit the specified row fields.",
+        "checks": [
+          "c02_rows"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S6": {
+        "id": "S6",
+        "parent": "M2",
+        "instruction": "Using the current c02_rows artifact, group retained rows by normalized client in lexical order. For each client, count retained records and sum signed net_cents as exact integers. Produce c02_aggregates as an array of objects with client, count, and net_cents; do not count items or use floating-point arithmetic.",
+        "checks": [
+          "c02_aggregates"
+        ],
+        "depends_on": [
+          "S5"
+        ],
+        "revision": 0
+      },
+      "S7": {
+        "id": "S7",
+        "parent": "M2",
+        "instruction": "Using the current c02_aggregates artifact, render c02_report with no trailing newline: first line CLIENT COUNT NET; then one line per client in lexical order as <client> <count> <net amount with exactly two decimal places>; final line TOTAL <retained record count> <grand net amount with exactly two decimal places>. Format cents exactly as decimal amounts, use single spaces, and include a minus sign only for negative amounts.",
+        "checks": [
+          "c02_report"
+        ],
+        "depends_on": [
+          "S6"
+        ],
+        "revision": 0
+      },
+      "S8": {
+        "id": "S8",
+        "parent": "M2",
+        "instruction": "Read the current c02 component revision and verify that the direct prerequisite c02_report passes against the current c02 environment. Produce c02_certify_1 with environment_revision equal to that revision and checked_gates exactly [\"c02_report\"], in that order; certify only if the prerequisite actually passes.",
+        "checks": [
+          "c02_certify_1"
+        ],
+        "depends_on": [
+          "S7"
+        ],
+        "revision": 0
+      }
+    }
+  },
+  "final_artifact_sha256": "46142973982f9178047a8968a3a514a4d3959c157b476fda53efa47bb81db4fe",
+  "final_plan_sha256": "26e1f20b80f369a020df878e545e654bc20bfedc9a662777aa816cfbdba61b62",
+  "final_environment_sha256": "ef5d8e9c31431eb2ee14aaf58e8243a6edfa7d9d3cbdfc7f8d3c61195f345b98",
+  "trace_final_sha256": "d56d24293a48aa4b6ce19c7840395139f7caa0fbeff2b6d5460f1213c24a3330"
+}

@@ -1,0 +1,390 @@
+{
+  "schema_version": "hiergoal.controlled_recovery.publication.v1",
+  "repository": "Unjuno/hiergoal-lab",
+  "run_id": "46061593147",
+  "run_attempt": "1",
+  "execution_commit": "af2781154078f0c7476a62e931f1aee54ea87698",
+  "protocol_id": "d36c836de43c41cb0248a95abaa6af810c0eafd896f606207b20ba4b7a3533a1",
+  "files": {
+    "audits.json": {
+      "sha256": "9d4bf1cd7e8ef18b74f8e686ab72ab39dd560c1bfdf7bc063005a6f55d600067",
+      "bytes": 355610
+    },
+    "authorization.json": {
+      "sha256": "5f11887a189e6c256a9ca4c672b2735104faf1c4acc4fbc10d1ac89e29e519fc",
+      "bytes": 683
+    },
+    "checkpoints/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1.json": {
+      "sha256": "a6c922ed82f89fe6ba62e1c25136b1d0ccbb35c3ff0d5875c32a780583d9eae2",
+      "bytes": 41727
+    },
+    "checkpoints/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2.json": {
+      "sha256": "cfd4ae7f2f10132b0ca9139b14ba4e96e600987b1e4ce81219e9b90607678dad",
+      "bytes": 41578
+    },
+    "checkpoints/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1.json": {
+      "sha256": "2ed2c0fae0072c49b60c8e4fa33c62ff9958b1b043dadc4199b6bb740eab636d",
+      "bytes": 41227
+    },
+    "checkpoints/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2.json": {
+      "sha256": "65be083aa2f509085b1282adfd860956602a07d72dbfd161f379e284628aad82",
+      "bytes": 41390
+    },
+    "checkpoints/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1.json": {
+      "sha256": "9df3af368dddab62bb961e686eb232b8bcdd7e7bf05c770ff1dce14e6c5c71fa",
+      "bytes": 60947
+    },
+    "checkpoints/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2.json": {
+      "sha256": "0ad155aa101542224e03d5d42da97a901a729ecbf5f05abad73d56ffbd8cb916",
+      "bytes": 60909
+    },
+    "checkpoints/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1.json": {
+      "sha256": "5b18e736aee2ffbb3ee8abc56033ffe74b15be119718bd2f4c8c1e9be4607e27",
+      "bytes": 61180
+    },
+    "checkpoints/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2.json": {
+      "sha256": "a51562c0797ae608e7c4b8c3a37bf6ae03036c40dc6e3e4ea40eb83ed1093ec9",
+      "bytes": 60834
+    },
+    "checkpoints/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1.json": {
+      "sha256": "081c462ffe801875d290b6ddbcb061e7e25f3baa0642530ae51352d52f22126b",
+      "bytes": 49561
+    },
+    "checkpoints/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2.json": {
+      "sha256": "f24d5fe190d0e7ef699ca61ca864ea27121439ae4045e98860f762988408c35b",
+      "bytes": 48724
+    },
+    "checkpoints/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1.json": {
+      "sha256": "d7b6dab004ab71fbaedf7d20be1eca5ac8937eda23a2b2814503a1f5a83c16a3",
+      "bytes": 49333
+    },
+    "checkpoints/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2.json": {
+      "sha256": "a1bfd03afe8ee16f5ff8b5275c9a0890e6f0438a5dc0e879eaf97bcc1db486ab",
+      "bytes": 49228
+    },
+    "execution.json": {
+      "sha256": "e0cbd4e44f3559bba42e424671c6fba3a9b4d24c725607e69cce16ff2bd11098",
+      "bytes": 173
+    },
+    "host.json": {
+      "sha256": "fec441567636a03a7f7a1c777a59ab1082e4d97c790853d3fb276ce521be15de",
+      "bytes": 463
+    },
+    "manifest.json": {
+      "sha256": "7e8eebd329c6de076da094ddbcc1dcc2c8ca104d457235c04fa3d8c8678d69bc",
+      "bytes": 67383
+    },
+    "preparations/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1/result.json": {
+      "sha256": "cd1758da7a0551b4e9b38536153220297ba7c54b476a5b1d930a7861ef252d3a",
+      "bytes": 5070
+    },
+    "preparations/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1/trace.jsonl": {
+      "sha256": "4272891531ea034de967ae163708c8f588748269f4f483c6d62150ae6b810e92",
+      "bytes": 65892
+    },
+    "preparations/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2/result.json": {
+      "sha256": "122fb7f7200e205bf6f553a0f74b63b1d0a5b169e22d246f57d5d610efeddcbf",
+      "bytes": 4974
+    },
+    "preparations/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2/trace.jsonl": {
+      "sha256": "87be7c632f69e3b2f40e4fc90ac05cbf27547c8295eab93e2bcb1fc22a4d4c7e",
+      "bytes": 65614
+    },
+    "preparations/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1/result.json": {
+      "sha256": "22bf84905b607f680fad8d6cea55207af617cac7487a345e8be539f3da72c357",
+      "bytes": 4618
+    },
+    "preparations/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1/trace.jsonl": {
+      "sha256": "0e9381df4d9c100015b4557934b9846fb777f52e45daebbbb26b81b8d8e9d476",
+      "bytes": 63746
+    },
+    "preparations/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2/result.json": {
+      "sha256": "684fe1cf37ae11d962c5b3912c3edf614f1a957ad2c630c639e946e185adc136",
+      "bytes": 4754
+    },
+    "preparations/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2/trace.jsonl": {
+      "sha256": "0278e817474c848b01f322d7717b20756d17df56ddbe110e4b69687abb2312ed",
+      "bytes": 64387
+    },
+    "preparations/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1/result.json": {
+      "sha256": "e758d51be584c06fad63effad51a11955cafb60491af48db58cb2c6afff8e1e9",
+      "bytes": 9814
+    },
+    "preparations/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1/trace.jsonl": {
+      "sha256": "baa635aa47fe1b752aa42aca980981586a31c2d38a05e9a4874a37c0fbe7032f",
+      "bytes": 88541
+    },
+    "preparations/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2/result.json": {
+      "sha256": "42b21a2d3d9d6d3cb05027615eb34561837e0fd22d43794e77135028da540865",
+      "bytes": 9777
+    },
+    "preparations/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2/trace.jsonl": {
+      "sha256": "07c4d3907162598707cab539a3bad476c9ea259644e9a0ab7cbe756db81f2f20",
+      "bytes": 88283
+    },
+    "preparations/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1/result.json": {
+      "sha256": "da09f60ff6e23cdc3cc1e5cdc541101db8605ea3c34e56a59bb1170547713293",
+      "bytes": 10033
+    },
+    "preparations/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1/trace.jsonl": {
+      "sha256": "98c3533315a8dd07c072fde2d9d72fe092cea18eb446e95ea8354c93fc5b6d9b",
+      "bytes": 89612
+    },
+    "preparations/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2/result.json": {
+      "sha256": "d803eeff7990c3d824882b00e189097ab0ca8704534f064f3ed4e36f31aa5dab",
+      "bytes": 9688
+    },
+    "preparations/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2/trace.jsonl": {
+      "sha256": "d120bfa2173ddd5ee1858330d82db2da456d37103c37f0434211f27317ee576d",
+      "bytes": 87860
+    },
+    "preparations/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1/result.json": {
+      "sha256": "2ee8eb3102ca059386019d15a6220c5e8f551520e4d3f284f91d2922dcb306f8",
+      "bytes": 6864
+    },
+    "preparations/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1/trace.jsonl": {
+      "sha256": "f13e46abb8561905ac37c6e3d157736174ca1a6484144f21f3b296411916294c",
+      "bytes": 102416
+    },
+    "preparations/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2/result.json": {
+      "sha256": "29574a47183911478699b87d1b237bd18c0866ed29f1e80dda3e293bfdb0d197",
+      "bytes": 6027
+    },
+    "preparations/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2/trace.jsonl": {
+      "sha256": "adae3c94c1ec1c272ec526241b284929b58ed36fa5e80a45501f9a290830122d",
+      "bytes": 68437
+    },
+    "preparations/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1/result.json": {
+      "sha256": "ffb5f0a41dd0e992a60b7aee7063d9f47ce8fb0fd00cd3c6886300f4c2278451",
+      "bytes": 6638
+    },
+    "preparations/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1/trace.jsonl": {
+      "sha256": "c091f2010bf17e2d0216431034330e3237c0a2047bb8f9655ecb4b9ad016bdcc",
+      "bytes": 71474
+    },
+    "preparations/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2/result.json": {
+      "sha256": "8d3a0278fa22b1de23a123e463c80c318a3af07f413229c35b226b0c19cf459c",
+      "bytes": 6534
+    },
+    "preparations/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2/trace.jsonl": {
+      "sha256": "e5d987cd8b7b5426e3cd2c8b71dc9c3e590bc19703b8428741d669db35c11fa6",
+      "bytes": 70886
+    },
+    "preparations.json": {
+      "sha256": "062616a104e07d00d43640c219cdc2c36ad7a7eb987e8f7b0ef62aa92abcf6f8",
+      "bytes": 90242
+    },
+    "results.json": {
+      "sha256": "e655cd1ad6d46915a9154f864a97d42ca5f7738c3fd47c4957ed1796c543d669",
+      "bytes": 197544
+    },
+    "summary.json": {
+      "sha256": "53b140a09e55e80df02f0aa2ea36d4b81b032e97139c5477330f3e9cc1d99a53",
+      "bytes": 11798
+    },
+    "summary.md": {
+      "sha256": "6fc9faf86bb4440e30686485fd9081628bec1bb03e783e13c3b391a05a68488f",
+      "bytes": 2013
+    },
+    "trials/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1-adaptive/result.json": {
+      "sha256": "455f61f2153b41ddd8da4e9f3bc9aa3949e54f20edb4ef26f2e55e6b973e7d20",
+      "bytes": 5082
+    },
+    "trials/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1-adaptive/trace.jsonl": {
+      "sha256": "4332396519edaab7316027e7e103d3c400af50afd73f1c3daa4871c06e5d0489",
+      "bytes": 67492
+    },
+    "trials/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1-fixed/result.json": {
+      "sha256": "fcf7e2a2b8eba7d9bf40bd59b459b640dff89d3807b74dca6a15a5f4660f5d75",
+      "bytes": 5064
+    },
+    "trials/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1-fixed/trace.jsonl": {
+      "sha256": "9fba1e42cf7d8b0fa4f5e3e7268c4bd3619685fe1103962b76e7dfdd823319c5",
+      "bytes": 41032
+    },
+    "trials/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2-adaptive/result.json": {
+      "sha256": "6b4721f911252861db6e343801e89e02bbcfe9628085bd5b23165cd2f7e1f3c9",
+      "bytes": 5072
+    },
+    "trials/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2-adaptive/trace.jsonl": {
+      "sha256": "f0bcd1c2d1030ae074e73d7e2d06fb1b7aa3cf218f604a5ef6a14acc6a1ddd5f",
+      "bytes": 67644
+    },
+    "trials/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2-fixed/result.json": {
+      "sha256": "db22a9acec903dd29f55aeb5909383c592f82caf1d323d5fbdb1b1621bd1e8e7",
+      "bytes": 4994
+    },
+    "trials/scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2-fixed/trace.jsonl": {
+      "sha256": "82490bd625a40132e55d929eb36a586fa52bb4b9feee84410423a88506728006",
+      "bytes": 40737
+    },
+    "trials/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1-adaptive/result.json": {
+      "sha256": "18a1322a1dbefaf7364edaef8a9a7f8abca733e12a82a614b8ef59d27b12400c",
+      "bytes": 4759
+    },
+    "trials/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1-adaptive/trace.jsonl": {
+      "sha256": "37b7896a3c1bba630a8522acd94d82077e03028062030ca91d48eb84592dba93",
+      "bytes": 66046
+    },
+    "trials/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1-fixed/result.json": {
+      "sha256": "a40b03f2bd4179efa6a421f44afbf4ec1d6ce4cb7f0fb3c8c2b8916362672e6b",
+      "bytes": 4632
+    },
+    "trials/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1-fixed/trace.jsonl": {
+      "sha256": "b4e45da7fb71dfbb2d45cf14c1d85ebe27aa7fb8029439f3f4800667974e94fc",
+      "bytes": 39269
+    },
+    "trials/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2-adaptive/result.json": {
+      "sha256": "46fb79568b718da8c3810fc7f0c9d4becb63301048da004ce9dcd2cc57f9cca2",
+      "bytes": 4885
+    },
+    "trials/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2-adaptive/trace.jsonl": {
+      "sha256": "70a5f020ae283292541ad9c88ae85e5dd502bec9b0ca7086ae1bd4256883f690",
+      "bytes": 66656
+    },
+    "trials/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2-fixed/result.json": {
+      "sha256": "3c99d8332d79b81ef89ac3db3db16380a28e8eea52858829db3e72cac6a1b2fe",
+      "bytes": 4762
+    },
+    "trials/scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2-fixed/trace.jsonl": {
+      "sha256": "b547d42ef468c8e2f484ad2dd99c77728f475231c9e9e5efe74df8062b7bcf98",
+      "bytes": 39799
+    },
+    "trials/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1-adaptive/result.json": {
+      "sha256": "cf6264ebf9bc5ec94d8f795c07e6c3bb088ee6f93ecd63712516c9ef635a1089",
+      "bytes": 9925
+    },
+    "trials/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1-adaptive/trace.jsonl": {
+      "sha256": "3e2333ff967819bb94d5ea98e1935d9c3673ece7c31c37e6b819f46078618ce1",
+      "bytes": 141477
+    },
+    "trials/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1-fixed/result.json": {
+      "sha256": "5650f03e9d0a6a3dd8057ce2efa21ef13173fba2ef5c154530d65b1954cb9be9",
+      "bytes": 9821
+    },
+    "trials/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1-fixed/trace.jsonl": {
+      "sha256": "3100e13f084d2a9c254e867f5b8b133964758460b2618e0dd18ed24378a26712",
+      "bytes": 104062
+    },
+    "trials/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2-adaptive/result.json": {
+      "sha256": "73a873e417de2b35ab3b6196be7c0ea3d46409ae2cf0f6912629698b7036db0a",
+      "bytes": 9965
+    },
+    "trials/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2-adaptive/trace.jsonl": {
+      "sha256": "4a722fd2a209297b17feb2b752e53b0b589cfe1a859edd83af42636071c983cf",
+      "bytes": 142322
+    },
+    "trials/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2-fixed/result.json": {
+      "sha256": "8f3986f7a02f4a9c0b88dc2172dac7319c01312ad5074ff1fef7dde4cb3bb08a",
+      "bytes": 9783
+    },
+    "trials/scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2-fixed/trace.jsonl": {
+      "sha256": "7901b63e7b0000801c105e017c0202440625ca4fe9c330db383cebfd19389f58",
+      "bytes": 60235
+    },
+    "trials/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1-adaptive/result.json": {
+      "sha256": "b7eb4ded172523d35ca7bd55f4347f09e91183a341c1c56cb80678c5c0545c05",
+      "bytes": 10068
+    },
+    "trials/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1-adaptive/trace.jsonl": {
+      "sha256": "0e7bf5b02ce74a6bc248a9591e0a9cf26b773fc077191a5e309f3dcfc344f5ad",
+      "bytes": 98187
+    },
+    "trials/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1-fixed/result.json": {
+      "sha256": "7102f7230fe0844e948d0ca276be9a0c8fa5c64a4175ae791304cd0c7c837903",
+      "bytes": 10040
+    },
+    "trials/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1-fixed/trace.jsonl": {
+      "sha256": "4a5b1d5236d1c03fb37ea4988abb8795294a45945023a51c53d5ebe33b19066d",
+      "bytes": 61276
+    },
+    "trials/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2-adaptive/result.json": {
+      "sha256": "51cc67520a4253bd5eec4759e9264563626f156c66595fa342310d22ea349c34",
+      "bytes": 9700
+    },
+    "trials/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2-adaptive/trace.jsonl": {
+      "sha256": "6e56991a52a9f25f5a5237e78ab68efda905458ad2adb5cc5185924032c4a8f3",
+      "bytes": 96186
+    },
+    "trials/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2-fixed/result.json": {
+      "sha256": "519b3cf9e94e237562e57d03fd156133a988fe58e6137956d8c3a21f6e64d883",
+      "bytes": 9694
+    },
+    "trials/scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2-fixed/trace.jsonl": {
+      "sha256": "ae20bf4dc05178b138e9596fcbc92f9f25ee3c00cb658e189bce4b9e2ae42437",
+      "bytes": 59777
+    },
+    "trials/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1-adaptive/result.json": {
+      "sha256": "54a487a67b2a2c4ac459cbee658b56d062046298fb720f49642c09960ba3093d",
+      "bytes": 6885
+    },
+    "trials/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1-adaptive/trace.jsonl": {
+      "sha256": "b320004287d4f339e7d0c057da942195c731c624a413c44951bad2d8e1ff20c8",
+      "bytes": 74732
+    },
+    "trials/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1-fixed/result.json": {
+      "sha256": "164e268736982f74c5cb3cc57430b52b849cd55a8dc9afe2c75e78533fbbf1b1",
+      "bytes": 6869
+    },
+    "trials/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1-fixed/trace.jsonl": {
+      "sha256": "61c32e0a52b935341366dd1af8434c2c7b799bfeffad0856c7eba155114ba74e",
+      "bytes": 81056
+    },
+    "trials/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2-adaptive/result.json": {
+      "sha256": "8f0b681015f761d39f9b8bfca7067573fdc9f46e783c1033107aacb5d422b5d5",
+      "bytes": 6058
+    },
+    "trials/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2-adaptive/trace.jsonl": {
+      "sha256": "5ae31b78706a0760677b83f18e536e15b5db63dd82c6e0965b6784eb3faca53f",
+      "bytes": 70367
+    },
+    "trials/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2-fixed/result.json": {
+      "sha256": "c02afc5013f2da4fb847a8a52d234e78bebee10454980ddfebbafe33d945bd49",
+      "bytes": 6034
+    },
+    "trials/scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2-fixed/trace.jsonl": {
+      "sha256": "acefc0934de2afcaa35f4df5d59551ed6f2b909def147105082bdb1438da7b18",
+      "bytes": 43423
+    },
+    "trials/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1-adaptive/result.json": {
+      "sha256": "09b622acd498a54f3661e5b7916e27fb91eaeb540d52a9fdbf7fbc846eda8496",
+      "bytes": 6682
+    },
+    "trials/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1-adaptive/trace.jsonl": {
+      "sha256": "81aa014a0245156ce6bf912f61dff0d70ddb2c56a598ff5d8431f95b4801fdcb",
+      "bytes": 73827
+    },
+    "trials/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1-fixed/result.json": {
+      "sha256": "c6ea3137a892901627250261a342dc2024e119e85396dc75fa2dbbedd1969587",
+      "bytes": 6644
+    },
+    "trials/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1-fixed/trace.jsonl": {
+      "sha256": "0fea839913cb7e958f18388391d8dce2274e7ec927dc6226f62931da88ea9b46",
+      "bytes": 45854
+    },
+    "trials/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2-adaptive/result.json": {
+      "sha256": "8e57aef290b63daa226e6fdc7df46cfa3b3c127628b9b17e9a85185162a50903",
+      "bytes": 6545
+    },
+    "trials/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2-adaptive/trace.jsonl": {
+      "sha256": "f54f76963378814ae7f8e342ca3cf33ce56fd68da70733f71acb98b32e053d34",
+      "bytes": 72608
+    },
+    "trials/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2-fixed/result.json": {
+      "sha256": "e70007598e12b97b5b3a06510ad7077df7fa1408a70713184c7c87cf1ca04f98",
+      "bytes": 6538
+    },
+    "trials/scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2-fixed/trace.jsonl": {
+      "sha256": "992b8009ed2c1cb3e7b252f16788158f35602413bca6d35ee616038071704581",
+      "bytes": 78934
+    },
+    "trials.csv": {
+      "sha256": "795add285e9633f5c2009214ad48519d261b1359b70b11520fec05972338a2fe",
+      "bytes": 15631
+    }
+  },
+  "file_count": 94,
+  "total_bytes": 4263616,
+  "raw_synthetic_model_evidence": true,
+  "content_policy": "Fixed synthetic tasks and full recorded model text are untrusted data; never execute artifact contents."
+}

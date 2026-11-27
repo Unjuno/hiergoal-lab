@@ -1,0 +1,1717 @@
+{
+  "schema_version": "hiergoal.controlled_recovery.v1",
+  "protocol_revision": "recovery-v1.0",
+  "profile": "controlled-recovery-pilot",
+  "backend": "openai",
+  "model": "gpt-6-luna",
+  "reasoning_effort": "low",
+  "batch_size": 1,
+  "endpoint": "https://api.openai.com/v1/responses",
+  "task_seed": 20261127,
+  "schedule_seed": 20261127,
+  "randomness_note": "Task and schedule seeds do not seed provider sampling.",
+  "tasks": [
+    {
+      "family": "code_repair",
+      "instance": 0,
+      "split": "heldout",
+      "seed": 20261127,
+      "scale": {
+        "size": "small",
+        "depth": 3,
+        "density": "sparse"
+      },
+      "fault_kind": "forced_subgoal",
+      "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+      "root_sha256": "14cdf81c2942dfd02ee6cba59f63e1f4914ffd5cc27c9d0a704f8ed28831fa83",
+      "initial_public_spec_sha256": "03367dbe2a93bec2354817b84bd6e13340ec9f180d6f699546518e83cd2e52e4",
+      "initial_environment_sha256": "8b5a4e3479fdc0b1e1d6628581eeecf8792ad24e2e3624bd7320eb3cfb49f748",
+      "planned_tree": {
+        "leaf_count": 8,
+        "group_count": 2,
+        "goal_count": 11,
+        "max_depth": 2,
+        "depth_levels": 3,
+        "depth_unit": "edges_from_root",
+        "tree_edges": 10,
+        "dependency_edges": 6,
+        "dependency_density": 0.21428571428571427,
+        "independent_branch_count": 2,
+        "component_count": 2,
+        "domain_gate_count": 6,
+        "certification_gate_count": 2
+      }
+    },
+    {
+      "family": "code_repair",
+      "instance": 1,
+      "split": "heldout",
+      "seed": 20261127,
+      "scale": {
+        "size": "small",
+        "depth": 3,
+        "density": "sparse"
+      },
+      "fault_kind": "forced_subgoal",
+      "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+      "root_sha256": "5c92d28fe2ed94a64c407c6593114a440f99ce77d51964925158175879f86516",
+      "initial_public_spec_sha256": "28f61d13e0463672b8d4337bed50d11e7f4048c1137cb1483d9fe0edf61757ba",
+      "initial_environment_sha256": "44a0e3c4f543dcce7aaa41630c44267d316fdcebd7455311c4e2942f37eddedc",
+      "planned_tree": {
+        "leaf_count": 8,
+        "group_count": 2,
+        "goal_count": 11,
+        "max_depth": 2,
+        "depth_levels": 3,
+        "depth_unit": "edges_from_root",
+        "tree_edges": 10,
+        "dependency_edges": 6,
+        "dependency_density": 0.21428571428571427,
+        "independent_branch_count": 2,
+        "component_count": 2,
+        "domain_gate_count": 6,
+        "certification_gate_count": 2
+      }
+    },
+    {
+      "family": "data_transform",
+      "instance": 0,
+      "split": "heldout",
+      "seed": 20261127,
+      "scale": {
+        "size": "small",
+        "depth": 3,
+        "density": "sparse"
+      },
+      "fault_kind": "forced_subgoal",
+      "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+      "root_sha256": "b10d089497b74b4c4a0ec8bc6848e3833d3aa4ed1f0d82c3f75a8e147c49a705",
+      "initial_public_spec_sha256": "ef5d8e9c31431eb2ee14aaf58e8243a6edfa7d9d3cbdfc7f8d3c61195f345b98",
+      "initial_environment_sha256": "d9596728f5ba6a7213e4e5d3e61e23d744473fe305e9dd72835a5fffa07413bf",
+      "planned_tree": {
+        "leaf_count": 8,
+        "group_count": 2,
+        "goal_count": 11,
+        "max_depth": 2,
+        "depth_levels": 3,
+        "depth_unit": "edges_from_root",
+        "tree_edges": 10,
+        "dependency_edges": 6,
+        "dependency_density": 0.21428571428571427,
+        "independent_branch_count": 2,
+        "component_count": 2,
+        "domain_gate_count": 6,
+        "certification_gate_count": 2
+      }
+    },
+    {
+      "family": "data_transform",
+      "instance": 1,
+      "split": "heldout",
+      "seed": 20261127,
+      "scale": {
+        "size": "small",
+        "depth": 3,
+        "density": "sparse"
+      },
+      "fault_kind": "forced_subgoal",
+      "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+      "root_sha256": "ac6dcc4a987bab784fe6d2db0376742f09ea391dc5a48a283fc34d4fc3717200",
+      "initial_public_spec_sha256": "d6662c804afba6f84d48b1309a24950ffc04ef11ed8aa9c9a8bdf398b12ecef5",
+      "initial_environment_sha256": "a0c668170e96cb2b745bfdb6f5e48059707046fa895608e20a5564419bc9dc26",
+      "planned_tree": {
+        "leaf_count": 8,
+        "group_count": 2,
+        "goal_count": 11,
+        "max_depth": 2,
+        "depth_levels": 3,
+        "depth_unit": "edges_from_root",
+        "tree_edges": 10,
+        "dependency_edges": 6,
+        "dependency_density": 0.21428571428571427,
+        "independent_branch_count": 2,
+        "component_count": 2,
+        "domain_gate_count": 6,
+        "certification_gate_count": 2
+      }
+    },
+    {
+      "family": "scheduling",
+      "instance": 0,
+      "split": "heldout",
+      "seed": 20261127,
+      "scale": {
+        "size": "small",
+        "depth": 3,
+        "density": "sparse"
+      },
+      "fault_kind": "forced_subgoal",
+      "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+      "root_sha256": "653324dcf367763680b3c9e39c0fe4b4a3f272c418b4fd307540e33b012b838c",
+      "initial_public_spec_sha256": "3ba0fe9931f1473e48ea564bd93d9aaaa07ed0ea90f2f8f4b3ab6c34f1c24d85",
+      "initial_environment_sha256": "5b0d7e01f8107ffe8accdf865172d879aff4ecf12ec869523c32a5630dbb0b31",
+      "planned_tree": {
+        "leaf_count": 8,
+        "group_count": 2,
+        "goal_count": 11,
+        "max_depth": 2,
+        "depth_levels": 3,
+        "depth_unit": "edges_from_root",
+        "tree_edges": 10,
+        "dependency_edges": 8,
+        "dependency_density": 0.2857142857142857,
+        "independent_branch_count": 2,
+        "component_count": 2,
+        "domain_gate_count": 6,
+        "certification_gate_count": 2
+      }
+    },
+    {
+      "family": "scheduling",
+      "instance": 1,
+      "split": "heldout",
+      "seed": 20261127,
+      "scale": {
+        "size": "small",
+        "depth": 3,
+        "density": "sparse"
+      },
+      "fault_kind": "forced_subgoal",
+      "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+      "root_sha256": "fbefe41b8eeaec95a0c5d9ac512e9e478a77fdb6d9ef2b30a130d193764be30f",
+      "initial_public_spec_sha256": "415b91126646d6ccfd5087b60c9ca917243af6878fd1671498bf89feed97e2b6",
+      "initial_environment_sha256": "c97fc5e7dfd53da621d5713d3961d7f3a017020cdd13e6ea4619e4401c914491",
+      "planned_tree": {
+        "leaf_count": 8,
+        "group_count": 2,
+        "goal_count": 11,
+        "max_depth": 2,
+        "depth_levels": 3,
+        "depth_unit": "edges_from_root",
+        "tree_edges": 10,
+        "dependency_edges": 8,
+        "dependency_density": 0.2857142857142857,
+        "independent_branch_count": 2,
+        "component_count": 2,
+        "domain_gate_count": 6,
+        "certification_gate_count": 2
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "pair_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2",
+      "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+      "repeat": 2,
+      "task": {
+        "family": "data_transform",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+        "root_sha256": "b10d089497b74b4c4a0ec8bc6848e3833d3aa4ed1f0d82c3f75a8e147c49a705",
+        "initial_public_spec_sha256": "ef5d8e9c31431eb2ee14aaf58e8243a6edfa7d9d3cbdfc7f8d3c61195f345b98",
+        "initial_environment_sha256": "d9596728f5ba6a7213e4e5d3e61e23d744473fe305e9dd72835a5fffa07413bf",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "fixed",
+        "adaptive"
+      ]
+    },
+    {
+      "pair_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2",
+      "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+      "repeat": 2,
+      "task": {
+        "family": "scheduling",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+        "root_sha256": "fbefe41b8eeaec95a0c5d9ac512e9e478a77fdb6d9ef2b30a130d193764be30f",
+        "initial_public_spec_sha256": "415b91126646d6ccfd5087b60c9ca917243af6878fd1671498bf89feed97e2b6",
+        "initial_environment_sha256": "c97fc5e7dfd53da621d5713d3961d7f3a017020cdd13e6ea4619e4401c914491",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "adaptive",
+        "fixed"
+      ]
+    },
+    {
+      "pair_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1",
+      "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+      "repeat": 1,
+      "task": {
+        "family": "scheduling",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+        "root_sha256": "653324dcf367763680b3c9e39c0fe4b4a3f272c418b4fd307540e33b012b838c",
+        "initial_public_spec_sha256": "3ba0fe9931f1473e48ea564bd93d9aaaa07ed0ea90f2f8f4b3ab6c34f1c24d85",
+        "initial_environment_sha256": "5b0d7e01f8107ffe8accdf865172d879aff4ecf12ec869523c32a5630dbb0b31",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "adaptive",
+        "fixed"
+      ]
+    },
+    {
+      "pair_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1",
+      "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+      "repeat": 1,
+      "task": {
+        "family": "data_transform",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+        "root_sha256": "ac6dcc4a987bab784fe6d2db0376742f09ea391dc5a48a283fc34d4fc3717200",
+        "initial_public_spec_sha256": "d6662c804afba6f84d48b1309a24950ffc04ef11ed8aa9c9a8bdf398b12ecef5",
+        "initial_environment_sha256": "a0c668170e96cb2b745bfdb6f5e48059707046fa895608e20a5564419bc9dc26",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "fixed",
+        "adaptive"
+      ]
+    },
+    {
+      "pair_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2",
+      "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+      "repeat": 2,
+      "task": {
+        "family": "code_repair",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+        "root_sha256": "5c92d28fe2ed94a64c407c6593114a440f99ce77d51964925158175879f86516",
+        "initial_public_spec_sha256": "28f61d13e0463672b8d4337bed50d11e7f4048c1137cb1483d9fe0edf61757ba",
+        "initial_environment_sha256": "44a0e3c4f543dcce7aaa41630c44267d316fdcebd7455311c4e2942f37eddedc",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "adaptive",
+        "fixed"
+      ]
+    },
+    {
+      "pair_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2",
+      "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+      "repeat": 2,
+      "task": {
+        "family": "data_transform",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+        "root_sha256": "ac6dcc4a987bab784fe6d2db0376742f09ea391dc5a48a283fc34d4fc3717200",
+        "initial_public_spec_sha256": "d6662c804afba6f84d48b1309a24950ffc04ef11ed8aa9c9a8bdf398b12ecef5",
+        "initial_environment_sha256": "a0c668170e96cb2b745bfdb6f5e48059707046fa895608e20a5564419bc9dc26",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "fixed",
+        "adaptive"
+      ]
+    },
+    {
+      "pair_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2",
+      "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+      "repeat": 2,
+      "task": {
+        "family": "code_repair",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+        "root_sha256": "14cdf81c2942dfd02ee6cba59f63e1f4914ffd5cc27c9d0a704f8ed28831fa83",
+        "initial_public_spec_sha256": "03367dbe2a93bec2354817b84bd6e13340ec9f180d6f699546518e83cd2e52e4",
+        "initial_environment_sha256": "8b5a4e3479fdc0b1e1d6628581eeecf8792ad24e2e3624bd7320eb3cfb49f748",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "adaptive",
+        "fixed"
+      ]
+    },
+    {
+      "pair_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1",
+      "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+      "repeat": 1,
+      "task": {
+        "family": "code_repair",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+        "root_sha256": "5c92d28fe2ed94a64c407c6593114a440f99ce77d51964925158175879f86516",
+        "initial_public_spec_sha256": "28f61d13e0463672b8d4337bed50d11e7f4048c1137cb1483d9fe0edf61757ba",
+        "initial_environment_sha256": "44a0e3c4f543dcce7aaa41630c44267d316fdcebd7455311c4e2942f37eddedc",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "fixed",
+        "adaptive"
+      ]
+    },
+    {
+      "pair_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1",
+      "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+      "repeat": 1,
+      "task": {
+        "family": "scheduling",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+        "root_sha256": "fbefe41b8eeaec95a0c5d9ac512e9e478a77fdb6d9ef2b30a130d193764be30f",
+        "initial_public_spec_sha256": "415b91126646d6ccfd5087b60c9ca917243af6878fd1671498bf89feed97e2b6",
+        "initial_environment_sha256": "c97fc5e7dfd53da621d5713d3961d7f3a017020cdd13e6ea4619e4401c914491",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "adaptive",
+        "fixed"
+      ]
+    },
+    {
+      "pair_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1",
+      "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+      "repeat": 1,
+      "task": {
+        "family": "data_transform",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+        "root_sha256": "b10d089497b74b4c4a0ec8bc6848e3833d3aa4ed1f0d82c3f75a8e147c49a705",
+        "initial_public_spec_sha256": "ef5d8e9c31431eb2ee14aaf58e8243a6edfa7d9d3cbdfc7f8d3c61195f345b98",
+        "initial_environment_sha256": "d9596728f5ba6a7213e4e5d3e61e23d744473fe305e9dd72835a5fffa07413bf",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "fixed",
+        "adaptive"
+      ]
+    },
+    {
+      "pair_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2",
+      "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+      "repeat": 2,
+      "task": {
+        "family": "scheduling",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+        "root_sha256": "653324dcf367763680b3c9e39c0fe4b4a3f272c418b4fd307540e33b012b838c",
+        "initial_public_spec_sha256": "3ba0fe9931f1473e48ea564bd93d9aaaa07ed0ea90f2f8f4b3ab6c34f1c24d85",
+        "initial_environment_sha256": "5b0d7e01f8107ffe8accdf865172d879aff4ecf12ec869523c32a5630dbb0b31",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "adaptive",
+        "fixed"
+      ]
+    },
+    {
+      "pair_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1",
+      "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+      "repeat": 1,
+      "task": {
+        "family": "code_repair",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+        "root_sha256": "14cdf81c2942dfd02ee6cba59f63e1f4914ffd5cc27c9d0a704f8ed28831fa83",
+        "initial_public_spec_sha256": "03367dbe2a93bec2354817b84bd6e13340ec9f180d6f699546518e83cd2e52e4",
+        "initial_environment_sha256": "8b5a4e3479fdc0b1e1d6628581eeecf8792ad24e2e3624bd7320eb3cfb49f748",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      },
+      "arm_order": [
+        "fixed",
+        "adaptive"
+      ]
+    }
+  ],
+  "trials": [
+    {
+      "trial_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2-fixed",
+      "pair_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2",
+      "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+      "repeat": 2,
+      "arm": "fixed",
+      "task": {
+        "family": "data_transform",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+        "root_sha256": "b10d089497b74b4c4a0ec8bc6848e3833d3aa4ed1f0d82c3f75a8e147c49a705",
+        "initial_public_spec_sha256": "ef5d8e9c31431eb2ee14aaf58e8243a6edfa7d9d3cbdfc7f8d3c61195f345b98",
+        "initial_environment_sha256": "d9596728f5ba6a7213e4e5d3e61e23d744473fe305e9dd72835a5fffa07413bf",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2-adaptive",
+      "pair_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r2",
+      "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+      "repeat": 2,
+      "arm": "adaptive",
+      "task": {
+        "family": "data_transform",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+        "root_sha256": "b10d089497b74b4c4a0ec8bc6848e3833d3aa4ed1f0d82c3f75a8e147c49a705",
+        "initial_public_spec_sha256": "ef5d8e9c31431eb2ee14aaf58e8243a6edfa7d9d3cbdfc7f8d3c61195f345b98",
+        "initial_environment_sha256": "d9596728f5ba6a7213e4e5d3e61e23d744473fe305e9dd72835a5fffa07413bf",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2-adaptive",
+      "pair_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2",
+      "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+      "repeat": 2,
+      "arm": "adaptive",
+      "task": {
+        "family": "scheduling",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+        "root_sha256": "fbefe41b8eeaec95a0c5d9ac512e9e478a77fdb6d9ef2b30a130d193764be30f",
+        "initial_public_spec_sha256": "415b91126646d6ccfd5087b60c9ca917243af6878fd1671498bf89feed97e2b6",
+        "initial_environment_sha256": "c97fc5e7dfd53da621d5713d3961d7f3a017020cdd13e6ea4619e4401c914491",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2-fixed",
+      "pair_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r2",
+      "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+      "repeat": 2,
+      "arm": "fixed",
+      "task": {
+        "family": "scheduling",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+        "root_sha256": "fbefe41b8eeaec95a0c5d9ac512e9e478a77fdb6d9ef2b30a130d193764be30f",
+        "initial_public_spec_sha256": "415b91126646d6ccfd5087b60c9ca917243af6878fd1671498bf89feed97e2b6",
+        "initial_environment_sha256": "c97fc5e7dfd53da621d5713d3961d7f3a017020cdd13e6ea4619e4401c914491",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1-adaptive",
+      "pair_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1",
+      "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+      "repeat": 1,
+      "arm": "adaptive",
+      "task": {
+        "family": "scheduling",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+        "root_sha256": "653324dcf367763680b3c9e39c0fe4b4a3f272c418b4fd307540e33b012b838c",
+        "initial_public_spec_sha256": "3ba0fe9931f1473e48ea564bd93d9aaaa07ed0ea90f2f8f4b3ab6c34f1c24d85",
+        "initial_environment_sha256": "5b0d7e01f8107ffe8accdf865172d879aff4ecf12ec869523c32a5630dbb0b31",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1-fixed",
+      "pair_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r1",
+      "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+      "repeat": 1,
+      "arm": "fixed",
+      "task": {
+        "family": "scheduling",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+        "root_sha256": "653324dcf367763680b3c9e39c0fe4b4a3f272c418b4fd307540e33b012b838c",
+        "initial_public_spec_sha256": "3ba0fe9931f1473e48ea564bd93d9aaaa07ed0ea90f2f8f4b3ab6c34f1c24d85",
+        "initial_environment_sha256": "5b0d7e01f8107ffe8accdf865172d879aff4ecf12ec869523c32a5630dbb0b31",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1-fixed",
+      "pair_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1",
+      "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+      "repeat": 1,
+      "arm": "fixed",
+      "task": {
+        "family": "data_transform",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+        "root_sha256": "ac6dcc4a987bab784fe6d2db0376742f09ea391dc5a48a283fc34d4fc3717200",
+        "initial_public_spec_sha256": "d6662c804afba6f84d48b1309a24950ffc04ef11ed8aa9c9a8bdf398b12ecef5",
+        "initial_environment_sha256": "a0c668170e96cb2b745bfdb6f5e48059707046fa895608e20a5564419bc9dc26",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1-adaptive",
+      "pair_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642-r1",
+      "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+      "repeat": 1,
+      "arm": "adaptive",
+      "task": {
+        "family": "data_transform",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+        "root_sha256": "ac6dcc4a987bab784fe6d2db0376742f09ea391dc5a48a283fc34d4fc3717200",
+        "initial_public_spec_sha256": "d6662c804afba6f84d48b1309a24950ffc04ef11ed8aa9c9a8bdf398b12ecef5",
+        "initial_environment_sha256": "a0c668170e96cb2b745bfdb6f5e48059707046fa895608e20a5564419bc9dc26",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2-adaptive",
+      "pair_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2",
+      "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+      "repeat": 2,
+      "arm": "adaptive",
+      "task": {
+        "family": "code_repair",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+        "root_sha256": "5c92d28fe2ed94a64c407c6593114a440f99ce77d51964925158175879f86516",
+        "initial_public_spec_sha256": "28f61d13e0463672b8d4337bed50d11e7f4048c1137cb1483d9fe0edf61757ba",
+        "initial_environment_sha256": "44a0e3c4f543dcce7aaa41630c44267d316fdcebd7455311c4e2942f37eddedc",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2-fixed",
+      "pair_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r2",
+      "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+      "repeat": 2,
+      "arm": "fixed",
+      "task": {
+        "family": "code_repair",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+        "root_sha256": "5c92d28fe2ed94a64c407c6593114a440f99ce77d51964925158175879f86516",
+        "initial_public_spec_sha256": "28f61d13e0463672b8d4337bed50d11e7f4048c1137cb1483d9fe0edf61757ba",
+        "initial_environment_sha256": "44a0e3c4f543dcce7aaa41630c44267d316fdcebd7455311c4e2942f37eddedc",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2-fixed",
+      "pair_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2",
+      "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+      "repeat": 2,
+      "arm": "fixed",
+      "task": {
+        "family": "data_transform",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+        "root_sha256": "ac6dcc4a987bab784fe6d2db0376742f09ea391dc5a48a283fc34d4fc3717200",
+        "initial_public_spec_sha256": "d6662c804afba6f84d48b1309a24950ffc04ef11ed8aa9c9a8bdf398b12ecef5",
+        "initial_environment_sha256": "a0c668170e96cb2b745bfdb6f5e48059707046fa895608e20a5564419bc9dc26",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2-adaptive",
+      "pair_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642-r2",
+      "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+      "repeat": 2,
+      "arm": "adaptive",
+      "task": {
+        "family": "data_transform",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-001-small-d3-sparse-8e180642",
+        "root_sha256": "ac6dcc4a987bab784fe6d2db0376742f09ea391dc5a48a283fc34d4fc3717200",
+        "initial_public_spec_sha256": "d6662c804afba6f84d48b1309a24950ffc04ef11ed8aa9c9a8bdf398b12ecef5",
+        "initial_environment_sha256": "a0c668170e96cb2b745bfdb6f5e48059707046fa895608e20a5564419bc9dc26",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2-adaptive",
+      "pair_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2",
+      "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+      "repeat": 2,
+      "arm": "adaptive",
+      "task": {
+        "family": "code_repair",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+        "root_sha256": "14cdf81c2942dfd02ee6cba59f63e1f4914ffd5cc27c9d0a704f8ed28831fa83",
+        "initial_public_spec_sha256": "03367dbe2a93bec2354817b84bd6e13340ec9f180d6f699546518e83cd2e52e4",
+        "initial_environment_sha256": "8b5a4e3479fdc0b1e1d6628581eeecf8792ad24e2e3624bd7320eb3cfb49f748",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2-fixed",
+      "pair_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2",
+      "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+      "repeat": 2,
+      "arm": "fixed",
+      "task": {
+        "family": "code_repair",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+        "root_sha256": "14cdf81c2942dfd02ee6cba59f63e1f4914ffd5cc27c9d0a704f8ed28831fa83",
+        "initial_public_spec_sha256": "03367dbe2a93bec2354817b84bd6e13340ec9f180d6f699546518e83cd2e52e4",
+        "initial_environment_sha256": "8b5a4e3479fdc0b1e1d6628581eeecf8792ad24e2e3624bd7320eb3cfb49f748",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1-fixed",
+      "pair_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1",
+      "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+      "repeat": 1,
+      "arm": "fixed",
+      "task": {
+        "family": "code_repair",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+        "root_sha256": "5c92d28fe2ed94a64c407c6593114a440f99ce77d51964925158175879f86516",
+        "initial_public_spec_sha256": "28f61d13e0463672b8d4337bed50d11e7f4048c1137cb1483d9fe0edf61757ba",
+        "initial_environment_sha256": "44a0e3c4f543dcce7aaa41630c44267d316fdcebd7455311c4e2942f37eddedc",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1-adaptive",
+      "pair_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1",
+      "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+      "repeat": 1,
+      "arm": "adaptive",
+      "task": {
+        "family": "code_repair",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+        "root_sha256": "5c92d28fe2ed94a64c407c6593114a440f99ce77d51964925158175879f86516",
+        "initial_public_spec_sha256": "28f61d13e0463672b8d4337bed50d11e7f4048c1137cb1483d9fe0edf61757ba",
+        "initial_environment_sha256": "44a0e3c4f543dcce7aaa41630c44267d316fdcebd7455311c4e2942f37eddedc",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1-adaptive",
+      "pair_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1",
+      "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+      "repeat": 1,
+      "arm": "adaptive",
+      "task": {
+        "family": "scheduling",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+        "root_sha256": "fbefe41b8eeaec95a0c5d9ac512e9e478a77fdb6d9ef2b30a130d193764be30f",
+        "initial_public_spec_sha256": "415b91126646d6ccfd5087b60c9ca917243af6878fd1671498bf89feed97e2b6",
+        "initial_environment_sha256": "c97fc5e7dfd53da621d5713d3961d7f3a017020cdd13e6ea4619e4401c914491",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1-fixed",
+      "pair_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d-r1",
+      "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+      "repeat": 1,
+      "arm": "fixed",
+      "task": {
+        "family": "scheduling",
+        "instance": 1,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-001-small-d3-sparse-05fe7e2d",
+        "root_sha256": "fbefe41b8eeaec95a0c5d9ac512e9e478a77fdb6d9ef2b30a130d193764be30f",
+        "initial_public_spec_sha256": "415b91126646d6ccfd5087b60c9ca917243af6878fd1671498bf89feed97e2b6",
+        "initial_environment_sha256": "c97fc5e7dfd53da621d5713d3961d7f3a017020cdd13e6ea4619e4401c914491",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1-fixed",
+      "pair_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1",
+      "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+      "repeat": 1,
+      "arm": "fixed",
+      "task": {
+        "family": "data_transform",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+        "root_sha256": "b10d089497b74b4c4a0ec8bc6848e3833d3aa4ed1f0d82c3f75a8e147c49a705",
+        "initial_public_spec_sha256": "ef5d8e9c31431eb2ee14aaf58e8243a6edfa7d9d3cbdfc7f8d3c61195f345b98",
+        "initial_environment_sha256": "d9596728f5ba6a7213e4e5d3e61e23d744473fe305e9dd72835a5fffa07413bf",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1-adaptive",
+      "pair_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86-r1",
+      "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+      "repeat": 1,
+      "arm": "adaptive",
+      "task": {
+        "family": "data_transform",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-data_transform-heldout-000-small-d3-sparse-9fd3bc86",
+        "root_sha256": "b10d089497b74b4c4a0ec8bc6848e3833d3aa4ed1f0d82c3f75a8e147c49a705",
+        "initial_public_spec_sha256": "ef5d8e9c31431eb2ee14aaf58e8243a6edfa7d9d3cbdfc7f8d3c61195f345b98",
+        "initial_environment_sha256": "d9596728f5ba6a7213e4e5d3e61e23d744473fe305e9dd72835a5fffa07413bf",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2-adaptive",
+      "pair_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2",
+      "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+      "repeat": 2,
+      "arm": "adaptive",
+      "task": {
+        "family": "scheduling",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+        "root_sha256": "653324dcf367763680b3c9e39c0fe4b4a3f272c418b4fd307540e33b012b838c",
+        "initial_public_spec_sha256": "3ba0fe9931f1473e48ea564bd93d9aaaa07ed0ea90f2f8f4b3ab6c34f1c24d85",
+        "initial_environment_sha256": "5b0d7e01f8107ffe8accdf865172d879aff4ecf12ec869523c32a5630dbb0b31",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2-fixed",
+      "pair_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7-r2",
+      "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+      "repeat": 2,
+      "arm": "fixed",
+      "task": {
+        "family": "scheduling",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-scheduling-heldout-000-small-d3-sparse-626f07a7",
+        "root_sha256": "653324dcf367763680b3c9e39c0fe4b4a3f272c418b4fd307540e33b012b838c",
+        "initial_public_spec_sha256": "3ba0fe9931f1473e48ea564bd93d9aaaa07ed0ea90f2f8f4b3ab6c34f1c24d85",
+        "initial_environment_sha256": "5b0d7e01f8107ffe8accdf865172d879aff4ecf12ec869523c32a5630dbb0b31",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 8,
+          "dependency_density": 0.2857142857142857,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1-fixed",
+      "pair_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1",
+      "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+      "repeat": 1,
+      "arm": "fixed",
+      "task": {
+        "family": "code_repair",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+        "root_sha256": "14cdf81c2942dfd02ee6cba59f63e1f4914ffd5cc27c9d0a704f8ed28831fa83",
+        "initial_public_spec_sha256": "03367dbe2a93bec2354817b84bd6e13340ec9f180d6f699546518e83cd2e52e4",
+        "initial_environment_sha256": "8b5a4e3479fdc0b1e1d6628581eeecf8792ad24e2e3624bd7320eb3cfb49f748",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    },
+    {
+      "trial_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1-adaptive",
+      "pair_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1",
+      "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+      "repeat": 1,
+      "arm": "adaptive",
+      "task": {
+        "family": "code_repair",
+        "instance": 0,
+        "split": "heldout",
+        "seed": 20261127,
+        "scale": {
+          "size": "small",
+          "depth": 3,
+          "density": "sparse"
+        },
+        "fault_kind": "forced_subgoal",
+        "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+        "root_sha256": "14cdf81c2942dfd02ee6cba59f63e1f4914ffd5cc27c9d0a704f8ed28831fa83",
+        "initial_public_spec_sha256": "03367dbe2a93bec2354817b84bd6e13340ec9f180d6f699546518e83cd2e52e4",
+        "initial_environment_sha256": "8b5a4e3479fdc0b1e1d6628581eeecf8792ad24e2e3624bd7320eb3cfb49f748",
+        "planned_tree": {
+          "leaf_count": 8,
+          "group_count": 2,
+          "goal_count": 11,
+          "max_depth": 2,
+          "depth_levels": 3,
+          "depth_unit": "edges_from_root",
+          "tree_edges": 10,
+          "dependency_edges": 6,
+          "dependency_density": 0.21428571428571427,
+          "independent_branch_count": 2,
+          "component_count": 2,
+          "domain_gate_count": 6,
+          "certification_gate_count": 2
+        }
+      }
+    }
+  ],
+  "limits": {
+    "max_calls": 8,
+    "max_replans": 1,
+    "max_total_tokens": 64000,
+    "max_output_tokens": 4096,
+    "max_prompt_bytes": 48000,
+    "request_timeout_seconds": 90,
+    "trial_timeout_seconds": 600,
+    "batch_timeout_seconds": 14400
+  },
+  "preparation_limits": {
+    "max_calls": 8,
+    "max_replans": 0,
+    "max_total_tokens": 64000,
+    "max_output_tokens": 4096,
+    "max_prompt_bytes": 48000,
+    "request_timeout_seconds": 90,
+    "trial_timeout_seconds": 600,
+    "batch_timeout_seconds": 14400
+  },
+  "preparation": {
+    "slots": 12,
+    "plan": "One model request per task/repeat before artifact generation.",
+    "artifact": "Model-generated by flat execution with public feedback, no reference solution.",
+    "qualification": "Public and hidden all-pass; hidden grade is never model feedback.",
+    "selection": "One bounded preparation attempt per assigned slot; no reroll, replacement, or outcome-based selection.",
+    "failure_status": "NOT_RUN_SOURCE_FAILURE",
+    "cost": "Recorded separately once per pair, excluded from both identical repair budgets; report preparation plus repair totals."
+  },
+  "treatment": {
+    "fixed": "Use unchanged initial hierarchy instructions with public failure feedback.",
+    "adaptive": "One instruction-revision request immediately after fork, charged to the same repair budget; rejected revision consumes its request and is retained.",
+    "revision_scope": "Only the failed target leaf instruction and revision count may change.",
+    "artifact_scope": "Both arms may replace any existing artifact field; locality is measured, not guaranteed by field filtering.",
+    "fork": "Identical post-fault artifact, environment, root, initial plan and public feedback; empty repair history in both arms.",
+    "hidden_inputs": "Never expose source artifact, preparation history, hidden grading feedback, or reference solution to repair prompts."
+  },
+  "execution_policy": {
+    "retry_failed_requests": false,
+    "retry_preparation": false,
+    "replace_missing_pairs": false,
+    "audit_each_phase": true,
+    "stop_on_transport_error": true,
+    "stop_on_audit_failure": true,
+    "stop_on_batch_timeout": true,
+    "time_semantics": "Batch threshold is checked before each phase; phase threshold before requests and after responses. In-flight work can exceed these thresholds; actual elapsed time is retained. Workflow limit is 260 minutes.",
+    "unknown_usage": "null total with known partial usage and counted request attempt",
+    "budget_semantics": "Logical token usage includes all completed responses, including invalid or rejected actions; after-response overage fails the phase and is retained. Token thresholds are not a hard billing ceiling because input usage is learned after the response.",
+    "maximum_request_attempts": 288
+  },
+  "analysis": {
+    "primary": "Independently graded recovery conditional on a qualified common checkpoint.",
+    "pairing_unit": "Task/repeat checkpoint; repeats share task content and are not independent tasks.",
+    "pilot_purpose": "Apparatus, accounting, provenance, ceiling and feasibility; no confirmatory efficacy PASS.",
+    "minimum_effect_for_future_study": 0.1,
+    "confidence_for_future_study": 0.95,
+    "reported_denominators": [
+      "6 assigned tasks",
+      "12 preparation slots",
+      "12 assigned pairs",
+      "24 assigned treatment slots",
+      "qualified complete pairs"
+    ],
+    "preparation_failures": "Report yield and reasons separately; never classify as a treatment failure or silently remove from the assignment flow.",
+    "missing_treatment": "Retain missing/uncertain assigned slots and pair incompleteness; do not impute recovery.",
+    "optional_stopping": "None for treatment outcomes; only frozen infrastructure/integrity/time limits stop execution.",
+    "scope": "Replanning procedure including diagnosis and instruction revision, not isolated text rewriting or hierarchy-versus-flat effectiveness."
+  },
+  "task_non_overlap": {
+    "baseline_manifest_sha256": {
+      "experiments/method-study-v1/pilot-manifest.json": "0f57a55fc83fb84f05340079058fab31bf685b93705ca5fa37dcd2da88e48d03",
+      "experiments/method-study-v1/study-manifest.json": "d4805ad30479eebac73d454902bfa5ae2054a1fd8f184cc1c8f3a0c77f43fdaf",
+      "experiments/method-study-v2/pilot-manifest.json": "4d375f48d1f4ed60b657bbe16ca0e863d56d29224b6f0e45461a952802157551",
+      "experiments/method-study-v2/study-manifest.json": "234f1aef4dbbb918d38485a6ff15a19508953289d62357023219f77a6e36277d",
+      "experiments/method-study-v2/mechanism-manifest.json": "953a6546991bb1f04bfe71b82df47efb1042ac0d3ae675a9782283241b03b014",
+      "experiments/method-study-v2/scale-manifest.json": "36758b902ed2a1d5c3d7cae1ca322237211d1543e354b0e6ef6b5607c41093a6",
+      "experiments/method-study-v2/reliability-manifest.json": "133d3a2eb830c88a219300925ba3a26a0f8210066288947d8d79208f787f3bb5",
+      "experiments/method-study-v2.1/pilot-manifest.json": "4f8f7e4c8e2bbcbd5964c19804899b4c89e22ad97487f51f82b46aebd208c442",
+      "experiments/method-study-v2.1/study-manifest.json": "53c1393977faae426a839d006d053d42004c203ca9a3ee0b2c1dea9c55ee473a",
+      "experiments/method-study-v2.1/mechanism-manifest.json": "3137e9da5dba2e05d15adeb588f0586ecc913f900f76dc8972a0dce9043ac1ad",
+      "experiments/method-study-v2.1/scale-manifest.json": "e6af6bf72a46c98d642c465d1e5698ae9e9199989fb2a6520ec15c03f90d80ed",
+      "experiments/method-study-v2.1/reliability-manifest.json": "6ee7a909f14a063da1aa9ddf396af2b0df60df1e2599bc4e7c19d01ddcd2d690",
+      "experiments/method-study-live/pilot/run-45656888380-attempt-1/manifest.json": "8a862463d5db90514b7f2427d0ed6ed793e7aeb6ba7e9010bab013fb9de40c79",
+      "experiments/method-study-live/mechanism/run-45658610566-attempt-1/manifest.json": "361a8752a483b47261cfe3e062042bea1be43d88abf07f6e87291094c0c17e8d",
+      "experiments/method-study-live/scale/run-45667519808-attempt-1/manifest.json": "3190f81223e2ce438f864ead124cac09746574cb355ff9e697499759ef6fb403",
+      "experiments/method-study-live/scale/run-45703053665-attempt-1/manifest.json": "de9b316623817cff5b1a8b23e2f1a92d63740635f9a633701e1855ea9839f412",
+      "experiments/method-study-live/study/run-45729335900-attempt-1/manifest.json": "0f12076a3aa4a4d5ae80c5e4a95dc9bed602a0c4ef16db7618f8d86ec2a6f8e6",
+      "experiments/method-study-live/reliability/run-45732751285-attempt-1/manifest.json": "1b8a15222efbcc2896e6728d525882842a7fe6759c7c35f5e33969fac02f65b5"
+    },
+    "archived_task_records": 198,
+    "archived_unique_task_ids": 45,
+    "exact_overlap_count": 0,
+    "scope": "Exact task IDs, root/spec hashes and initial environment hashes; same task families are reused."
+  },
+  "source_file_sha256": {
+    "hiergoal/study_protocol.py": "4e97b4865a1024ae2101544c05f868f14234d706140a4dd06dac94eeb8c523b6",
+    "hiergoal/study_tasks.py": "298022f469ac5e05d30a8f58a81406eaeaf93ae5590c36666e9fd55b0adb8e8b",
+    "hiergoal/study_api.py": "0545f04f4b5b4a9da8cc90c299ea8c26bff1989a2486712d2b23d6a5aae1f1c4",
+    "hiergoal/study_wire.py": "da871b45f48b5372fe16e63bd2fe70bf35f9fb26a0a1ab418ee61e330aa88330",
+    "hiergoal/study.py": "1626d8175427fa129f3d857c703977cb40ee4103237c56e6885501515a0cfa37",
+    "hiergoal/study_analysis.py": "7a8bda6a802b7010851b6f8db0a4269f5896d7c54e69650594121bfff3558eb9",
+    "hiergoal/study_suite.py": "7303af96b22d70f0326490b8c9d968cdd60cee87a3bfb39ce549e0bfee33852c",
+    "hiergoal/study_planning.py": "ff0ecf6e25a253561b814a23e27ece24b9d2490c2e72d2a96625b8c797bb8237",
+    "hiergoal/study_scale.py": "a5ba2ef203dc1dd42bc7d04d5c9d694a5e4fa8c4813b03acc1dac8fcd7f62714",
+    "hiergoal/study_mechanisms.py": "c49fb65c2334f2041fd2afe31f934aad35fc00748a470c630bf91701c96b0558",
+    "docs/method_study_ja.md": "75b84df97888f37d038fc7ecbc27afbab153f928b1c274028e840d2162a15206",
+    "docs/method_requirements_audit_ja.md": "9930c42336c87d7d600097baa8c2bc1341b398a90bc794c1a847b3a445c9a7ee",
+    "docs/method_reaudit_v2_4_ja.md": "2c469c077b3b7a64d542ffd965a8c5bdd5b9f65c5b05f0ef214942662de58c95",
+    "docs/method_resume_v2_5_ja.md": "dc76462157edc236b9998b8f3026c3cde7107d99e9f870a62cb75bb0eedc1ff0",
+    ".github/workflows/method-study.yml": "e7a11039f4ddbe0d3f20c184b6862eacf3a9f44fb6a246c96591c4edc8189bd6",
+    "hiergoal/recovery_protocol.py": "61dc7d3116e03a38e4740c71539b8576d33fcb01a5b79346beb3aa6cdc8eeab0",
+    "hiergoal/recovery_checkpoint.py": "56c1fd450655a9ebecbb378581f96c18414310e9c99e89b0dad0a8bc3b5c0e2f",
+    "hiergoal/recovery.py": "14a747e9851939084d2b1482d028a5e07603133b624f745342d5806808a1733b",
+    "hiergoal/recovery_audit.py": "9ca47f25140a8fab67bfa921d666c2b16697afdf3f7635138195fb84415fb829",
+    "hiergoal/recovery_analysis.py": "f7701af67ed010c4c4dbf0a8a89221a32ea1baab02f556b3e9555a2b73344eb0",
+    "hiergoal/recovery_launch.py": "37b5e89fe1975a34c82f77ac2326423ac8db6e1613e9016373a73f0f75695691",
+    "docs/controlled_recovery_protocol_ja.md": "6030635329573f7e0678cdf91ed5476d7ebc224825a45e758cda91978e4b3439",
+    ".github/workflows/controlled-recovery.yml": "7268aae3fdd217dd45d0f2e600b1bee2dc698178ceab189ece7da2e95775f01b"
+  },
+  "protocol_id": "d36c836de43c41cb0248a95abaa6af810c0eafd896f606207b20ba4b7a3533a1"
+}

@@ -1,0 +1,1381 @@
+{
+  "schema_version": "hiergoal.recovery_checkpoint.v1",
+  "protocol_id": "d36c836de43c41cb0248a95abaa6af810c0eafd896f606207b20ba4b7a3533a1",
+  "pair_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r2",
+  "task": {
+    "family": "code_repair",
+    "instance": 0,
+    "split": "heldout",
+    "seed": 20261127,
+    "scale": {
+      "size": "small",
+      "depth": 3,
+      "density": "sparse"
+    },
+    "fault_kind": "forced_subgoal",
+    "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+    "root_sha256": "14cdf81c2942dfd02ee6cba59f63e1f4914ffd5cc27c9d0a704f8ed28831fa83",
+    "initial_public_spec_sha256": "03367dbe2a93bec2354817b84bd6e13340ec9f180d6f699546518e83cd2e52e4",
+    "initial_environment_sha256": "8b5a4e3479fdc0b1e1d6628581eeecf8792ad24e2e3624bd7320eb3cfb49f748",
+    "planned_tree": {
+      "leaf_count": 8,
+      "group_count": 2,
+      "goal_count": 11,
+      "max_depth": 2,
+      "depth_levels": 3,
+      "depth_unit": "edges_from_root",
+      "tree_edges": 10,
+      "dependency_edges": 6,
+      "dependency_density": 0.21428571428571427,
+      "independent_branch_count": 2,
+      "component_count": 2,
+      "domain_gate_count": 6,
+      "certification_gate_count": 2
+    }
+  },
+  "root_contract": {
+    "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+    "family": "code_repair",
+    "split": "heldout",
+    "seed": 20261127,
+    "instance": 0,
+    "instance_seed": 2424841784125273873,
+    "contract_version": 1,
+    "objective": "Satisfy every domain and certification gate against the current component environments.",
+    "environment_policy": "An environment update changes one component only. Task objectives, hierarchy, and acceptance rules remain fixed.",
+    "benchmark_scope": "Prescribed-hierarchy bounded scale fixture; domain gates and certification gates are not independent task observations.",
+    "scale": {
+      "size": "small",
+      "depth": 3,
+      "density": "sparse"
+    },
+    "gates": {
+      "c01_base": "Component c01: Compute max(0, x minus floor), multiply by multiplier, then add y.",
+      "c01_adjusted": "Component c01: Add rate times z to base, then clamp into the inclusive range zero through cap.",
+      "c01_total": "Component c01: Add bonus to adjusted if z is nonnegative; subtract bonus otherwise.",
+      "c01_certify_1": "Certify component c01 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass.",
+      "c02_base": "Component c02: Compute max(0, x minus floor), multiply by multiplier, then add y.",
+      "c02_adjusted": "Component c02: Add rate times z to base, then clamp into the inclusive range zero through cap.",
+      "c02_total": "Component c02: Add bonus to adjusted if z is nonnegative; subtract bonus otherwise.",
+      "c02_certify_1": "Certify component c02 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass."
+    },
+    "dependencies": {
+      "c01_base": [],
+      "c01_adjusted": [
+        "c01_base"
+      ],
+      "c01_total": [
+        "c01_adjusted"
+      ],
+      "c01_certify_1": [
+        "c01_total"
+      ],
+      "c02_base": [],
+      "c02_adjusted": [
+        "c02_base"
+      ],
+      "c02_total": [
+        "c02_adjusted"
+      ],
+      "c02_certify_1": [
+        "c02_total"
+      ]
+    },
+    "solution_shape": {
+      "c01_base": "one Python integer expression string",
+      "c01_adjusted": "one Python integer expression string",
+      "c01_total": "one Python integer expression string",
+      "c01_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c01_total"
+        ]
+      },
+      "c02_base": "one Python integer expression string",
+      "c02_adjusted": "one Python integer expression string",
+      "c02_total": "one Python integer expression string",
+      "c02_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c02_total"
+        ]
+      }
+    },
+    "hierarchy": {
+      "groups": [
+        {
+          "id": "M1",
+          "parent": "G0",
+          "title": "Verify component c01 at grouping level 1"
+        },
+        {
+          "id": "M2",
+          "parent": "G0",
+          "title": "Verify component c02 at grouping level 1"
+        }
+      ],
+      "gate_parents": {
+        "c01_base": "M1",
+        "c01_adjusted": "M1",
+        "c01_total": "M1",
+        "c01_certify_1": "M1",
+        "c02_base": "M2",
+        "c02_adjusted": "M2",
+        "c02_total": "M2",
+        "c02_certify_1": "M2"
+      },
+      "depth_levels": 3
+    },
+    "gate_artifact_fields": {
+      "c01_base": [
+        "c01_base"
+      ],
+      "c01_adjusted": [
+        "c01_adjusted"
+      ],
+      "c01_total": [
+        "c01_total"
+      ],
+      "c01_certify_1": [
+        "c01_certify_1"
+      ],
+      "c02_base": [
+        "c02_base"
+      ],
+      "c02_adjusted": [
+        "c02_adjusted"
+      ],
+      "c02_total": [
+        "c02_total"
+      ],
+      "c02_certify_1": [
+        "c02_certify_1"
+      ]
+    },
+    "domain_gates": [
+      "c01_base",
+      "c01_adjusted",
+      "c01_total",
+      "c02_base",
+      "c02_adjusted",
+      "c02_total"
+    ],
+    "certification_gates": [
+      "c01_certify_1",
+      "c02_certify_1"
+    ],
+    "component_contracts": {
+      "c01": {
+        "task_id": "code_repair-heldout-000-975e2e8d",
+        "family": "code_repair",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 0,
+        "instance_seed": 10907206533862137962,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "base": "Compute max(0, x minus floor), multiply by multiplier, then add y.",
+          "adjusted": "Add rate times z to base, then clamp into the inclusive range zero through cap.",
+          "total": "Add bonus to adjusted if z is nonnegative; subtract bonus otherwise."
+        },
+        "dependencies": {
+          "base": [],
+          "adjusted": [
+            "base"
+          ],
+          "total": [
+            "adjusted"
+          ]
+        },
+        "solution_shape": {
+          "expressions": {
+            "base": "one Python integer expression string",
+            "adjusted": "one Python integer expression string",
+            "total": "one Python integer expression string"
+          }
+        },
+        "allowed_names": {
+          "base": [
+            "floor",
+            "multiplier",
+            "x",
+            "y"
+          ],
+          "adjusted": [
+            "base",
+            "cap",
+            "rate",
+            "z"
+          ],
+          "total": [
+            "adjusted",
+            "bonus",
+            "z"
+          ]
+        },
+        "expression_language": {
+          "operators": [
+            "+",
+            "-",
+            "*",
+            "//",
+            "%",
+            "unary + and -",
+            "comparisons",
+            "and",
+            "or",
+            "not",
+            "A if condition else B"
+          ],
+          "calls": {
+            "abs": "one integer argument",
+            "min": "two to four integer arguments",
+            "max": "two to four integer arguments"
+          },
+          "limits": {
+            "source_characters": 512,
+            "ast_nodes": 128,
+            "ast_depth": 32,
+            "literal_absolute_value": 1000000,
+            "integer_absolute_value": 1000000000
+          },
+          "types": "Inputs, arithmetic, and outputs are integers (Boolean outputs forbidden). Conditions are Boolean comparisons/combinations. Division by zero fails. // and % use Python integer semantics.",
+          "execution": "Interpreted AST whitelist; no eval, exec, attributes, subscripts, imports, loops, strings, floats, exponentiation, or arbitrary calls."
+        },
+        "input_domain": {
+          "x": [
+            -50,
+            50
+          ],
+          "y": [
+            -20,
+            20
+          ],
+          "z": [
+            -10,
+            10
+          ]
+        },
+        "public_probe_inputs": [
+          {
+            "x": 3,
+            "y": 2,
+            "z": 1
+          },
+          {
+            "x": 0,
+            "y": -3,
+            "z": -2
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "z": 0
+          },
+          {
+            "x": 11,
+            "y": 10,
+            "z": 5
+          }
+        ],
+        "final_check": "Additional private inputs in the published domain test the same rules; their inputs and outcomes are not shown during execution."
+      },
+      "c02": {
+        "task_id": "code_repair-heldout-001-5e25ccca",
+        "family": "code_repair",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 1,
+        "instance_seed": 6784053584099016831,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "base": "Compute max(0, x minus floor), multiply by multiplier, then add y.",
+          "adjusted": "Add rate times z to base, then clamp into the inclusive range zero through cap.",
+          "total": "Add bonus to adjusted if z is nonnegative; subtract bonus otherwise."
+        },
+        "dependencies": {
+          "base": [],
+          "adjusted": [
+            "base"
+          ],
+          "total": [
+            "adjusted"
+          ]
+        },
+        "solution_shape": {
+          "expressions": {
+            "base": "one Python integer expression string",
+            "adjusted": "one Python integer expression string",
+            "total": "one Python integer expression string"
+          }
+        },
+        "allowed_names": {
+          "base": [
+            "floor",
+            "multiplier",
+            "x",
+            "y"
+          ],
+          "adjusted": [
+            "base",
+            "cap",
+            "rate",
+            "z"
+          ],
+          "total": [
+            "adjusted",
+            "bonus",
+            "z"
+          ]
+        },
+        "expression_language": {
+          "operators": [
+            "+",
+            "-",
+            "*",
+            "//",
+            "%",
+            "unary + and -",
+            "comparisons",
+            "and",
+            "or",
+            "not",
+            "A if condition else B"
+          ],
+          "calls": {
+            "abs": "one integer argument",
+            "min": "two to four integer arguments",
+            "max": "two to four integer arguments"
+          },
+          "limits": {
+            "source_characters": 512,
+            "ast_nodes": 128,
+            "ast_depth": 32,
+            "literal_absolute_value": 1000000,
+            "integer_absolute_value": 1000000000
+          },
+          "types": "Inputs, arithmetic, and outputs are integers (Boolean outputs forbidden). Conditions are Boolean comparisons/combinations. Division by zero fails. // and % use Python integer semantics.",
+          "execution": "Interpreted AST whitelist; no eval, exec, attributes, subscripts, imports, loops, strings, floats, exponentiation, or arbitrary calls."
+        },
+        "input_domain": {
+          "x": [
+            -50,
+            50
+          ],
+          "y": [
+            -20,
+            20
+          ],
+          "z": [
+            -10,
+            10
+          ]
+        },
+        "public_probe_inputs": [
+          {
+            "x": 7,
+            "y": 2,
+            "z": 1
+          },
+          {
+            "x": 4,
+            "y": -3,
+            "z": -2
+          },
+          {
+            "x": 9,
+            "y": 1,
+            "z": 0
+          },
+          {
+            "x": 15,
+            "y": 10,
+            "z": 5
+          }
+        ],
+        "final_check": "Additional private inputs in the published domain test the same rules; their inputs and outcomes are not shown during execution."
+      }
+    },
+    "composition_rules": [
+      "Prefix all artifact fields with the component ID. For code_repair, each stage expression is a separate prefixed field, without an expressions wrapper.",
+      "Grade each component with its published domain rules. A gate passes only when its own artifact and every declared prerequisite pass.",
+      "Certification fields have exactly environment_revision and checked_gates. The integer must equal the current component revision; checked_gates must exactly equal that gate's ordered direct prerequisites.",
+      "Additional direct dependencies are explicit verification obligations. Dense and sparse variants may have the same transitive closure; density is a direct-edge burden, not a claim of additional independent information.",
+      "Independent components have no cross-component dependencies or shared resources; same-named jobs and resources in distinct components are separate namespaces.",
+      "Increasing prescribed depth adds executable certification leaves. It does not hold the leaf count fixed or demonstrate autonomous hierarchy discovery."
+    ],
+    "topology": {
+      "leaf_count": 8,
+      "group_count": 2,
+      "goal_count": 11,
+      "max_depth": 2,
+      "depth_levels": 3,
+      "depth_unit": "edges_from_root",
+      "tree_edges": 10,
+      "dependency_edges": 6,
+      "dependency_density": 0.21428571428571427,
+      "independent_branch_count": 2,
+      "component_count": 2,
+      "domain_gate_count": 6,
+      "certification_gate_count": 2
+    }
+  },
+  "root_sha256": "14cdf81c2942dfd02ee6cba59f63e1f4914ffd5cc27c9d0a704f8ed28831fa83",
+  "public_spec": {
+    "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+    "family": "code_repair",
+    "split": "heldout",
+    "seed": 20261127,
+    "instance": 0,
+    "instance_seed": 2424841784125273873,
+    "contract_version": 1,
+    "objective": "Satisfy every domain and certification gate against the current component environments.",
+    "environment_policy": "An environment update changes one component only. Task objectives, hierarchy, and acceptance rules remain fixed.",
+    "benchmark_scope": "Prescribed-hierarchy bounded scale fixture; domain gates and certification gates are not independent task observations.",
+    "scale": {
+      "size": "small",
+      "depth": 3,
+      "density": "sparse"
+    },
+    "gates": {
+      "c01_base": "Component c01: Compute max(0, x minus floor), multiply by multiplier, then add y.",
+      "c01_adjusted": "Component c01: Add rate times z to base, then clamp into the inclusive range zero through cap.",
+      "c01_total": "Component c01: Add bonus to adjusted if z is nonnegative; subtract bonus otherwise.",
+      "c01_certify_1": "Certify component c01 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass.",
+      "c02_base": "Component c02: Compute max(0, x minus floor), multiply by multiplier, then add y.",
+      "c02_adjusted": "Component c02: Add rate times z to base, then clamp into the inclusive range zero through cap.",
+      "c02_total": "Component c02: Add bonus to adjusted if z is nonnegative; subtract bonus otherwise.",
+      "c02_certify_1": "Certify component c02 grouping level 1: provide its current environment_revision and checked_gates in the published direct dependency order. Every referenced gate must actually pass."
+    },
+    "dependencies": {
+      "c01_base": [],
+      "c01_adjusted": [
+        "c01_base"
+      ],
+      "c01_total": [
+        "c01_adjusted"
+      ],
+      "c01_certify_1": [
+        "c01_total"
+      ],
+      "c02_base": [],
+      "c02_adjusted": [
+        "c02_base"
+      ],
+      "c02_total": [
+        "c02_adjusted"
+      ],
+      "c02_certify_1": [
+        "c02_total"
+      ]
+    },
+    "solution_shape": {
+      "c01_base": "one Python integer expression string",
+      "c01_adjusted": "one Python integer expression string",
+      "c01_total": "one Python integer expression string",
+      "c01_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c01_total"
+        ]
+      },
+      "c02_base": "one Python integer expression string",
+      "c02_adjusted": "one Python integer expression string",
+      "c02_total": "one Python integer expression string",
+      "c02_certify_1": {
+        "environment_revision": "nonnegative integer, current component revision",
+        "checked_gates": [
+          "c02_total"
+        ]
+      }
+    },
+    "hierarchy": {
+      "groups": [
+        {
+          "id": "M1",
+          "parent": "G0",
+          "title": "Verify component c01 at grouping level 1"
+        },
+        {
+          "id": "M2",
+          "parent": "G0",
+          "title": "Verify component c02 at grouping level 1"
+        }
+      ],
+      "gate_parents": {
+        "c01_base": "M1",
+        "c01_adjusted": "M1",
+        "c01_total": "M1",
+        "c01_certify_1": "M1",
+        "c02_base": "M2",
+        "c02_adjusted": "M2",
+        "c02_total": "M2",
+        "c02_certify_1": "M2"
+      },
+      "depth_levels": 3
+    },
+    "gate_artifact_fields": {
+      "c01_base": [
+        "c01_base"
+      ],
+      "c01_adjusted": [
+        "c01_adjusted"
+      ],
+      "c01_total": [
+        "c01_total"
+      ],
+      "c01_certify_1": [
+        "c01_certify_1"
+      ],
+      "c02_base": [
+        "c02_base"
+      ],
+      "c02_adjusted": [
+        "c02_adjusted"
+      ],
+      "c02_total": [
+        "c02_total"
+      ],
+      "c02_certify_1": [
+        "c02_certify_1"
+      ]
+    },
+    "domain_gates": [
+      "c01_base",
+      "c01_adjusted",
+      "c01_total",
+      "c02_base",
+      "c02_adjusted",
+      "c02_total"
+    ],
+    "certification_gates": [
+      "c01_certify_1",
+      "c02_certify_1"
+    ],
+    "component_contracts": {
+      "c01": {
+        "task_id": "code_repair-heldout-000-975e2e8d",
+        "family": "code_repair",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 0,
+        "instance_seed": 10907206533862137962,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "base": "Compute max(0, x minus floor), multiply by multiplier, then add y.",
+          "adjusted": "Add rate times z to base, then clamp into the inclusive range zero through cap.",
+          "total": "Add bonus to adjusted if z is nonnegative; subtract bonus otherwise."
+        },
+        "dependencies": {
+          "base": [],
+          "adjusted": [
+            "base"
+          ],
+          "total": [
+            "adjusted"
+          ]
+        },
+        "solution_shape": {
+          "expressions": {
+            "base": "one Python integer expression string",
+            "adjusted": "one Python integer expression string",
+            "total": "one Python integer expression string"
+          }
+        },
+        "allowed_names": {
+          "base": [
+            "floor",
+            "multiplier",
+            "x",
+            "y"
+          ],
+          "adjusted": [
+            "base",
+            "cap",
+            "rate",
+            "z"
+          ],
+          "total": [
+            "adjusted",
+            "bonus",
+            "z"
+          ]
+        },
+        "expression_language": {
+          "operators": [
+            "+",
+            "-",
+            "*",
+            "//",
+            "%",
+            "unary + and -",
+            "comparisons",
+            "and",
+            "or",
+            "not",
+            "A if condition else B"
+          ],
+          "calls": {
+            "abs": "one integer argument",
+            "min": "two to four integer arguments",
+            "max": "two to four integer arguments"
+          },
+          "limits": {
+            "source_characters": 512,
+            "ast_nodes": 128,
+            "ast_depth": 32,
+            "literal_absolute_value": 1000000,
+            "integer_absolute_value": 1000000000
+          },
+          "types": "Inputs, arithmetic, and outputs are integers (Boolean outputs forbidden). Conditions are Boolean comparisons/combinations. Division by zero fails. // and % use Python integer semantics.",
+          "execution": "Interpreted AST whitelist; no eval, exec, attributes, subscripts, imports, loops, strings, floats, exponentiation, or arbitrary calls."
+        },
+        "input_domain": {
+          "x": [
+            -50,
+            50
+          ],
+          "y": [
+            -20,
+            20
+          ],
+          "z": [
+            -10,
+            10
+          ]
+        },
+        "public_probe_inputs": [
+          {
+            "x": 3,
+            "y": 2,
+            "z": 1
+          },
+          {
+            "x": 0,
+            "y": -3,
+            "z": -2
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "z": 0
+          },
+          {
+            "x": 11,
+            "y": 10,
+            "z": 5
+          }
+        ],
+        "final_check": "Additional private inputs in the published domain test the same rules; their inputs and outcomes are not shown during execution."
+      },
+      "c02": {
+        "task_id": "code_repair-heldout-001-5e25ccca",
+        "family": "code_repair",
+        "split": "heldout",
+        "seed": 20261127,
+        "instance": 1,
+        "instance_seed": 6784053584099016831,
+        "contract_version": 1,
+        "objective": "Satisfy every gate against the currently published environment.",
+        "environment_policy": "Rules, source records, or resource calendars may be updated. Recompute as needed against the latest public environment; task objectives and acceptance policy remain fixed.",
+        "benchmark_scope": "Bounded mechanism benchmark; no evidence of real-world autonomy.",
+        "gates": {
+          "base": "Compute max(0, x minus floor), multiply by multiplier, then add y.",
+          "adjusted": "Add rate times z to base, then clamp into the inclusive range zero through cap.",
+          "total": "Add bonus to adjusted if z is nonnegative; subtract bonus otherwise."
+        },
+        "dependencies": {
+          "base": [],
+          "adjusted": [
+            "base"
+          ],
+          "total": [
+            "adjusted"
+          ]
+        },
+        "solution_shape": {
+          "expressions": {
+            "base": "one Python integer expression string",
+            "adjusted": "one Python integer expression string",
+            "total": "one Python integer expression string"
+          }
+        },
+        "allowed_names": {
+          "base": [
+            "floor",
+            "multiplier",
+            "x",
+            "y"
+          ],
+          "adjusted": [
+            "base",
+            "cap",
+            "rate",
+            "z"
+          ],
+          "total": [
+            "adjusted",
+            "bonus",
+            "z"
+          ]
+        },
+        "expression_language": {
+          "operators": [
+            "+",
+            "-",
+            "*",
+            "//",
+            "%",
+            "unary + and -",
+            "comparisons",
+            "and",
+            "or",
+            "not",
+            "A if condition else B"
+          ],
+          "calls": {
+            "abs": "one integer argument",
+            "min": "two to four integer arguments",
+            "max": "two to four integer arguments"
+          },
+          "limits": {
+            "source_characters": 512,
+            "ast_nodes": 128,
+            "ast_depth": 32,
+            "literal_absolute_value": 1000000,
+            "integer_absolute_value": 1000000000
+          },
+          "types": "Inputs, arithmetic, and outputs are integers (Boolean outputs forbidden). Conditions are Boolean comparisons/combinations. Division by zero fails. // and % use Python integer semantics.",
+          "execution": "Interpreted AST whitelist; no eval, exec, attributes, subscripts, imports, loops, strings, floats, exponentiation, or arbitrary calls."
+        },
+        "input_domain": {
+          "x": [
+            -50,
+            50
+          ],
+          "y": [
+            -20,
+            20
+          ],
+          "z": [
+            -10,
+            10
+          ]
+        },
+        "public_probe_inputs": [
+          {
+            "x": 7,
+            "y": 2,
+            "z": 1
+          },
+          {
+            "x": 4,
+            "y": -3,
+            "z": -2
+          },
+          {
+            "x": 9,
+            "y": 1,
+            "z": 0
+          },
+          {
+            "x": 15,
+            "y": 10,
+            "z": 5
+          }
+        ],
+        "final_check": "Additional private inputs in the published domain test the same rules; their inputs and outcomes are not shown during execution."
+      }
+    },
+    "composition_rules": [
+      "Prefix all artifact fields with the component ID. For code_repair, each stage expression is a separate prefixed field, without an expressions wrapper.",
+      "Grade each component with its published domain rules. A gate passes only when its own artifact and every declared prerequisite pass.",
+      "Certification fields have exactly environment_revision and checked_gates. The integer must equal the current component revision; checked_gates must exactly equal that gate's ordered direct prerequisites.",
+      "Additional direct dependencies are explicit verification obligations. Dense and sparse variants may have the same transitive closure; density is a direct-edge burden, not a claim of additional independent information.",
+      "Independent components have no cross-component dependencies or shared resources; same-named jobs and resources in distinct components are separate namespaces.",
+      "Increasing prescribed depth adds executable certification leaves. It does not hold the leaf count fixed or demonstrate autonomous hierarchy discovery."
+    ],
+    "topology": {
+      "leaf_count": 8,
+      "group_count": 2,
+      "goal_count": 11,
+      "max_depth": 2,
+      "depth_levels": 3,
+      "depth_unit": "edges_from_root",
+      "tree_edges": 10,
+      "dependency_edges": 6,
+      "dependency_density": 0.21428571428571427,
+      "independent_branch_count": 2,
+      "component_count": 2,
+      "domain_gate_count": 6,
+      "certification_gate_count": 2
+    },
+    "environment": {
+      "components": {
+        "c01": {
+          "coefficients": {
+            "floor": 1,
+            "multiplier": 3,
+            "rate": 2,
+            "cap": 63,
+            "bonus": 2
+          }
+        },
+        "c02": {
+          "coefficients": {
+            "floor": 5,
+            "multiplier": 3,
+            "rate": 2,
+            "cap": 72,
+            "bonus": 2
+          }
+        }
+      },
+      "component_revisions": {
+        "c01": 0,
+        "c02": 0
+      }
+    },
+    "environment_revision": 0,
+    "public_probes": {
+      "c01": [
+        {
+          "input": {
+            "x": 3,
+            "y": 2,
+            "z": 1
+          },
+          "expected": {
+            "base": 8,
+            "adjusted": 10,
+            "total": 12
+          }
+        },
+        {
+          "input": {
+            "x": 0,
+            "y": -3,
+            "z": -2
+          },
+          "expected": {
+            "base": -3,
+            "adjusted": 0,
+            "total": -2
+          }
+        },
+        {
+          "input": {
+            "x": 5,
+            "y": 1,
+            "z": 0
+          },
+          "expected": {
+            "base": 13,
+            "adjusted": 13,
+            "total": 15
+          }
+        },
+        {
+          "input": {
+            "x": 11,
+            "y": 10,
+            "z": 5
+          },
+          "expected": {
+            "base": 40,
+            "adjusted": 50,
+            "total": 52
+          }
+        }
+      ],
+      "c02": [
+        {
+          "input": {
+            "x": 7,
+            "y": 2,
+            "z": 1
+          },
+          "expected": {
+            "base": 8,
+            "adjusted": 10,
+            "total": 12
+          }
+        },
+        {
+          "input": {
+            "x": 4,
+            "y": -3,
+            "z": -2
+          },
+          "expected": {
+            "base": -3,
+            "adjusted": 0,
+            "total": -2
+          }
+        },
+        {
+          "input": {
+            "x": 9,
+            "y": 1,
+            "z": 0
+          },
+          "expected": {
+            "base": 13,
+            "adjusted": 13,
+            "total": 15
+          }
+        },
+        {
+          "input": {
+            "x": 15,
+            "y": 10,
+            "z": 5
+          },
+          "expected": {
+            "base": 40,
+            "adjusted": 50,
+            "total": 52
+          }
+        }
+      ]
+    }
+  },
+  "public_spec_sha256": "03367dbe2a93bec2354817b84bd6e13340ec9f180d6f699546518e83cd2e52e4",
+  "plan": {
+    "milestones": [
+      {
+        "id": "M1",
+        "parent": "G0",
+        "title": "Verify component c01 at grouping level 1"
+      },
+      {
+        "id": "M2",
+        "parent": "G0",
+        "title": "Verify component c02 at grouping level 1"
+      }
+    ],
+    "leaves": {
+      "S1": {
+        "id": "S1",
+        "parent": "M1",
+        "instruction": "Write one permitted Python integer expression for base using only floor, multiplier, x, and y: max(0, x-floor)*multiplier+y.",
+        "checks": [
+          "c01_base"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S2": {
+        "id": "S2",
+        "parent": "M1",
+        "instruction": "Write one permitted Python integer expression for adjusted using only base, cap, rate, and z. Add rate*z to base and clamp the result to the inclusive interval [0, cap].",
+        "checks": [
+          "c01_adjusted"
+        ],
+        "depends_on": [
+          "S1"
+        ],
+        "revision": 0
+      },
+      "S3": {
+        "id": "S3",
+        "parent": "M1",
+        "instruction": "Write one permitted Python integer expression for total using only adjusted, bonus, and z: add bonus when z is nonnegative, and subtract bonus otherwise.",
+        "checks": [
+          "c01_total"
+        ],
+        "depends_on": [
+          "S2"
+        ],
+        "revision": 0
+      },
+      "S4": {
+        "id": "S4",
+        "parent": "M1",
+        "instruction": "After c01_total passes, certify component c01 by recording environment_revision as the current c01 component revision (currently 0) and checked_gates exactly as [\"c01_total\"]. Confirm the referenced gate passes.",
+        "checks": [
+          "c01_certify_1"
+        ],
+        "depends_on": [
+          "S3"
+        ],
+        "revision": 0
+      },
+      "S5": {
+        "id": "S5",
+        "parent": "M2",
+        "instruction": "Write one permitted Python integer expression for base using only floor, multiplier, x, and y: max(0, x-floor)*multiplier+y.",
+        "checks": [
+          "c02_base"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S6": {
+        "id": "S6",
+        "parent": "M2",
+        "instruction": "Write one permitted Python integer expression for adjusted using only base, cap, rate, and z. Add rate*z to base and clamp the result to the inclusive interval [0, cap].",
+        "checks": [
+          "c02_adjusted"
+        ],
+        "depends_on": [
+          "S5"
+        ],
+        "revision": 0
+      },
+      "S7": {
+        "id": "S7",
+        "parent": "M2",
+        "instruction": "Write one permitted Python integer expression for total using only adjusted, bonus, and z: add bonus when z is nonnegative, and subtract bonus otherwise.",
+        "checks": [
+          "c02_total"
+        ],
+        "depends_on": [
+          "S6"
+        ],
+        "revision": 0
+      },
+      "S8": {
+        "id": "S8",
+        "parent": "M2",
+        "instruction": "After c02_total passes, certify component c02 by recording environment_revision as the current c02 component revision (currently 0) and checked_gates exactly as [\"c02_total\"]. Confirm the referenced gate passes.",
+        "checks": [
+          "c02_certify_1"
+        ],
+        "depends_on": [
+          "S7"
+        ],
+        "revision": 0
+      }
+    }
+  },
+  "plan_sha256": "bd8f66a1aa65367f83caabbf809ee21dbd4f58723c05c4c120b8be8808c8ffa5",
+  "source_solution": {
+    "c01_base": "max(0, x - 1) * 3 + y",
+    "c01_adjusted": "min(63, max(0, base + 2 * z))",
+    "c01_total": "adjusted + (2 if z >= 0 else -2)",
+    "c02_base": "max(0, x - 5) * 3 + y",
+    "c02_adjusted": "min(72, max(0, base + 2 * z))",
+    "c02_total": "adjusted + (2 if z >= 0 else -2)",
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c01_total"
+      ]
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c02_total"
+      ]
+    }
+  },
+  "source_solution_sha256": "bc754e66137677e9ddd4b8003f1b9c8813f3a72dd7bb06ec71c1477a374a0abd",
+  "source_public_grade": {
+    "c01_base": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c01_adjusted": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c01_total": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c01_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    },
+    "c02_base": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c02_adjusted": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c02_total": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c02_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    }
+  },
+  "source_hidden_grade": {
+    "c01_base": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c01_adjusted": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c01_total": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c01_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    },
+    "c02_base": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c02_adjusted": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c02_total": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c02_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    }
+  },
+  "source_trace_sha256": "a68d9aaf07ceda325213fa6b4b50f2bc2b44ddf2725f9c5096f2ccde7d5e1dfd",
+  "failed_solution": {
+    "c01_base": "max(0, x - 1) * 3 + y",
+    "c01_adjusted": "min(63, max(0, base + 2 * z))",
+    "c01_total": "adjusted + (2 if z >= 0 else -2)",
+    "c02_base": "0",
+    "c02_adjusted": "min(72, max(0, base + 2 * z))",
+    "c02_total": "adjusted + (2 if z >= 0 else -2)",
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c01_total"
+      ]
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c02_total"
+      ]
+    }
+  },
+  "failed_solution_sha256": "c85d16b082da96022da4493e3479b94e03172f7bb10e7666aeb3739478d3c7a3",
+  "public_feedback": {
+    "c01_base": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c01_adjusted": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c01_total": {
+      "passed": true,
+      "message": "All stage probes passed."
+    },
+    "c01_certify_1": {
+      "passed": true,
+      "message": "Current component certification passed."
+    },
+    "c02_base": {
+      "passed": false,
+      "message": "Expression does not meet the public stage contract."
+    },
+    "c02_adjusted": {
+      "passed": false,
+      "message": "At least one authoritative prerequisite has not passed."
+    },
+    "c02_total": {
+      "passed": false,
+      "message": "At least one authoritative prerequisite has not passed."
+    },
+    "c02_certify_1": {
+      "passed": false,
+      "message": "At least one authoritative prerequisite has not passed."
+    }
+  },
+  "fault_receipt": {
+    "kind": "forced_subgoal",
+    "perturbation_type": "subgoal",
+    "target_component": "c02",
+    "target_gate": "c02_base",
+    "affected_gates": [
+      "c02_base",
+      "c02_adjusted",
+      "c02_total",
+      "c02_certify_1"
+    ],
+    "unaffected_gates": [
+      "c01_base",
+      "c01_adjusted",
+      "c01_total",
+      "c01_certify_1"
+    ],
+    "changed_fields": [
+      "c02_base"
+    ],
+    "delivered": true,
+    "domain_fault_delivered": true,
+    "certification_invalidated": true,
+    "status": "delivered",
+    "seed": 20261127,
+    "instance_seed": 2424841784125273873,
+    "environment_revision": 0,
+    "environment_before": {
+      "components": {
+        "c01": {
+          "coefficients": {
+            "floor": 1,
+            "multiplier": 3,
+            "rate": 2,
+            "cap": 63,
+            "bonus": 2
+          }
+        },
+        "c02": {
+          "coefficients": {
+            "floor": 5,
+            "multiplier": 3,
+            "rate": 2,
+            "cap": 72,
+            "bonus": 2
+          }
+        }
+      },
+      "component_revisions": {
+        "c01": 0,
+        "c02": 0
+      }
+    },
+    "environment_after": {
+      "components": {
+        "c01": {
+          "coefficients": {
+            "floor": 1,
+            "multiplier": 3,
+            "rate": 2,
+            "cap": 63,
+            "bonus": 2
+          }
+        },
+        "c02": {
+          "coefficients": {
+            "floor": 5,
+            "multiplier": 3,
+            "rate": 2,
+            "cap": 72,
+            "bonus": 2
+          }
+        }
+      },
+      "component_revisions": {
+        "c01": 0,
+        "c02": 0
+      }
+    },
+    "before_grade": {
+      "c01_base": {
+        "passed": true,
+        "message": "All stage probes passed."
+      },
+      "c01_adjusted": {
+        "passed": true,
+        "message": "All stage probes passed."
+      },
+      "c01_total": {
+        "passed": true,
+        "message": "All stage probes passed."
+      },
+      "c01_certify_1": {
+        "passed": true,
+        "message": "Current component certification passed."
+      },
+      "c02_base": {
+        "passed": true,
+        "message": "All stage probes passed."
+      },
+      "c02_adjusted": {
+        "passed": true,
+        "message": "All stage probes passed."
+      },
+      "c02_total": {
+        "passed": true,
+        "message": "All stage probes passed."
+      },
+      "c02_certify_1": {
+        "passed": true,
+        "message": "Current component certification passed."
+      }
+    },
+    "after_grade": {
+      "c01_base": {
+        "passed": true,
+        "message": "All stage probes passed."
+      },
+      "c01_adjusted": {
+        "passed": true,
+        "message": "All stage probes passed."
+      },
+      "c01_total": {
+        "passed": true,
+        "message": "All stage probes passed."
+      },
+      "c01_certify_1": {
+        "passed": true,
+        "message": "Current component certification passed."
+      },
+      "c02_base": {
+        "passed": false,
+        "message": "Expression does not meet the public stage contract."
+      },
+      "c02_adjusted": {
+        "passed": false,
+        "message": "At least one authoritative prerequisite has not passed."
+      },
+      "c02_total": {
+        "passed": false,
+        "message": "At least one authoritative prerequisite has not passed."
+      },
+      "c02_certify_1": {
+        "passed": false,
+        "message": "At least one authoritative prerequisite has not passed."
+      }
+    },
+    "raw_domain_after_grade": {
+      "c02_base": {
+        "passed": false,
+        "message": "Expression does not meet the public stage contract."
+      },
+      "c02_adjusted": {
+        "passed": false,
+        "message": "Expression does not meet the public stage contract."
+      },
+      "c02_total": {
+        "passed": false,
+        "message": "Expression does not meet the public stage contract."
+      }
+    },
+    "unaffected_artifacts_unchanged": true,
+    "unrelated_component_gates": [
+      "c01_base",
+      "c01_adjusted",
+      "c01_total",
+      "c01_certify_1"
+    ],
+    "subgoal_fault_count": 1
+  },
+  "target_leaf_id": "S5",
+  "repair_history": [],
+  "source_visibility": "archival_only_never_repair_prompt",
+  "checkpoint_sha256": "ed5a6a2c5ce0c8f6f21ad75cb635f407fb102dde433cdf1c0957814b5050fa02"
+}

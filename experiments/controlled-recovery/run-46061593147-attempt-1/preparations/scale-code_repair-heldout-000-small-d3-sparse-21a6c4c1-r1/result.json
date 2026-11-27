@@ -1,0 +1,156 @@
+{
+  "phase": "prepare",
+  "identifier": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1",
+  "pair_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1-r1",
+  "task_id": "scale-code_repair-heldout-000-small-d3-sparse-21a6c4c1",
+  "arm": null,
+  "status": "PASS",
+  "diagnostic": "INDEPENDENT_GRADING_PASS",
+  "calls": 2,
+  "input_tokens": 6082,
+  "output_tokens": 657,
+  "known_input_tokens": 6082,
+  "known_output_tokens": 657,
+  "elapsed_seconds": 5.183620255999983,
+  "replan_attempts": 0,
+  "replans": 0,
+  "rejected_actions": 0,
+  "patch_actions": 1,
+  "simulated": false,
+  "invariant_ok": true,
+  "stop_batch": false,
+  "success": true,
+  "wall_seconds": 5.198387115000003,
+  "final_solution": {
+    "c01_base": "max(0, x - floor) * multiplier + y",
+    "c01_adjusted": "min(cap, max(0, base + rate * z))",
+    "c01_total": "adjusted + bonus if z >= 0 else adjusted - bonus",
+    "c02_base": "max(0, x - floor) * multiplier + y",
+    "c02_adjusted": "min(cap, max(0, base + rate * z))",
+    "c02_total": "adjusted + bonus if z >= 0 else adjusted - bonus",
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c01_total"
+      ]
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c02_total"
+      ]
+    }
+  },
+  "final_plan": {
+    "milestones": [
+      {
+        "id": "M1",
+        "parent": "G0",
+        "title": "Verify component c01 at grouping level 1"
+      },
+      {
+        "id": "M2",
+        "parent": "G0",
+        "title": "Verify component c02 at grouping level 1"
+      }
+    ],
+    "leaves": {
+      "S1": {
+        "id": "S1",
+        "parent": "M1",
+        "instruction": "Write one valid Python integer expression using only floor, multiplier, x, and y. Compute max(0, x - floor)*multiplier + y.",
+        "checks": [
+          "c01_base"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S2": {
+        "id": "S2",
+        "parent": "M1",
+        "instruction": "Write one valid Python integer expression using only the permitted inputs base, cap, rate, and z. Add rate*z to base, then clamp the result to the inclusive interval [0, cap], for example min(cap, max(0, base + rate*z)).",
+        "checks": [
+          "c01_adjusted"
+        ],
+        "depends_on": [
+          "S1"
+        ],
+        "revision": 0
+      },
+      "S3": {
+        "id": "S3",
+        "parent": "M1",
+        "instruction": "Write one valid Python integer expression using only adjusted, bonus, and z. Return adjusted + bonus when z >= 0; otherwise return adjusted - bonus.",
+        "checks": [
+          "c01_total"
+        ],
+        "depends_on": [
+          "S2"
+        ],
+        "revision": 0
+      },
+      "S4": {
+        "id": "S4",
+        "parent": "M1",
+        "instruction": "After verifying that c01_total passes, create the certification artifact with environment_revision equal to c01's current component revision and checked_gates exactly [\"c01_total\"].",
+        "checks": [
+          "c01_certify_1"
+        ],
+        "depends_on": [
+          "S3"
+        ],
+        "revision": 0
+      },
+      "S5": {
+        "id": "S5",
+        "parent": "M2",
+        "instruction": "Write one valid Python integer expression using only floor, multiplier, x, and y. Compute max(0, x - floor)*multiplier + y.",
+        "checks": [
+          "c02_base"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S6": {
+        "id": "S6",
+        "parent": "M2",
+        "instruction": "Write one valid Python integer expression using only the permitted inputs base, cap, rate, and z. Add rate*z to base, then clamp the result to the inclusive interval [0, cap], for example min(cap, max(0, base + rate*z)).",
+        "checks": [
+          "c02_adjusted"
+        ],
+        "depends_on": [
+          "S5"
+        ],
+        "revision": 0
+      },
+      "S7": {
+        "id": "S7",
+        "parent": "M2",
+        "instruction": "Write one valid Python integer expression using only adjusted, bonus, and z. Return adjusted + bonus when z >= 0; otherwise return adjusted - bonus.",
+        "checks": [
+          "c02_total"
+        ],
+        "depends_on": [
+          "S6"
+        ],
+        "revision": 0
+      },
+      "S8": {
+        "id": "S8",
+        "parent": "M2",
+        "instruction": "After verifying that c02_total passes, create the certification artifact with environment_revision equal to c02's current component revision and checked_gates exactly [\"c02_total\"].",
+        "checks": [
+          "c02_certify_1"
+        ],
+        "depends_on": [
+          "S7"
+        ],
+        "revision": 0
+      }
+    }
+  },
+  "final_artifact_sha256": "cba3e9771ae3b1f4e4200d19b145dd930981b2241ce310403a1afeebb13c2e2a",
+  "final_plan_sha256": "1d91214b688112f3eb6ccf7374462517b22b52ccf1667e150572274f07ab87c7",
+  "final_environment_sha256": "03367dbe2a93bec2354817b84bd6e13340ec9f180d6f699546518e83cd2e52e4",
+  "trace_final_sha256": "90614e8826b1021a49c135ffa291d13f31c287d49bf40b63983d0a836e98f839"
+}

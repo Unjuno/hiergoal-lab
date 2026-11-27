@@ -1,0 +1,156 @@
+{
+  "phase": "repair",
+  "identifier": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1-adaptive",
+  "pair_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3-r1",
+  "task_id": "scale-code_repair-heldout-001-small-d3-sparse-2669a2e3",
+  "arm": "adaptive",
+  "status": "PASS",
+  "diagnostic": "INDEPENDENT_GRADING_PASS",
+  "calls": 2,
+  "input_tokens": 6886,
+  "output_tokens": 882,
+  "known_input_tokens": 6886,
+  "known_output_tokens": 882,
+  "elapsed_seconds": 7.519432101000007,
+  "replan_attempts": 1,
+  "replans": 1,
+  "rejected_actions": 0,
+  "patch_actions": 1,
+  "simulated": false,
+  "invariant_ok": true,
+  "stop_batch": false,
+  "success": true,
+  "wall_seconds": 7.535260230000006,
+  "final_solution": {
+    "c01_base": "max(0,x-floor)*multiplier+y",
+    "c01_adjusted": "max(0,min(cap,base+rate*z))",
+    "c01_total": "adjusted+(bonus if z>=0 else -bonus)",
+    "c02_base": "((x - floor) if x > floor else 0) * multiplier + y",
+    "c02_adjusted": "max(0,min(cap,base+rate*z))",
+    "c02_total": "adjusted+(bonus if z>=0 else -bonus)",
+    "c01_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c01_total"
+      ]
+    },
+    "c02_certify_1": {
+      "environment_revision": 0,
+      "checked_gates": [
+        "c02_total"
+      ]
+    }
+  },
+  "final_plan": {
+    "milestones": [
+      {
+        "id": "M1",
+        "parent": "G0",
+        "title": "Verify component c01 at grouping level 1"
+      },
+      {
+        "id": "M2",
+        "parent": "G0",
+        "title": "Verify component c02 at grouping level 1"
+      }
+    ],
+    "leaves": {
+      "S1": {
+        "id": "S1",
+        "parent": "M1",
+        "instruction": "Implement c01_base as the integer expression max(0, x - floor) * multiplier + y.",
+        "checks": [
+          "c01_base"
+        ],
+        "depends_on": [],
+        "revision": 0
+      },
+      "S2": {
+        "id": "S2",
+        "parent": "M1",
+        "instruction": "Implement c01_adjusted as the integer expression min(cap, max(0, base + rate * z)).",
+        "checks": [
+          "c01_adjusted"
+        ],
+        "depends_on": [
+          "S1"
+        ],
+        "revision": 0
+      },
+      "S3": {
+        "id": "S3",
+        "parent": "M1",
+        "instruction": "Implement c01_total as the integer expression adjusted + bonus if z >= 0, otherwise adjusted - bonus.",
+        "checks": [
+          "c01_total"
+        ],
+        "depends_on": [
+          "S2"
+        ],
+        "revision": 0
+      },
+      "S4": {
+        "id": "S4",
+        "parent": "M1",
+        "instruction": "Certify c01 by checking that c01_total passes, then record environment_revision 0 and checked_gates [\"c01_total\"] in the certification artifact. Use the current component revision if the environment changes.",
+        "checks": [
+          "c01_certify_1"
+        ],
+        "depends_on": [
+          "S3"
+        ],
+        "revision": 0
+      },
+      "S5": {
+        "id": "S5",
+        "parent": "M2",
+        "instruction": "Implement c02_base as the integer expression `((x - floor) if x > floor else 0) * multiplier + y`. Keep `y` outside the conditional so it is added even when `x` is at or below `floor`.",
+        "checks": [
+          "c02_base"
+        ],
+        "depends_on": [],
+        "revision": 1
+      },
+      "S6": {
+        "id": "S6",
+        "parent": "M2",
+        "instruction": "Implement c02_adjusted as the integer expression min(cap, max(0, base + rate * z)).",
+        "checks": [
+          "c02_adjusted"
+        ],
+        "depends_on": [
+          "S5"
+        ],
+        "revision": 0
+      },
+      "S7": {
+        "id": "S7",
+        "parent": "M2",
+        "instruction": "Implement c02_total as the integer expression adjusted + bonus if z >= 0, otherwise adjusted - bonus.",
+        "checks": [
+          "c02_total"
+        ],
+        "depends_on": [
+          "S6"
+        ],
+        "revision": 0
+      },
+      "S8": {
+        "id": "S8",
+        "parent": "M2",
+        "instruction": "Certify c02 by checking that c02_total passes, then record environment_revision 0 and checked_gates [\"c02_total\"] in the certification artifact. Use the current component revision if the environment changes.",
+        "checks": [
+          "c02_certify_1"
+        ],
+        "depends_on": [
+          "S7"
+        ],
+        "revision": 0
+      }
+    }
+  },
+  "final_artifact_sha256": "f314c68349a82f38d555412d226e72c0e044233e4810361c45f86fc58175cb9d",
+  "final_plan_sha256": "f299a98ce4c53596bc77421b3a72431fd8e48694bbe694ebdd14a1199942fed0",
+  "final_environment_sha256": "28f61d13e0463672b8d4337bed50d11e7f4048c1137cb1483d9fe0edf61757ba",
+  "trace_final_sha256": "c23034b45167bf2dd128d594bca98f0c94913c34023072166883566633177423"
+}
