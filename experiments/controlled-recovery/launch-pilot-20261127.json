@@ -1,0 +1,15 @@
+{
+  "schema_version": "hiergoal.controlled_recovery.launch.v1",
+  "request_id": "pilot-20261127",
+  "repository": "Unjuno/hiergoal-lab",
+  "requested_by": "Unjuno",
+  "user_request": "構築して実験までしてください",
+  "approved": true,
+  "allow_paid_api": true,
+  "source_commit": "ceacd88007e27e1aefa09ae64c3db3cb77757852",
+  "protocol_id": "d36c836de43c41cb0248a95abaa6af810c0eafd896f606207b20ba4b7a3533a1",
+  "limits_sha256": "70642ec8011d4c474f64e26a7e1219625391a8c18582b62fa10800f33293be42",
+  "max_pairs": 12,
+  "max_trials": 24,
+  "max_logical_calls": 288
+}
